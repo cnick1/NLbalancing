@@ -1,4 +1,4 @@
-function [w] = approxFutureEnergyQB(A,N,B,Q,C,eta,d,verbose)
+function [w] = approxFutureEnergyQB(A,N,B,C,eta,d,verbose)
 %  Calculates a polynomial approximation to the future energy function
 %  for a quadratic system.
 %
@@ -50,6 +50,8 @@ function [w] = approxFutureEnergyQB(A,N,B,Q,C,eta,d,verbose)
   m = size(B,2);   % B should be n-by-m
   p = size(C,1);   % C should be p-by-n
 
+  Q = sparse(n,n*m); % Hardcoded zero Q for now
+  Q(1,1) = 1; 
   % Create a vec function for readability
   vec = @(X) X(:);
 
@@ -106,15 +108,20 @@ function [w] = approxFutureEnergyQB(A,N,B,Q,C,eta,d,verbose)
   
   %% k>3 cases (up to d)
   BWk = cell(1,d-1); % Pre-compute B.'*Wi for all the i we need
+  QWk = cell(1,d-1); % Pre-compute Q.'*Wi for all the i we need
+  BWk{2} = B.'*W2; % Newly needed for QB work
+  QWk{2} = Q.'*W2; % Newly needed for QB work
+  Im = speye(m);
   if ( d>3 )
 
     for k=4:d
       BWk{k-1} = B.'*reshape(w{k-1},n,n^(k-2));
+      QWk{k-1} = Q.'*reshape(w{k-1},n,n^(k-2));
 
       b = -LyapProduct(N.',w{k-1},k-1); % Pre-compue all the L(N') terms
       
       % Now add all the terms from the 'B' sum by looping through the i and j
-      for i=3:(k+1)/2
+      for i=3:(k+1)/2 % i+j=k+2
         j   = k+2-i;
         tmp = BWk{i}.'*BWk{j};
         b   = b + 0.25*eta*i*j*(vec(tmp) + vec(tmp.'));
@@ -127,30 +134,33 @@ function [w] = approxFutureEnergyQB(A,N,B,Q,C,eta,d,verbose)
         b   = b + 0.25*eta*i*j*vec(tmp);
       end
       
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      %%
       % Now add the linear Q terms by iterating through the first sum
-      for i=3:(k)/2
+      for i=2:k-1 % i+j=k+1
         j   = k+1-i;
+        
+        tmp = kron(QWk{j},BWk{i}); 
+        
         %
-      end
-
-      if (mod(k+1,2)==0) % k+1 is even
-        i   = (k+1)/2; 
-        j   = i;
-        %
+        b   = b + 0.25*eta*i*j*kron(speye(n^k),vec(Im).')*vec(tmp);
+        % The first part " kron(speye(n^k),vec(Im).') " can probably be made quickly w/ a special function; it is some almost `rectangular diagonal` thing, not a permutation matrix tho; look to how perfect shuffle is created
+        
       end
       
-      
+      %%
       % Now add the quadratic Q terms by iterating through the second sum
-      for i=3:(k-1)/2
+      for i=2:k-2 % i+j=k
         j   = k-i;
+        
+        tmp = kron(speye(n),vec(Im).') ...
+        * kron(vec(QWk{j}).' , kron(QWk{i},Im)) ...
+        * kron(speye(n^(j-1)),kron(perfectShuffle(n^(i-1),n*m),Im))...
+        * kron(speye(n^(k-1)),vec(Im));
         %
+        b   = b + 0.125*eta*i*j*vec(tmp);
       end
 
-      if (mod(k,2)==0) % k is even
-        i   = (k)/2; 
-        j   = i;
-        %
-      end
       
       
       
