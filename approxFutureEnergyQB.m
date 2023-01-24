@@ -52,6 +52,7 @@ function [w] = approxFutureEnergyQB(A,N,B,C,eta,d,verbose)
 
   Q = sparse(n,n*m); % Hardcoded zero Q for now
   Q(1,1) = 1; 
+  
   % Create a vec function for readability
   vec = @(X) X(:);
 
@@ -161,13 +162,7 @@ function [w] = approxFutureEnergyQB(A,N,B,C,eta,d,verbose)
         b   = b + 0.125*eta*i*j*vec(tmp);
       end
 
-      
-      
-      
-      
-      
-      
-
+ 
       [w{k}] = KroneckerSumSolver(Acell(1:k),b,k);
 
       [w{k}] = kronMonomialSymmetrize(w{k},n,k);
