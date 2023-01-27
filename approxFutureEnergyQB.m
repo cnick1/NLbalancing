@@ -1,4 +1,4 @@
-function [w] = approxFutureEnergyQB(A,N,B,C,eta,d,verbose)
+function [w] = approxFutureEnergyQB(A,N,B,Q,C,eta,d,verbose)
 %  Calculates a polynomial approximation to the future energy function
 %  for a quadratic system.
 %
@@ -42,7 +42,7 @@ function [w] = approxFutureEnergyQB(A,N,B,C,eta,d,verbose)
 %  Part of the NLbalancing repository.
 %%
 
-  if (nargin<7)
+  if (nargin<8)
     verbose = false;
   end
 
@@ -50,8 +50,8 @@ function [w] = approxFutureEnergyQB(A,N,B,C,eta,d,verbose)
   m = size(B,2);   % B should be n-by-m
   p = size(C,1);   % C should be p-by-n
 
-  Q = sparse(n,n*m); % Hardcoded zero Q for now
-  Q(1,1) = 1; 
+%   Q = sparse(n,n*m); % Hardcoded zero Q for now
+%   Q(1,1) = 1; 
   
   % Create a vec function for readability
   vec = @(X) X(:);
@@ -94,27 +94,29 @@ function [w] = approxFutureEnergyQB(A,N,B,C,eta,d,verbose)
   w{2} = vec(W2);
 
   %% k=3 case
+  BWk = cell(1,d-1); % Pre-compute B.'*Wi for all the i we need
+  QWk = cell(1,d-1); % Pre-compute Q.'*Wi for all the i we need
+  BWk{2} = B.'*W2; % Newly needed for QB work
+  QWk{2} = Q.'*W2; % Newly needed for QB work
+  Im = speye(m);
+  
   if ( d>2 ) % set up the generalized Lyapunov solver
     W2BB = W2*(B*B.');
     Acell = cell(1,d);
     for i=1:d % Pre-computing the left-hand-sides of (46) in [1]
       Acell{i} = A.'-eta*W2BB; 
     end
-
-    b = -LyapProduct(N.',w{2},2);
+    
+    b = -LyapProduct(N.',w{2},2) ... 
+        + 2*eta*kron(speye(n^3),vec(Im).')*vec(kron(QWk{2},BWk{2})); % New QB term
+    
     [w{3}] = KroneckerSumSolver(Acell(1:3),b,3); % Solve Ax=b for k=3
     
     [w{3}] = kronMonomialSymmetrize(w{3},n,3); % Symmetrize w3
   end
   
   %% k>3 cases (up to d)
-  BWk = cell(1,d-1); % Pre-compute B.'*Wi for all the i we need
-  QWk = cell(1,d-1); % Pre-compute Q.'*Wi for all the i we need
-  BWk{2} = B.'*W2; % Newly needed for QB work
-  QWk{2} = Q.'*W2; % Newly needed for QB work
-  Im = speye(m);
   if ( d>3 )
-
     for k=4:d
       BWk{k-1} = B.'*reshape(w{k-1},n,n^(k-2));
       QWk{k-1} = Q.'*reshape(w{k-1},n,n^(k-2));
@@ -144,7 +146,7 @@ function [w] = approxFutureEnergyQB(A,N,B,C,eta,d,verbose)
         tmp = kron(QWk{j},BWk{i}); 
         
         %
-        b   = b + 0.25*eta*i*j*kron(speye(n^k),vec(Im).')*vec(tmp);
+        b   = b + 0.5*eta*i*j*kron(speye(n^k),vec(Im).')*vec(tmp);
         % The first part " kron(speye(n^k),vec(Im).') " can probably be made quickly w/ a special function; it is some almost `rectangular diagonal` thing, not a permutation matrix tho; look to how perfect shuffle is created
         
       end
@@ -159,7 +161,7 @@ function [w] = approxFutureEnergyQB(A,N,B,C,eta,d,verbose)
         * kron(speye(n^(j-1)),kron(perfectShuffle(n^(i-1),n*m),Im))...
         * kron(speye(n^(k-1)),vec(Im));
         %
-        b   = b + 0.125*eta*i*j*vec(tmp);
+        b   = b + 0.25*eta*i*j*vec(tmp);
       end
 
  

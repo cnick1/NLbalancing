@@ -1,8 +1,8 @@
-function [v] = approxPastEnergyQB(A,N,B,C,eta,d,verbose)
+function [v] = approxPastEnergyQB(A,N,B,Q,C,eta,d,verbose)
 %  Calculates a polynomial approximation to the past energy function
-%  for a quadratic system.
+%  for a quadratic bilinear system.
 %
-%  v = approxPastEnergy(A,N,B,C,eta,d) 
+%  v = approxPastEnergy(A,N,B,Q,C,eta,d) 
 %
 %  Computes a degree d polynomial approximation to the past energy function 
 %
@@ -42,7 +42,7 @@ function [v] = approxPastEnergyQB(A,N,B,C,eta,d,verbose)
 %  Part of the NLbalancing repository.
 %%
 
-  if (nargin<7)
+  if (nargin<8)
     verbose = false;
   end
 
@@ -50,8 +50,8 @@ function [v] = approxPastEnergyQB(A,N,B,C,eta,d,verbose)
   m = size(B,2);   % B should be n-by-m
   p = size(C,1);   % C should be p-by-n
   
-  Q = sparse(n,n*m); % Hardcoded zero Q for now
-  Q(1,1) = 1; 
+%   Q = sparse(n,n*m); % Hardcoded zero Q for now
+%   Q(1,1) = 1; 
 
   % Create a vec function for readability
   vec = @(X) X(:);
@@ -114,6 +114,11 @@ function [v] = approxPastEnergyQB(A,N,B,C,eta,d,verbose)
   v{2} = vec(V2);
 
   %% k=3 case
+  BVk = cell(1,d-1);% Pre-compute B.'*Vi for all the i we need
+  QVk = cell(1,d-1); % Pre-compute Q.'*Vi for all the i we need
+  BVk{2} = B.'*V2; % Newly needed for QB work
+  QVk{2} = Q.'*V2; % Newly needed for QB work
+  Im = speye(m);
   if ( d>2 )
     % set up the generalized Lyapunov solver
     V2BB = V2*(B*B.');
@@ -121,20 +126,17 @@ function [v] = approxPastEnergyQB(A,N,B,C,eta,d,verbose)
     for i=1:d
       Acell{i} = A.'+V2BB;
     end
-  
-    b = -LyapProduct(N.',v2,2);
+    
+    b = -LyapProduct(N.',v{2},2) ... 
+        - 2*kron(speye(n^3),vec(Im).')*vec(kron(QVk{2},BVk{2})); % New QB term
+    
     [v{3}] = KroneckerSumSolver(Acell(1:3),b,3);
 
     [v{3}] = kronMonomialSymmetrize(v{3},n,3);
   end
   
   %% k>3 case (up to d)
-  BVk = cell(1,d-1);% Pre-compute B.'*Vi for all the i we need
-  QVk = cell(1,d-1); % Pre-compute Q.'*Vi for all the i we need
-  BVk{2} = B.'*V2; % Newly needed for QB work
-  QVk{2} = Q.'*V2; % Newly needed for QB work
   if ( d>3 )
-
     for k=4:d
       BVk{k-1} = B.'*reshape(v{k-1},n,n^(k-2));
       QVk{k-1} = Q.'*reshape(v{k-1},n,n^(k-2));
@@ -163,7 +165,7 @@ function [v] = approxPastEnergyQB(A,N,B,C,eta,d,verbose)
         tmp = kron(QVk{j},BVk{i}); 
         
         %
-        b   = b - 0.25*i*j*kron(speye(n^k),vec(Im).')*vec(tmp);
+        b   = b - 0.5*i*j*kron(speye(n^k),vec(Im).')*vec(tmp);
         % The first part " kron(speye(n^k),vec(Im).') " can probably be made quickly w/ a special function; it is some almost `rectangular diagonal` thing, not a permutation matrix tho; look to how perfect shuffle is created
         
       end
@@ -178,7 +180,7 @@ function [v] = approxPastEnergyQB(A,N,B,C,eta,d,verbose)
         * kron(speye(n^(j-1)),kron(perfectShuffle(n^(i-1),n*m),Im))...
         * kron(speye(n^(k-1)),vec(Im));
         %
-        b   = b - 0.125*i*j*vec(tmp);
+        b   = b - 0.25*i*j*vec(tmp);
       end
 
       
