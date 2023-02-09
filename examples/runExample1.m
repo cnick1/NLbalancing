@@ -21,7 +21,7 @@ function [v,w] = runExample1()
   [w] = approxFutureEnergy(A,N,B,C,eta,8);
   w2 = w{2}; w3 = w{3}; w4 = w{4}; w5 = w{5}; w6 = w{6}; w7 = w{7}; w8 = w{8};
 
-  x = linspace(-6,6,121);
+  x = linspace(-6,6,250);
     
   Ef2 =       0.5*w2*x.^2;
   Ef3 = Ef2 + 0.5*w3*x.^3;
@@ -55,6 +55,8 @@ function [v,w] = runExample1()
          'FontSize', 20,...
          'fontweight','bold')
 
+     ylim([-5,70])
+     
   %  Save data to generate tikz plots for the paper
   fid = fopen('plots/ex1_future_a.txt','w');
   fprintf(fid,'%g %g\n',[x;EPlusAnalytic]);

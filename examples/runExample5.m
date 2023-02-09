@@ -6,7 +6,7 @@ function [v,w] = runExample5
 %%
 hold off
   [A,B,C,N,Q] = getSystem5();
-  Q = 0.2;
+  Q = 0.5;
   eta = 0.5;    % values should be between -\infty and 1.
                 % eta=0.5 corresponds to gamma= sqrt(2)
                 % since eta = 1 - 1/gamma^2;
