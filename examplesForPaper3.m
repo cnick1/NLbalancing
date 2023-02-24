@@ -16,3 +16,6 @@ addpath('utils')
  figure
  copyobj(allchild(2),4);
 [v,w] = runExample2(6,true,false,6);
+
+%%  runExample8 produces the plots for Fig. 2.  
+% [v,w] = runExample8(6,true,false,6);

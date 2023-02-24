@@ -4,3 +4,6 @@
 *.asv
 obsolete
 development
+chatGPT_FEM.m
+ode45Test.m
+testingKronAssembleGlobal.m
