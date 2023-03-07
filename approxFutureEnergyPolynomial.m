@@ -1,8 +1,8 @@
-function [w] = approxFutureEnergyQB(A,N,B,Q,C,eta,d,verbose)
+function [w] = approxFutureEnergyPolynomial(f,g,C,eta,d,verbose)
 %  Calculates a polynomial approximation to the future energy function
 %  for a quadratic system.
 %
-%  w = approxFutureEnergyQB(A,N,B,Q,C,eta,d)
+%  w = approxFutureEnergyPolynomial(f,g,C,eta,d)
 %
 %  Computes a degree d polynomial approximation to the future energy function
 %
@@ -28,7 +28,8 @@ function [w] = approxFutureEnergyQB(A,N,B,Q,C,eta,d,verbose)
 %      kronMonomialSymmetrize
 %      LyapProduct
 %
-%  Author: Jeff Borggaard, Virginia Tech
+%  Author: Nick Corbin, UCSD
+%          Built on code by Jeff Borggaard, Virginia Tech
 %
 %  License: MIT
 %
@@ -46,16 +47,19 @@ if (nargin<8)
     verbose = false;
 end
 
+% Create pointer/shortcuts for dynamical system polynomial coefficients
+A = f{1}; H2 = f{2};
+B = g{1};
+
+l = length(g) - 1;
+
 n = size(A,1);   % A should be n-by-n
 m = size(B,2);   % B should be n-by-m
 p = size(C,1);   % C should be p-by-n
 
-%   Q = sparse(n,n*m); % Hardcoded zero Q for now
-%   Q(1,1) = 1;
 
 % Create a vec function for readability
 vec = @(X) X(:);
-
 
 %% k=2 case
 R = eye(m)/eta;
@@ -94,75 +98,61 @@ end
 w{2} = vec(W2);
 
 %% k=3 case
-if ( d>2 ) % set up the generalized Lyapunov solver
-    BWk = cell(1,d-1); % Pre-compute B.'*Wi for all the i we need
-    QWk = cell(1,d-1); % Pre-compute Q.'*Wi for all the i we need
-    BWk{2} = B.'*W2; % Newly needed for QB work
-    QWk{2} = Q.'*W2; % Newly needed for QB work
+if ( d>2 )   
+    NaWb = cell(l+1,d-1); % Pre-compute N_a.'*V_b, etc for all the a,b we need
+    NaWb{1,2} = B.'*W2;
+    NaWb{2,2} = g{2}.'*W2; % Newly needed for QB work
     Im = speye(m);
     % set up the generalized Lyapunov solver
     Acell = cell(1,d);
     Acell{1} = A.'-eta*W2*(B*B.');
     [Acell{:}] = deal(Acell{1});
     
-    b = -LyapProduct(N.',w{2},2) ...
-        + 2*eta*kron(speye(n^3),vec(Im).')*vec(kron(QWk{2},BWk{2})); % New QB term
+    b = -LyapProduct(H2.',w{2},2) ...
+        + 2*eta*kron(speye(n^3),vec(Im).')*vec(kron(NaWb{2,2},NaWb{1,2})); % New QB term
     
     [w{3}] = KroneckerSumSolver(Acell(1:3),b,3); % Solve Ax=b for k=3
-    
     [w{3}] = kronMonomialSymmetrize(w{3},n,3); % Symmetrize w3
     
     %% k>3 cases (up to d)
     for k=4:d
-        BWk{k-1} = B.'*reshape(w{k-1},n,n^(k-2));
-        QWk{k-1} = Q.'*reshape(w{k-1},n,n^(k-2));
+        NaWb{1,k-1} = B.'*reshape(w{k-1},n,n^(k-2));
         
-        b = -LyapProduct(N.',w{k-1},k-1); % Pre-compue all the L(N') terms
+        b = -LyapProduct(H2.',w{k-1},k-1); % Pre-compue all the L(N') terms
         
         % Now add all the terms from the 'B' sum by looping through the i and j
         for i=3:(k+1)/2 % i+j=k+2
             j   = k+2-i;
-            tmp = BWk{i}.'*BWk{j};
+            tmp = NaWb{1,i}.'*NaWb{1,j};
             b   = b + 0.25*eta*i*j*(vec(tmp) + vec(tmp.'));
         end
         
-        if (mod(k,2)==0) % k+2 is even
+        if (mod(k,2)==0) % k is even
             i   = (k+2)/2;
             j   = i;
-            tmp = BWk{i}.'*BWk{j};
+            tmp = NaWb{1,i}.'*NaWb{1,j};
             b   = b + 0.25*eta*i*j*vec(tmp);
         end
         
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        %%
-        % Now add the linear Q terms by iterating through the first sum
-        for i=2:k-1 % i+j=k+1
-            j   = k+1-i;
-            
-            tmp = kron(QWk{j},BWk{i});
-            
-            %
-            b   = b + 0.5*eta*i*j*kron(speye(n^k),vec(Im).')*vec(tmp);
-            % The first part " kron(speye(n^k),vec(Im).') " can probably be made quickly w/ a special function; it is some almost `rectangular diagonal` thing, not a permutation matrix tho; look to how perfect shuffle is created
-            
-        end
-        
-        %%
-        % Now add the quadratic Q terms by iterating through the second sum
-        for i=2:k-2 % i+j=k
-            j   = k-i;
-            
-            tmp = kron(speye(n),vec(Im).') ...
-                * kron(vec(QWk{j}).' , kron(QWk{i},Im)) ...
-                * kron(speye(n^(j-1)),kron(perfectShuffle(n^(i-1),n*m),Im))...
-                * kron(speye(n^(k-1)),vec(Im));
-            %
-            b   = b + 0.25*eta*i*j*vec(tmp);
+        % Now add the higher order polynomial terms by iterating through the sum
+        g{2*l+1} = 0; % Need an extra space in g because of NaVb indexing
+        for o=1:2*l
+            NaWb{o+1,k-1} = g{o+1}.'*reshape(w{k-1},n,n^(k-2)); 
+            for p=max(0,o-l):min(o,l)
+                for i=2:k-o
+                    q = o-p;
+                    j   = k-o-i+2;
+                    tmp = kron(speye(n^p),vec(Im).') ...
+                        * kron(vec(NaWb{q+1,j}).' , kron(NaWb{p+1,i},Im)) ...
+                        * kron(speye(n^(j-1)),kron(perfectShuffle(n^(i-1),n^q*m),Im))...
+                        * kron(speye(n^(k-p)),vec(Im));
+                    b   = b + 0.25*eta*i*j*vec(tmp);
+                end
+            end
         end
         
         
         [w{k}] = KroneckerSumSolver(Acell(1:k),b,k);
-        
         [w{k}] = kronMonomialSymmetrize(w{k},n,k);
     end
 end

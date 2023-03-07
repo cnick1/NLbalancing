@@ -51,10 +51,13 @@ function [v,w] = runExample7(degree,plotEnergy,plotBalancing,balancingDegree)
     dataRange = 1; %0.75;
   end
   
-  [A,B,C,N,Q] = getSystem7();
- 
+  [f{1},g{1},C,f{2},g{2}] = getSystem7();
+
   %  Compute the polynomial approximations to the future energy function
-  [w] = approxFutureEnergyQB(A,N,B,Q,C,eta,degree,true);
+  [w1] = approxFutureEnergyQB(f{1},f{2},g{1},g{2},C,eta,degree,true);
+  [w2] = approxFutureEnergyPolynomial(f,g,C,eta,degree,true);
+  w1-w2
+  
   futureEnergy{degree} = [];
   for k=2:degree
     futureEnergy{k} = w{k}.'/2;
@@ -88,7 +91,7 @@ function [v,w] = runExample7(degree,plotEnergy,plotBalancing,balancingDegree)
     title('Future Energy Function')
   end
 
-  [v] = approxPastEnergyQB(A,N,B,Q,C,eta,degree,true);
+  [v] = approxPastEnergyPolynomial(f,g,C,eta,degree,true);
   pastEnergy{degree} = [];
   for k=2:degree
     pastEnergy{k} = v{k}.'/2;
