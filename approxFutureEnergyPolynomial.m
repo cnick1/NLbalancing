@@ -1,8 +1,12 @@
-function [w] = approxFutureEnergyPolynomial(f, g, C, eta, d, verbose)
+function [w] = approxFutureEnergyPolynomial(A, N, g, C, eta, d, verbose)
     %  Calculates a polynomial approximation to the future energy function
-    %  for a quadratic drift, polynomial input system.
+    %  for a quadratic drift, polynomial input system. The default usage is
     %
-    %  w = approxFutureEnergyPolynomial(f,g,C,eta,d)
+    %  w = approxFutureEnergyPolynomial(A,N,g,C,eta,d,verbose)
+    %
+    %  where 'verbose' is an optional argument. If the system has a constant
+    %  input vector field Bu, the matrix B may be passes in place of the cell
+    %  array g.
     %
     %  Computes a degree d polynomial approximation to the future energy function
     %
@@ -43,15 +47,22 @@ function [w] = approxFutureEnergyPolynomial(f, g, C, eta, d, verbose)
     %  Part of the NLbalancing repository.
     %%
 
-    if (nargin < 6)
+    if (nargin < 7)
         verbose = false;
     end
 
     % Create pointer/shortcuts for dynamical system polynomial coefficients
     A = f{1}; N = f{2};
-    B = g{1};
 
-    l = length(g) - 1;
+    if ismatrix(g)
+        % Will reduce to Jeff's original code
+        B = g;
+        l = 1;
+    else
+        % QB or polynomial input balancing
+        B = g{1};
+        l = length(g) - 1;
+    end
 
     n = size(A, 1); % A should be n-by-n
     m = size(B, 2); % B should be n-by-m
@@ -99,7 +110,7 @@ function [w] = approxFutureEnergyPolynomial(f, g, C, eta, d, verbose)
 
     %% k=3 case
     if (d > 2)
-        NaWb = cell(l + 1, d - 1); % Pre-compute N_a.'*W_b, etc for all the a,b we need
+        NaWb = cell(2 * l + 1, d - 1); % Pre-compute N_a.'*W_b, etc for all the a,b we need
         NaWb{1, 2} = g{1}.' * W2; % Recall g{1} = B
         NaWb{2, 2} = g{2}.' * W2; % Newly needed for QB work
         Im = speye(m);
@@ -133,7 +144,7 @@ function [w] = approxFutureEnergyPolynomial(f, g, C, eta, d, verbose)
             end
 
             % Now add the higher order polynomial terms by iterating through the sums
-            g{2 * l + 1} = 0; % Need an extra space in g because of NaVb indexing
+            [g{l + 1:2 * l + 1}] = deal(0); % Need an extra space in g because of NaVb indexing
 
             for o = 1:2 * l
                 NaWb{o + 1, k - 1} = g{o + 1}.' * reshape(w{k - 1}, n, n ^ (k - 2));
