@@ -81,6 +81,12 @@ function [v,w] = runExample1()
 
   %  Compute the polynomial approximations to the past energy function
   [v] = approxPastEnergy(A,N,B,C,eta,8);
+  [vb] = approxPastEnergyPolynomial(A,N,B,C,eta,8);
+  
+  for i=1:length(v)
+      v{i}-vb{i}
+  end
+  
   v2 = v{2}; v3 = v{3}; v4 = v{4}; v5 = v{5}; v6 = v{6}; v7 = v{7}; v8 = v{8};
 
   x = linspace(-6,6,121);

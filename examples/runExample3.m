@@ -42,7 +42,7 @@ for n=[8,16,32,64]
   [A,B,C,N,zInit] = getSystem3(n,m,p,epsilon,alpha);
   zInit = z_factor*zInit;
 
-  tic; for i=1:nTest, [w] = approxFutureEnergy(full(A),N,B,C,eta,degree); end, tt=toc/nTest;
+  tic; for i=1:nTest, [w] = approxFutureEnergyPolynomial(full(A),N,B,C,eta,degree); end, tt=toc/nTest;
   fprintf('%10.4e & ',length(w{degree}))
   fprintf('%8.2e & ',tt)
 
