@@ -7,3 +7,8 @@ development
 chatGPT_FEM.m
 ode45Test.m
 testingKronAssembleGlobal.m
+approxPastEnergyQB.m 
+approxFutureEnergyQB.m 
+memUsed.m 
+testingIndexing.m 
+testingMemoryAllocation.m 
