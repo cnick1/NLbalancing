@@ -1,8 +1,10 @@
-function [A, B, C, N, Q, f, g] = getSystem8(numElements, varargin)
+function [A, B, C, N, Q, f, g, h] = getSystem8(numElements, varargin)
 %getSystem8  Generates a cubic system for testing energy functions.
 %            The system is a finite element model for a nonlinear (due to
 %            von Karman strains) Euler-Bernoulli Beam.
 %
+%   Usage:  [A,B,C,N,Q] = getSystem8()
+%        or [~,~,~,~,~,f,g,h] = getSystem8()
 %%
 
 % TODO: Code up true angle dependent bilinear inputs Q
@@ -258,17 +260,19 @@ In3(:,idxs) = speye(2*n^p);
 N3 = [sparse(n, n^3), sparse(n,n^3);
      -Minv * K3G, sparse(n,n^3)]*In3
  
- 
- 
-N = full(N2); Q = 0;
+% Construct Q
+Q = 0;
 
+
+%% Format outputs
 f = {A,N2,N3}; 
 g = {B,Q};
+h = {C};
 
 A = full(A);
 B = full(B);
 C = full(C);
-
+N = full(N2);
 
 
 end

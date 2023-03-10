@@ -1,12 +1,16 @@
-function [A, B, C, N, Q] = getSystem7()
+function [A, B, C, N, Q, g, f, h] = getSystem7()
 %getSystem7  Generates a quadratic-bilinear system for testing energy functions.
 %            System based on systems taken from [1,2].
+%
+%   Usage:  [A,B,C,N,Q] = getSystem7()
+%        or [~,~,~,~,~,f,g,h] = getSystem7()
 %
 %        \dot(x1) = -x1 + x2 - x2^2 + (1 + 2 x2) u1
 %        \dot(x2) =     - x2        + u1
 %              y1 =  x1
 %
-%   Excluding the bilinear term gives the same system as getSystem2().
+%   Excluding the bilinear term gives the same system as getSystem2(). The
+%   cell arrays f, g, and h can also be used as outputs. 
 %
 %       References: [1] B. Kramer, S. Gugercin, J. Borggaard, and L. Balicki,
 %                       “Nonlinear balanced truncation: part 1-computing energy
@@ -26,5 +30,9 @@ B = [1;
 C = [1 1];
 Q = [0 2;
      0 0];
+ 
+f = {A,N}; 
+g = {B,Q}; 
+h = {C}
 
 end
