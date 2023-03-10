@@ -1,5 +1,5 @@
-function [A,B,C,N,Q] = getSystem6()
-%getSystem6  Generates a unicycle quadratic bilinear system for testing energy functions.
+function [A, B, C, N, Q] = getSystem6()
+%getSystem6  Generates a unicycle quadratic-bilinear system for testing energy functions.
 %
 %   Usage:  [A,B,C,N,Q] = getSystem6()
 %
@@ -16,10 +16,10 @@ function [A,B,C,N,Q] = getSystem6()
 %   Part of the NLbalancing repository.
 %%
 
-    A = [0 0 0; 0 -1 0; 0 0 0];
-    B =  [1 0; 0 0; 0 1];
-    C =  speye(3);
-    N =  sparse(3,3);
-    Q = [0 0 0 0 0 0; 0 0 0 0 1 0; 0 0 0 0 0 0];
+A = [0 0 0; 0 -1 0; 0 0 0];
+B = [1 0; 0 0; 0 1];
+C = speye(3);
+N = sparse(3, 3);
+Q = [0 0 0 0 0 0; 0 0 0 0 1 0; 0 0 0 0 0 0];
 
 end
