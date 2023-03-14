@@ -5,8 +5,8 @@ addpath('examples')
 addpath('utils')
 
 %%  runExample5
+% TODO: Fix Example 5
 % runExample5
-
 
 %%  runExample7 produces the plots for Fig. 2.  
 % %  For Table 1, please use energyFunctionValidation in the tests directory.
@@ -16,8 +16,6 @@ addpath('utils')
 %  figure
 %  copyobj(allchild(2),4);
 % [v,w] = runExample2(6,true,false,6);
-
-vTest = load('testV.mat'); vTest = vTest.v;
 
 %%  runExample8 produces the plots for Fig. 2.  
 % [v,w] = runExample8(6,true,false,6);

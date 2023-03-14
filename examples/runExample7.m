@@ -37,11 +37,11 @@ function [v,w] = runExample7(degree,plotEnergy,plotBalancing,balancingDegree)
 
 
   if (nargin<1)
-    degree = 4;
+    degree = 6;
     plotEnergy = true;
 
     plotBalancing = false;
-    balancingDegree = 3;
+    balancingDegree = 6;
   end
 
 
@@ -51,7 +51,7 @@ function [v,w] = runExample7(degree,plotEnergy,plotBalancing,balancingDegree)
     dataRange = 1; %0.75;
   end
   
-  [f{1},g{1},C,f{2},g{2}] = getSystem7();
+  [A,B,C,N,Q,g,f,h] = getSystem7();
 
   %  Compute the polynomial approximations to the future energy function
 %   [w] = approxFutureEnergyQB(f{1},f{2},g{1},g{2},C,eta,degree,true);

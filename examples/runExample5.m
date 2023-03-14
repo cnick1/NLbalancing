@@ -1,11 +1,12 @@
 function [v,w] = runExample5
 %runExample5 Runs the example 
-%   Usage:  [] = runExaple5()
+%   Usage:  [] = runExample5()
 %   
 %   Part of the NLbalancing repository.
 %%
 hold off
-  [A,B,C,N,Q] = getSystem5();
+%   [A,B,C,N,Q] = getSystem5();
+  [A,B,C,N,Q,f,g,h] = getSystem5();
   Q = 0.5;
   eta = 0.5;    % values should be between -\infty and 1.
                 % eta=0.5 corresponds to gamma= sqrt(2)
@@ -13,7 +14,7 @@ hold off
 
   %  Compute the polynomial approximations to the future energy function
   d=8;
-  [w] = approxFutureEnergyQB(A,N,B,Q,C,eta,d);
+  [w] = approxFutureEnergy(A,N,g,C,eta,d);
   w2 = w{2}; w3 = w{3}; w4 = w{4}; w5 = w{5}; w6 = w{6}; w7 = w{7}; w8 = w{8};
   
   x = linspace(-6,6,250);
@@ -74,7 +75,8 @@ hold off
 %   fid = fopen('plots/ex1_future_8.txt','w');
 %   fprintf(fid,'%g %g\n',[x;Ef8]);
 %   fclose(fid);
-ylim([0,70])
+xlim([-2,2])
+ylim([0,3])
 
 %   %  Compute the polynomial approximations to the past energy function
 %   [v] = approxPastEnergyQB(A,N,B,Q,C,eta,8);
