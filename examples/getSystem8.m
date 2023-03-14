@@ -7,7 +7,8 @@ function [A, B, C, N, Q, f, g, h] = getSystem8(numElements, actuatorConfiguratio
 %        or [~,~,~,~,~,f,g,h] = getSystem8()
 %%
 
-% TODO: Code up true angle dependent bilinear inputs Q
+% TODO: Add standard LU if using rotary inertia!!!!
+
 
 vec = @(X) X(:);
 
@@ -16,7 +17,7 @@ if nargin < 1
 end
 
 if nargin < 2
-  actuatorConfiguration = 1;
+  actuatorConfiguration = 2;
 end
 
 if nargin < 3
@@ -236,12 +237,12 @@ switch actuatorConfiguration
         RB1(TotalDOFs-1, 2*(TotalDOFs-1))   = -1; % Force in y direction from cable 2 xn-1 u2
         
         % Order-2 terms
-        RB2(TotalDOFs-2, 2*(TotalDOFs-1)^2-1)             =  1/(2*L^2);         % Force in x direction from cable 1
-        RB2(TotalDOFs-2, 2*(TotalDOFs-1)^2)               =  1/(2*L^2);         % Force in x direction from cable 2
-        RB2(TotalDOFs-1, 2*(TotalDOFs-1)*(TotalDOFs-2)-1) =  1/L^2;             % Force in y direction from cable 1 
-        RB2(TotalDOFs-1, 2*(TotalDOFs-1)*(TotalDOFs-2))   =  1/L^2;             % Force in y direction from cable 2 
-        RB2(TotalDOFs  , 2*(TotalDOFs-1)^2-1)             = -delta/(2*L^2);     % Moment in z direction from cable 1 
-        RB2(TotalDOFs  , 2*(TotalDOFs-1)^2)               =  delta/(2*L^2);     % Moment in z direction from cable 2 
+        RB2(TotalDOFs-2, 2*(TotalDOFs-1)^2-1)             =  1/(2*BeamLength^2);         % Force in x direction from cable 1
+        RB2(TotalDOFs-2, 2*(TotalDOFs-1)^2)               =  1/(2*BeamLength^2);         % Force in x direction from cable 2
+        RB2(TotalDOFs-1, 2*(TotalDOFs-1)*(TotalDOFs-2)-1) =  1/BeamLength^2;             % Force in y direction from cable 1 
+        RB2(TotalDOFs-1, 2*(TotalDOFs-1)*(TotalDOFs-2))   =  1/BeamLength^2;             % Force in y direction from cable 2 
+        RB2(TotalDOFs  , 2*(TotalDOFs-1)^2-1)             = -delta/(2*BeamLength^2);     % Moment in z direction from cable 1 
+        RB2(TotalDOFs  , 2*(TotalDOFs-1)^2)               =  delta/(2*BeamLength^2);     % Moment in z direction from cable 2 
         
         % x1x1u1 x1x1u2 x1x2u1 x1x2u2 x1x3u1 x1x3u2 ..... xnx1u1 xnx1u2 ... xnxnu1 xnxnu2
         % Need (xn-1)(xn-1) u1 = -1
@@ -252,14 +253,14 @@ switch actuatorConfiguration
         %                               (or (xn-2)(xn-1) u1 = -1
         
         % Order-3 terms TODO !!! NOT CORRECT
-        RB3(TotalDOFs-2, 2*(TotalDOFs-2)*(TotalDOFs-1)^2-1) = -1/L^3;         % Force in x direction from cable 1
-        RB3(TotalDOFs-2, 2*(TotalDOFs-2)*(TotalDOFs-1)^2)   = -1/L^3;         % Force in x direction from cable 2
-        RB3(TotalDOFs-1, 2*(TotalDOFs-1)*(TotalDOFs-2)^2-1) = -1/L^3;         % Force in y direction from cable 1 part1
-        RB3(TotalDOFs-1, 2*(TotalDOFs-1)*(TotalDOFs-2)^2)   = -1/L^3;         % Force in y direction from cable 2 part1
-        RB3(TotalDOFs-1, 2*(TotalDOFs-1)^3-1)               =  1/(2*L^3);     % Force in y direction from cable 1 part2
-        RB3(TotalDOFs-1, 2*(TotalDOFs-1)^3)                 =  1/(2*L^3);     % Force in y direction from cable 2 part2
-        RB3(TotalDOFs  , 2*(TotalDOFs-2)*(TotalDOFs-1)^2-1) =  delta/L^3;     % Moment in z direction from cable 1 
-        RB3(TotalDOFs  , 2*(TotalDOFs-2)*(TotalDOFs-1)^2)   = -delta/L^3;     % Moment in z direction from cable 2 
+        RB3(TotalDOFs-2, 2*(TotalDOFs-2)*(TotalDOFs-1)^2-1) = -1/BeamLength^3;         % Force in x direction from cable 1
+        RB3(TotalDOFs-2, 2*(TotalDOFs-2)*(TotalDOFs-1)^2)   = -1/BeamLength^3;         % Force in x direction from cable 2
+        RB3(TotalDOFs-1, 2*(TotalDOFs-1)*(TotalDOFs-2)^2-1) = -1/BeamLength^3;         % Force in y direction from cable 1 part1
+        RB3(TotalDOFs-1, 2*(TotalDOFs-1)*(TotalDOFs-2)^2)   = -1/BeamLength^3;         % Force in y direction from cable 2 part1
+        RB3(TotalDOFs-1, 2*(TotalDOFs-1)^3-1)               =  1/(2*BeamLength^3);     % Force in y direction from cable 1 part2
+        RB3(TotalDOFs-1, 2*(TotalDOFs-1)^3)                 =  1/(2*BeamLength^3);     % Force in y direction from cable 2 part2
+        RB3(TotalDOFs  , 2*(TotalDOFs-2)*(TotalDOFs-1)^2-1) =  delta/BeamLength^3;     % Moment in z direction from cable 1 
+        RB3(TotalDOFs  , 2*(TotalDOFs-2)*(TotalDOFs-1)^2)   = -delta/BeamLength^3;     % Moment in z direction from cable 2 
 end
 %% Impose boundary conditions
 fixedDOFs = [1, 2, 3];
