@@ -303,16 +303,13 @@ D1G = 0.00001 * M1G + 0.00001 * K1G;
 %% Convert to state-space representation
 n = length(M1G);
 
-Minv = inv(M1G); % Yikes!
-
-McholL = chol(M1G).';
-Minv * K1G-McholL.'\(McholL\K1G) 
+McholL = chol(M1G).'; % Use cholesky factor for inverting rather than inv()
 
 N1 = [sparse(n, n), speye(n);
-     -Minv * K1G, -Minv * D1G];
+     -McholL.'\(McholL\K1G), -McholL.'\(McholL\D1G)];
 
 G0 = [sparse(n, 2);
-     Minv * RB0];
+     McholL.'\(McholL\RB0)];
 
 C = sparse(1, 2 * n); C(1, n - 1) = 1;
 
@@ -323,7 +320,7 @@ In2 = sparse(2*n^p, (2*n)^p);
 In2(:,idxs) = speye(2*n^p);
 
 N2 = [sparse(n, n^2), sparse(n, n^2);
-     -Minv * K2G, sparse(n,n^2)]*In2;
+     -McholL.'\(McholL\K2G), sparse(n,n^2)]*In2;
 
 % Construct N_3
 p=3;
@@ -332,18 +329,18 @@ In3 = sparse(2*n^p, (2*n)^p);
 In3(:,idxs) = speye(2*n^p);
 
 N3 = [sparse(n, n^3), sparse(n,n^3);
-     -Minv * K3G, sparse(n,n^3)]*In3;
+     -McholL.'\(McholL\K3G), sparse(n,n^3)]*In3;
  
 % Construct Q
 Im = speye(2);
 G1 = [sparse(n,2*n), sparse(n,2*n);
-     Minv * RB1, sparse(n,2*n)];
+     McholL.'\(McholL\RB1), sparse(n,2*n)];
  
 G2 = [sparse(n,2*n^2), sparse(n,2*n^2);
-     Minv * RB2, sparse(n,2*n^2)]*kron(In2,Im);
+     McholL.'\(McholL\RB2), sparse(n,2*n^2)]*kron(In2,Im);
  
 G3 = [sparse(n,2*n^3), sparse(n,2*n^3);
-     Minv * RB3, sparse(n,2*n^3)]*kron(In3,Im);
+     McholL.'\(McholL\RB3), sparse(n,2*n^3)]*kron(In3,Im);
  
 
 
