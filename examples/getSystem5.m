@@ -1,7 +1,7 @@
-function [A, B, C, N, Q, f, g, h] = getSystem5()
+function [A, B, C, N, G, f, g, h] = getSystem5()
 %getSystem5  Generates a simple quadratic-bilinear system for testing energy functions.
 %
-%   Usage:  [A,B,C,N,Q] = getSystem5()
+%   Usage:  [A,B,C,N,G] = getSystem5()
 %        or [~,~,~,~,~,f,g,h] = getSystem5()
 %
 %   The "matrices" correspond to the quadratic-bilinear input-output system
@@ -25,10 +25,10 @@ A = -2;
 B = 2;
 C = 2;
 N = 1;
-Q = 2;
+G = 2;
 
 f = {A,N}; 
-g = {B,Q}; 
+g = {B,G}; 
 h = {C};
 
 end

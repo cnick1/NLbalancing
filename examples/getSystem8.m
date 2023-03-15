@@ -1,9 +1,9 @@
-function [A, B, C, N, Q, f, g, h] = getSystem8(numElements, actuatorConfiguration, rotaryInertiaBool, varargin)
+function [A, B, C, N, G, f, g, h] = getSystem8(numElements, actuatorConfiguration, rotaryInertiaBool, varargin)
 %getSystem8  Generates a cubic system for testing energy functions.
 %            The system is a finite element model for a nonlinear (due to
 %            von Karman strains) Euler-Bernoulli Beam.
 %
-%   Usage:  [A,B,C,N,Q] = getSystem8()
+%   Usage:  [A,B,C,N,G] = getSystem8()
 %        or [~,~,~,~,~,f,g,h] = getSystem8()
 %%
 
@@ -44,7 +44,7 @@ TotalDOFs = numNodes * DOFsPerNode;
 %% Assemble linear global matrices (mass and stiffness)
 % Define mass matrix for one element
 M1E = density * CrossSecArea * elementLength / 420 * ...
-[140, 0, 0, 70, 0, 0;
+  [140, 0, 0, 70, 0, 0;
  0, 156, 22 * elementLength, 0, 54, -13 * elementLength;
  0, 22 * elementLength, 4 * elementLength ^ 2, 0, 13 * elementLength, -3 * elementLength ^ 2;
  70, 0, 0, 140, 0, 0;
@@ -326,7 +326,7 @@ In3(:, idxs) = speye(2 * n ^ p);
 N3 = [sparse(n, n ^ 3), sparse(n, n ^ 3);
       -McholL.' \ (McholL \ K3G), sparse(n, n ^ 3)] * In3;
 
-% Construct Q
+% Construct G
 Im = speye(2);
 G1 = [sparse(n, 2 * n), sparse(n, 2 * n);
       McholL.' \ (McholL \ RB1), sparse(n, 2 * n)];
@@ -338,14 +338,14 @@ G3 = [sparse(n, 2 * n ^ 3), sparse(n, 2 * n ^ 3);
       McholL.' \ (McholL \ RB3), sparse(n, 2 * n ^ 3)] * kron(In3, Im);
 
 %% Format outputs
-f = {N1, N2, N3};
-g = {G0, G1, G2, G3};
-h = {C};
+f = {full(N1), N2, N3};
+g = {full(G0), G1, G2, G3};
+h = {full(C)};
 
 A = full(N1);
 B = full(G0);
 C = full(C);
 N = full(N2);
-Q = G1;
+G = G1;
 
 end

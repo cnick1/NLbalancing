@@ -1,7 +1,7 @@
 function [A,B,C,N] = getSystem1()
 %getSystem1  Generates a simple quadratic system for testing energy functions.
 %
-%   Usage:  [A,B,C,N] = runExaple1()
+%   Usage:  [A,B,C,N] = runExample1()
 %
 %   The "matrices" correspond to the quadratic input-output system
 %

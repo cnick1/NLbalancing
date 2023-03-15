@@ -1,8 +1,8 @@
-function [A, B, C, N, Q, g, f, h] = getSystem7()
+function [A, B, C, N, G, g, f, h] = getSystem7()
 %getSystem7  Generates a quadratic-bilinear system for testing energy functions.
 %            System based on systems taken from [1,2].
 %
-%   Usage:  [A,B,C,N,Q] = getSystem7()
+%   Usage:  [A,B,C,N,G] = getSystem7()
 %        or [~,~,~,~,~,f,g,h] = getSystem7()
 %
 %        \dot(x1) = -x1 + x2 - x2^2 + (1 + 2 x2) u1
@@ -28,11 +28,11 @@ N = [0 0 0 -1;
 B = [1;
      1];
 C = [1 1];
-Q = [0 2;
+G = [0 2;
      0 0];
  
 f = {A,N}; 
-g = {B,Q}; 
+g = {B,G}; 
 h = {C};
 
 end

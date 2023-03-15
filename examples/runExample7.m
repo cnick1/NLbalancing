@@ -39,7 +39,6 @@ function [v,w] = runExample7(degree,plotEnergy,plotBalancing,balancingDegree)
   if (nargin<1)
     degree = 6;
     plotEnergy = true;
-
     plotBalancing = false;
     balancingDegree = 6;
   end

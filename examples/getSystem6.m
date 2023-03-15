@@ -1,7 +1,7 @@
-function [A, B, C, N, Q, f, g, h] = getSystem6()
+function [A, B, C, N, G, f, g, h] = getSystem6()
 %getSystem6  Generates a unicycle quadratic-bilinear system for testing energy functions.
 %
-%   Usage:  [A,B,C,N,Q] = getSystem6()
+%   Usage:  [A,B,C,N,G] = getSystem6()
 %        or [~,~,~,~,~,f,g,h] = getSystem6()
 %
 %   The "matrices" correspond to the quadratic bilinear input-output system
@@ -22,10 +22,10 @@ A = [0 0 0; 0 -1 0; 0 0 0];
 B = [1 0; 0 0; 0 1];
 C = speye(3);
 N = sparse(3, 3);
-Q = [0 0 0 0 0 0; 0 0 0 0 1 0; 0 0 0 0 0 0];
+G = [0 0 0 0 0 0; 0 0 0 0 1 0; 0 0 0 0 0 0];
 
 f = {A,N}; 
-g = {B,Q}; 
+g = {B,G}; 
 h = {C}
 
 end
