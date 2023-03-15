@@ -34,6 +34,7 @@ Ef8 = Ef7 + 0.5 * w8 * x .^ 8;
 %  Compute the analytical solution for comparison
 EPlusAnalytic = EgammaPlus(x, A, B, C, N, eta);
 
+figure
 plot(x, EPlusAnalytic, '+', ...
   x, Ef2, ...
   x, Ef4, ...
@@ -80,11 +81,6 @@ fclose(fid);
 
 %  Compute the polynomial approximations to the past energy function
 [v] = approxPastEnergy(A, N, B, C, eta, 8);
-[vb] = approxPastEnergyPolynomial(A, N, B, C, eta, 8);
-
-for i = 1:length(v)
-  v{i} - vb{i}
-end
 
 v2 = v{2}; v3 = v{3}; v4 = v{4}; v5 = v{5}; v6 = v{6}; v7 = v{7}; v8 = v{8};
 

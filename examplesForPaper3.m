@@ -1,7 +1,7 @@
 %  A script to run the examples in QB NLBT
 %  The examples are the following: 
 %
-%       Example 5: a 1-DOF quadratic-bilinear model for which we can
+%       Example 1B: a 1-DOF quadratic-bilinear model for which we can
 %       analytically plot the energy functions 
 %       Example 6: a 3-DOF quadratic-bilinear unicycle model 
 %       Example 7: a 2-DOF quadratic-bilinear model based on
@@ -15,10 +15,14 @@ setKroneckerToolsPath
 addpath('examples')
 addpath('utils')
 
-%%  runExample5
-% TODO: Fix Example 5
-runExample5
+%%  Example 1
+% TODO: Fix Example 1B
+runExample1
+close; xlim([-1, 1]); ylim([0, 0.5])
 
+runExample1B; xlim([-1, 1]); ylim([0, 0.5])
+runExample1B(1); xlim([-1, 1]); ylim([0, 0.5])
+runExample1P
 %%  runExample7 produces the plots for Fig. 2.  
 % %  For Table 1, please use energyFunctionValidation in the tests directory.
 % [v,w] = runExample7(6,true,false,6);

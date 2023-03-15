@@ -1,10 +1,10 @@
-function [v, w] = runExample1P
-%runExample1P Runs the example on system 1 assuming the model is the full polynomial model
+function [v, w] = runExample1P(ignoreGTerms,varargin)
+%runExample1P Runs the example on system 1 assuming the model is quadratic-bilinear
 %   Usage:  [] = runExample1P()
 %
 %   Part of the NLbalancing repository.
 %%
-hold off
+
 [A, B, C, N, f, g, h] = getSystem1();
 
 eta = 0.5; % values should be between -\infty and 1.
@@ -13,10 +13,15 @@ eta = 0.5; % values should be between -\infty and 1.
 
 %  Compute the polynomial approximations to the future energy function
 d = 8;
-[w] = approxFutureEnergy(A, N, g, C, eta, d);
+if nargin > 0 && ignoreGTerms
+    [w] = approxFutureEnergy(A, N, B, C, eta, d);
+else
+    [w] = approxFutureEnergy(A, N, g, C, eta, d);
+end
+
 w2 = w{2}; w3 = w{3}; w4 = w{4}; w5 = w{5}; w6 = w{6}; w7 = w{7}; w8 = w{8};
 
-x = linspace(-6, 6, 250);
+x = linspace(-3, 3, 250);
 
 Ef2 = 0.5 * w2 * x .^ 2;
 Ef3 = Ef2 + 0.5 * w3 * x .^ 3;
@@ -31,8 +36,10 @@ Ef8 = Ef7 + 0.5 * w8 * x .^ 8;
 %     Efd = Efd + 0.5*w{idx}*x.^idx;
 %   end
 
+%  Compute the analytical solution for comparison
+figure
 %  TODO: FIX ANALYTICAL SOLUTION Compute the analytical solution for comparison
-warning('This analyticall solution is still just for the bilinear case')
+warning('This analytical solution is still just for the bilinear case')
 EPlusAnalytic = EgammaPlus(x, A, B, C, N, g{2}, eta);
 
 plot(x, Ef2, ...
@@ -55,6 +62,9 @@ ylabel('$\mathcal{E}_\gamma^+$', ...
   'FontSize', 20, ...
   'fontweight', 'bold')
 
+xlim([-3, 3])
+ylim([0, 3])
+
 %  Save data to generate tikz plots for the paper
 %   fid = fopen('plots/ex1_future_a.txt','w');
 %   fprintf(fid,'%g %g\n',[x;EPlusAnalytic]);
@@ -75,8 +85,6 @@ ylabel('$\mathcal{E}_\gamma^+$', ...
 %   fid = fopen('plots/ex1_future_8.txt','w');
 %   fprintf(fid,'%g %g\n',[x;Ef8]);
 %   fclose(fid);
-xlim([-2, 2])
-ylim([0, 3])
 
 %   %  Compute the polynomial approximations to the past energy function
 %   [v] = approxPastEnergyQB(A,N,B,Q,C,eta,8);
@@ -209,3 +217,4 @@ E = (log(sqrt(a ^ 2 + b ^ 2 * c ^ 2 * eta + 2 * a * n * x + n ^ 2 * x .^ 2) + (a
   (sqrt(a ^ 2 + b ^ 2 * c ^ 2 * eta) * ((n ^ 2 * (a ^ 2 + b ^ 2 * c ^ 2 * eta)) / 3 - (a ^ 2 * n ^ 2) / 2)) / (b ^ 2 * n ^ 4);
 
 end
+
