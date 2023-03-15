@@ -6,7 +6,7 @@ function [w] = approxFutureEnergy(A, N, g, C, eta, d, verbose)
 %
 %  where 'verbose' is an optional argument. If the system has a constant
 %  input vector field Bu, the matrix B may be passes in place of a cell
-%  array 'g'.The cell array 'g' should be g{1} = B = G_0, g{2} = G1, g{3} = G2 ...
+%  array 'g'. The cell array 'g' should be g{1} = B = G_0, g{2} = G1, g{3} = G2 ...
 %
 %  Computes a degree d polynomial approximation to the future energy function
 %
@@ -146,11 +146,12 @@ if (d > 2)
     end
 
     % Now add the higher order polynomial terms by iterating through the sums
-    [g{l + 2:2 * l + 1}] = deal(0); % Need an extra space in g because of NaVb indexing
+    [g{l + 2:2 * l + 1}] = deal(0); % Need extra space in g because of GaWb indexing
 
     for o = 1:2 * l
-      GaWb{o + 1, k - 1} = g{o + 1}.' * reshape(w{k - 1}, n, n ^ (k - 2));
-
+        for idx = 2:k-1 % Might be repetitive
+            GaWb{o + 1, idx} = g{o + 1}.' * reshape(w{idx}, n, n ^ (idx - 1)); 
+        end
       for p = max(0, o - l):min(o, l)
 
         for i = 2:k - o
