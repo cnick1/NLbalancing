@@ -17,7 +17,7 @@ addpath('utils')
 
 %%  runExample5
 % TODO: Fix Example 5
-% runExample5
+runExample5
 
 %%  runExample7 produces the plots for Fig. 2.  
 % %  For Table 1, please use energyFunctionValidation in the tests directory.
@@ -29,5 +29,5 @@ addpath('utils')
 % [v,w] = runExample2(6,true,false,6);
 
 %%  runExample8 produces the plots for Fig. 2.  
-[v,w] = runExample8(4,true);
+% [v,w] = runExample8(4,true);
 

@@ -15,7 +15,7 @@ function [v, w] = runExample8(degree, plotEnergy)
 %   Part of the NLbalancing repository.
 %%
 
-fprintf('Running Example8\n')
+fprintf('Running Example6\n')
 
 eta = 0.1; % values should be between -\infty and 1.
 % eta=0.1 corresponds to gamma= 1.0541...
@@ -28,7 +28,7 @@ if (nargin < 1)
   plotEnergy = true;
 end
 
-[A, B, C, N, Q, f, g, h] = getSystem8();
+[A, B, C, N, Q, f, g, h] = getSystem6();
 
 %  Compute the polynomial approximations to the energy functions
 [v] = approxPastEnergy(A, N, g(1:2), C, eta, degree, true);

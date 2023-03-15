@@ -1,34 +1,36 @@
-function [A, B, C, N, G, f, g, h] = getSystem5()
-%getSystem5  Generates a simple quadratic-bilinear system for testing energy functions.
+function [A, B, C, N, f, g, h] = getSystem5()
+%getSystem5  Generates a unicycle quadratic-bilinear system for testing energy functions.
 %
-%   Usage:  [A,B,C,N,G] = getSystem5()
-%        or [~,~,~,~,~,f,g,h] = getSystem5()
+%   Usage:  [A,B,C,N] = getSystem5()
+%        or [A,B,C,N,f,g,h] = getSystem5()
 %
-%   The "matrices" correspond to the quadratic-bilinear input-output system
+%   The "matrices" correspond to the input-output system
 %
-%       \dot(x) = -2x + x^2 + (2+2x)u
-%             y = 2x
+%       \dot(x1) = u1 cos x3
+%       \dot(x2) = u1 sin x3  - x2
+%       \dot(x3) = u2
+%             y = x
 %
-%   for which there is an analytic solution to the past and future energy functions.
-%
-%   Excluding the bilinear term gives the same system as getSystem1(). The
-%   cell arrays f, g, and h can also be used as outputs. 
-%
-%   Reference: Nonlinear Balanced Truncation Model Reduction:
-%        Part 1-Computing Energy Functions, by Kromer, Gugercin, and Borggaard.
-%        arXiv.
+%   upon polynomial approximation to f(x) and g(x). The cell arrays f, g, and h
+%   can also be used as outputs.
 %
 %   Part of the NLbalancing repository.
 %%
 
-A = -2;
-B = 2;
-C = 2;
-N = 1;
-G = 2;
+A = [0 0 0;
+     0 -1 0;
+     0 0 0];
+B = [1 0;
+     0 0;
+     0 1];
+C = speye(3);
+N = sparse(3, 3);
+G = [0 0 0 0 0 0;
+     0 0 0 0 1 0;
+     0 0 0 0 0 0];
 
-f = {A,N}; 
-g = {B,G}; 
+f = {A, N};
+g = {B, G};
 h = {C};
 
 end
