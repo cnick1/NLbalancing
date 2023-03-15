@@ -1,7 +1,7 @@
-function [v, w] = runExample2(degree, plotEnergy, plotBalancing, balancingDegree)
-%runExample2 Runs the second example from the paper
+function [v, w] = runExample2P(degree, plotEnergy, plotBalancing, balancingDegree)
+%runExample2P Runs the example from the paper
 %
-%   Usage:  [v,w] = runExample2(degree,plotEnergy,plotBalancing,balancingDegree)
+%   Usage:  [v,w] = runExample2P(degree,plotEnergy,plotBalancing,balancingDegree)
 %
 %   where
 %         degree          is the degree of energy function approximations
@@ -36,11 +36,10 @@ eta = 0.1; % values should be between -\infty and 1.
 fprintf('Simulating for eta=%g (gamma=%g)\n', eta, 1 / sqrt(1 - eta))
 
 if (nargin < 1)
-  degree = 4;
+  degree = 6;
   plotEnergy = true;
-
   plotBalancing = false;
-  balancingDegree = 3;
+  balancingDegree = 6;
 end
 
 if (plotBalancing)
@@ -49,17 +48,20 @@ else
   dataRange = 1; %0.75;
 end
 
-[A, B, C, N] = getSystem2();
+[A, B, C, N, g, f, h] = getSystem2();
 
 %  Compute the polynomial approximations to the future energy function
-[w] = approxFutureEnergy(A, N, B, C, eta, degree, true);
+[w] = approxFutureEnergy(A, N, g, C, eta, degree, true);
+%     for i=1:length(w)
+%         w{i} - w2{i}
+%     end
 futureEnergy{degree} = [];
 for k = 2:degree
   futureEnergy{k} = w{k}.' / 2;
 end
 
 %  Plot the future energy function for this example
-%disp('Future energy function for example 2')
+%disp('Future energy function for example 7')
 
 if (plotEnergy || plotBalancing)
   nX = 101; nY = 101;
@@ -86,14 +88,14 @@ if (plotEnergy || plotBalancing)
   title('Future Energy Function')
 end
 
-[v] = approxPastEnergy(A, N, B, C, eta, degree, true);
+[v] = approxPastEnergy(f{1}, f{2}, g, C, eta, degree, true);
 pastEnergy{degree} = [];
 for k = 2:degree
   pastEnergy{k} = v{k}.' / 2;
 end
 
 %  Plot the past energy function for this example
-%disp('Past energy function for example 2')
+%disp('Past energy function for example 7')
 
 if (plotEnergy || plotBalancing)
   nX = 101; nY = 101;
@@ -122,7 +124,7 @@ if (plotEnergy || plotBalancing)
   title('Past Energy Function')
 end
 
-save('Ex2_RawData.mat', 'v', 'w')
+save('Ex7_RawData.mat', 'v', 'w')
 
 if (plotBalancing)
   [sigma, T] = inputNormalTransformation(v, w, balancingDegree);

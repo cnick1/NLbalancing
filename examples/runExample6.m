@@ -1,11 +1,10 @@
-function [v, w] = runExample8(degree, plotEnergy)
-%EXAMPLE8 Runs the example from the paper
+function [v, w] = runExample6(degree)
+%runExample6 Runs the example from the paper
 %
-%   Usage:  [v,w] = runExample8(degree,plotEnergy)
+%   Usage:  [v,w] = runExample6(degree)
 %
 %   where
 %         degree          is the degree of energy function approximations
-%         plotEnergy      is a logical variable to determine if a plot is made.
 %
 %         v,w             are coefficients of the past and future energy
 %                         function approximations, respectively.
@@ -15,7 +14,7 @@ function [v, w] = runExample8(degree, plotEnergy)
 %   Part of the NLbalancing repository.
 %%
 
-fprintf('Running Example6\n')
+fprintf('Running Example 6\n')
 
 eta = 0.1; % values should be between -\infty and 1.
 % eta=0.1 corresponds to gamma= 1.0541...
@@ -25,7 +24,6 @@ fprintf('Simulating for eta=%g (gamma=%g)\n', eta, 1 / sqrt(1 - eta))
 
 if (nargin < 1)
   degree = 4;
-  plotEnergy = true;
 end
 
 [A, B, C, N, Q, f, g, h] = getSystem6();
