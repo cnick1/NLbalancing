@@ -75,7 +75,7 @@ if (plotEnergy || plotBalancing)
       eFuture(i, j) = kronPolyEval(futureEnergy, x, degree);
     end
   end
-  figure(1)
+  figure
   contourf(X, Y, eFuture)
   xlabel('$x_1$', 'interpreter', 'latex');
   ylabel('$x_2$', 'interpreter', 'latex');
@@ -110,7 +110,7 @@ if (plotEnergy || plotBalancing)
       ePast(i, j) = kronPolyEval(pastEnergy, x, degree);
     end
   end
-  figure(2)
+  figure
   contourf(X, Y, ePast)
   %    mesh(X,Y,ePast)
   xlabel('$x_1$', 'interpreter', 'latex');
@@ -122,7 +122,7 @@ if (plotEnergy || plotBalancing)
   title('Past Energy Function')
 end
 
-save('Ex2_RawData.mat', 'v', 'w')
+% save('Ex2_RawData.mat', 'v', 'w')
 
 if (plotBalancing)
   [sigma, T] = inputNormalTransformation(v, w, balancingDegree);

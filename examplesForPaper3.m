@@ -15,21 +15,31 @@ setKroneckerToolsPath
 addpath('examples')
 addpath('utils')
 
-%%  Example 1
-% TODO: Fix Example 1B
-runExample1
-close; xlim([-1, 1]); ylim([0, 0.5])
+%%  Example 1: 1D ODE with analytical energy functions
+runExample1(1);
+runExample1(2,2,true);
+runExample1(3);
 
-runExample1B; xlim([-1, 1]); ylim([0, 0.5])
-runExample1B(1); xlim([-1, 1]); ylim([0, 0.5])
-runExample1P
-%%  runExample7 produces the plots for Fig. 2.  
+% Compare all 4 cases
+% a = 4; b = 5;
+% runExample1;
+% close; xlim([-a, a]); ylim([0, b]); grid on
+% title('quadratic, quadratic assumed')
+% runExample1B(1); xlim([-a, a]); ylim([0, b]); grid on
+% title('QB system, quadratic assumed')
+% runExample1B; xlim([-a, a]); ylim([0, b]); grid on
+% title('QB system, QB assumed')
+% runExample1P; xlim([-a, a]); ylim([0, b]); grid on
+% title('polynomial system, polynomial assumed ***')
+% 
+% plotEnergyFunctionsTest
+
+%%  Example 2: 2D Energy Functions 
 % %  For Table 1, please use energyFunctionValidation in the tests directory.
-% [v,w] = runExample7(6,true,false,6);
-%  figure
-%  copyobj(allchild(1),3); 
-%  figure
-%  copyobj(allchild(2),4);
+% [v,w] = runExample2(6,true,false,6);
+% [v,w] = runExample2B(6,true,false,6);
+% [v,w] = runExample2P(6,true,false,6);
+
 % [v,w] = runExample2(6,true,false,6);
 
 %%  runExample8 produces the plots for Fig. 2.  

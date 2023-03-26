@@ -6,7 +6,7 @@ function [A, B, C, N, f, g, h] = getSystem1()
 %
 %   The "matrices" correspond to the input-output system
 %
-%       \dot(x) = -2x + x^2 + 2u + 2xu + x^2u
+%       \dot(x) = -2x + x^2 + 2u - 0.2xu + x^2u
 %             y = 2x
 %
 %   for which there is an analytic solution to the past and future energy functions.
@@ -25,8 +25,8 @@ A = -2;
 B = 2;
 C = 2;
 N = 1;
-G1 = 2;
-G2 = 1;
+G1 = -0.2;
+G2 = 0.2;
 
 f = {A, N};
 g = {B, G1, G2};

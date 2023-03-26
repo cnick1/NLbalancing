@@ -27,7 +27,7 @@ function [v, w] = runExample2P(degree, plotEnergy, plotBalancing, balancingDegre
 %   Part of the NLbalancing repository.
 %%
 
-fprintf('Running Example 2\n')
+fprintf('Running Example 2, polynomial\n')
 
 eta = 0.1; % values should be between -\infty and 1.
 % eta=0.1 corresponds to gamma= 1.0541...
@@ -77,7 +77,7 @@ if (plotEnergy || plotBalancing)
       eFuture(i, j) = kronPolyEval(futureEnergy, x, degree);
     end
   end
-  figure(1)
+  figure
   contourf(X, Y, eFuture)
   xlabel('$x_1$', 'interpreter', 'latex');
   ylabel('$x_2$', 'interpreter', 'latex');
@@ -112,7 +112,7 @@ if (plotEnergy || plotBalancing)
       ePast(i, j) = kronPolyEval(pastEnergy, x, degree);
     end
   end
-  figure(2)
+  figure
   contourf(X, Y, ePast)
   %    mesh(X,Y,ePast)
   xlabel('$x_1$', 'interpreter', 'latex');
