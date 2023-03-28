@@ -1,33 +1,44 @@
 function [v, w] = runExample2_singularValueFunctions(degree, plotEnergy, plotBalancing, balancingDegree, numGTermsModel, numGTermsApprox, exportPlotData, kawanoModel)
-%runExample2_singularValueFunctions Runs the second example from the paper
+%runExample2_singularValueFunctions Runs the 2D example to plot energy
+%functions as surfaces in the original and input normal coordinates. This
+%function also plots the singular value functions.
 %
 %   Usage:  [v,w] = runExample2_singularValueFunctions(degree,plotEnergy,plotBalancing,balancingDegree
 %                                   , numGTermsModel, numGTermsApprox, exportPlotData, kawanoModel)
 %
-%   where
-%         degree          is the degree of energy function approximations
-%         plotEnergy      is a logical variable to determine if a plot is made.
+%   runExample2_singularValueFunctions() runs the default case of a quadratic model from [1] which
+%                 is based on a model from [2].
 %
-%         plotBalancing   is a logical variable to determine if a plot is made.
-%         balancingDegree is a small integer setting the degree of approximation
+%   Inputs:
+%       degree          is the degree of energy function approximations
+%       plotEnergy      is a logical variable to determine if a plot is made.
+%
+%       plotBalancing   is a logical variable to determine if a plot is made.
+%       balancingDegree is a small integer setting the degree of approximation
 %                         in the balancing transformation. Must be < degree.
 %                         (used if plotBalancing = true)
+%       numGTermsModel   Number of terms in the full order model
+%       numGTermsApprox  Number of terms assumed when computing energy functions
+%       exportPlotData   Boolean variable to determine if plots/data are exported
+%       kawanoModel      Boolean variable modifying the output equation for
+%                          the model to match [2]
 %
-%         v,w             are coefficients of the past and future energy
-%                         function approximations, respectively.
+%   Outputs:
+%       v,w              are coefficients of the past and future energy
+%                        function approximations, respectively.
 %
 %   The value of eta is set below.
 %
-%   Reference: Nonlinear Balanced Truncation Model Reduction:
+%   References: [1] Nonlinear Balanced Truncation Model Reduction:
 %        Part 1-Computing Energy Functions, by Kramer, Gugercin, and Borggaard.
 %        arXiv:2209.07645.
-%
-%   This example is motivated by Kawano and Scherpen, IEEE Transactions
-%   on Automatic Control, 2016.  Here we ignore the bilinear term 2*x_2*u.
+%              [2] Y. Kawano and J. M. A. Scherpen, “Model reduction by
+%        differential balancing based on nonlinear hankel operators,”
+%        IEEE Transactions on Automatic Control, vol. 62, no. 7,
+%        pp. 3293–3308, Jul. 2017, doi: 10.1109/tac.2016.2628201.
 %
 %   Part of the NLbalancing repository.
-%%
-% set up the test
+%% Process inputs
 if nargin < 8
     if nargin < 7
         if nargin < 6
@@ -55,10 +66,10 @@ end
 
 validateInputNormalPastEnergy = true;
 
-zmin = -0.2; zmax = 0.2;
+zmax = 0.2; zmin = -zmax;
 % Npts = 51;
 
-% get the system
+%% Get model and compute energy functions and input normal transformation
 [A, ~, C, N, g, ~, ~] = getSystem2(kawanoModel);
 g(numGTermsModel + 1:end) = deal({0}); % Adjust FOM to be Quadratic, QB, etc.
 % n = size(A, 1);
@@ -81,6 +92,7 @@ end
 % compute the input-normal transformation approximation
 [sigma, T] = inputNormalTransformation(v, w, degree - 1, true);
 
+%% Plot the past and future energy functions
 if (plotEnergy || plotBalancing)
     %  Plot the past and future energy functions in a neighborhood of the origin,
     %  first in the original coordinates, then in input normal
@@ -117,10 +129,15 @@ if (plotEnergy || plotBalancing)
             balancingDegree, EminusError);
         %[g,i] = max(max(abs(Eplot-Epast)))
     end
-
+    
     if (plotEnergy)
         figure
         surf(X, Y, ePastOriginal)
+        title(sprintf('Past energy function in original coordinates (degree %d approximation)', degree))
+        xlabel('$x_1$', 'interpreter', 'latex'); ylabel('$x_2$', 'interpreter', 'latex');
+        zlabel('$\mathcal{E}^-_\gamma(${\boldmath$x$}$)$', 'interpreter', 'latex');
+        figure
+        contourf(X, Y, ePastOriginal)
         title(sprintf('Past energy function in original coordinates (degree %d approximation)', degree))
         xlabel('$x_1$', 'interpreter', 'latex'); ylabel('$x_2$', 'interpreter', 'latex');
         zlabel('$\mathcal{E}^-_\gamma(${\boldmath$x$}$)$', 'interpreter', 'latex');
@@ -130,9 +147,19 @@ if (plotEnergy || plotBalancing)
         title(sprintf('Past energy function in input-normal coordinates using degree %d transformation', balancingDegree))
         xlabel('$z_1$', 'interpreter', 'latex'); ylabel('$z_2$', 'interpreter', 'latex');
         zlabel('$\mathcal{E}^-_\gamma(\Phi(${\boldmath$z$}$))$', 'interpreter', 'latex');
+        figure
+        contourf(X, Y, ePastInputNormal)
+        title(sprintf('Past energy function in input-normal coordinates using degree %d transformation', balancingDegree))
+        xlabel('$z_1$', 'interpreter', 'latex'); ylabel('$z_2$', 'interpreter', 'latex');
+        zlabel('$\mathcal{E}^-_\gamma(\Phi(${\boldmath$z$}$))$', 'interpreter', 'latex');
 
         figure
         surf(X, Y, eFutureOriginal)
+        title(sprintf('Future energy function in original coordinates (degree %d approximation)', degree))
+        xlabel('$x_1$', 'interpreter', 'latex'); ylabel('$x_2$', 'interpreter', 'latex');
+        zlabel('$\mathcal{E}^+_\gamma(${\boldmath$x$}$)$', 'interpreter', 'latex');
+        figure
+        contourf(X, Y, eFutureOriginal)
         title(sprintf('Future energy function in original coordinates (degree %d approximation)', degree))
         xlabel('$x_1$', 'interpreter', 'latex'); ylabel('$x_2$', 'interpreter', 'latex');
         zlabel('$\mathcal{E}^+_\gamma(${\boldmath$x$}$)$', 'interpreter', 'latex');
@@ -142,13 +169,17 @@ if (plotEnergy || plotBalancing)
         title(sprintf('Future energy function in input-normal coordinates using degree %d transformation', balancingDegree))
         xlabel('$z_1$', 'interpreter', 'latex'); ylabel('$z_2$', 'interpreter', 'latex');
         zlabel('$\mathcal{E}^+_\gamma(\Phi(${\boldmath$z$}$))$', 'interpreter', 'latex');
+        figure
+        contourf(X, Y, eFutureInputNormal)
+        title(sprintf('Future energy function in input-normal coordinates using degree %d transformation', balancingDegree))
+        xlabel('$z_1$', 'interpreter', 'latex'); ylabel('$z_2$', 'interpreter', 'latex');
+        zlabel('$\mathcal{E}^+_\gamma(\Phi(${\boldmath$z$}$))$', 'interpreter', 'latex');
     end
 end
 
 %% Approximate the singular value functions using Algorithm 2.
 [c] = approximateSingularValueFunctions(T, w, sigma, degree - 2);
 
-%
 %% Generate data for plots of singular value functions
 zRange = linspace(- .2, .2, 51);
 plotSingularValueFunctions(sigma, c, zRange)

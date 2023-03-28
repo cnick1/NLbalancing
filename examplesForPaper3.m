@@ -15,9 +15,10 @@ setKroneckerToolsPath
 addpath('examples')
 addpath('utils')
 
+exportData = true;
 %%  Example 1: 1D ODE with analytical energy functions
 % runExample1(1);
-% runExample1(2,2,true);
+runExample1(2,2,exportData);
 % runExample1(3);
 
 % Compare all 4 cases
@@ -45,7 +46,7 @@ addpath('utils')
 % 
 % % Kawano model
 % [v,w] = runExample2(6,true,false,6,1,1,false,true);
-% [v,w] = runExample2(6,true,false,6,2,2,true,true);
+[v,w] = runExample2(6,true,false,6,2,2,exportData,true);
 % [v,w] = runExample2(6,true,false,6,3,3,false,true);
 
 %% Example 2: Singular Value Functions

@@ -1,6 +1,21 @@
 function [v, w] = runExample1(numGTermsModel, numGTermsApprox, exportPlotData, varargin)
-%runExample1 Runs the example on system 1 assuming the model is quadratic-bilinear
-%   Usage:  [] = runExample1()
+%runExample1 Runs 1D ODE example to compare computed and analytical energy functions
+%   Usage:  [v, w] = runExample1(numGTermsModel, numGTermsApprox, exportPlotData)
+%
+%   runExample1() runs the default case of a quadratic model from [1].
+%
+%   Inputs:
+%       numGTermsModel     - Number of terms in the full order model
+%       numGTermsApprox    - Number of terms assumed when computing energy functions
+%       exportPlotData     - Boolean variable to determine if plots/data are exported
+%
+%   Outputs:
+%       v,w             are coefficients of the past and future energy
+%                       function approximations, respectively.
+%
+%   Reference: [1] Nonlinear Balanced Truncation Model Reduction:
+%        Part 1-Computing Energy Functions, by Kramer, Gugercin, and Borggaard.
+%        arXiv:2209.07645.
 %
 %   Part of the NLbalancing repository.
 %%

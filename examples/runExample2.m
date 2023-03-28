@@ -1,32 +1,42 @@
 function [v, w] = runExample2(degree, plotEnergy, plotBalancing, balancingDegree, numGTermsModel, numGTermsApprox, exportPlotData, kawanoModel, varargin)
-%runExample2 Runs the second example from the paper
+%runExample2 Runs the 2D example to plot energy functions as contour plots
 %
 %   Usage:  [v,w] = runExample2(degree,plotEnergy,plotBalancing,balancingDegree,
 %                               numGTermsModel, numGTermsApprox, exportPlotData, kawanoModel)
 %
-%   where
-%         degree          is the degree of energy function approximations
-%         plotEnergy      is a logical variable to determine if a plot is made.
+%   runExample2() runs the default case of a quadratic model from [1] which
+%                 is based on a model from [2].
 %
-%         plotBalancing   is a logical variable to determine if a plot is made.
-%         balancingDegree is a small integer setting the degree of approximation
+%   Inputs:
+%       degree          is the degree of energy function approximations
+%       plotEnergy      is a logical variable to determine if a plot is made.
+%
+%       plotBalancing   is a logical variable to determine if a plot is made.
+%       balancingDegree is a small integer setting the degree of approximation
 %                         in the balancing transformation. Must be < degree.
 %                         (used if plotBalancing = true)
+%       numGTermsModel   Number of terms in the full order model
+%       numGTermsApprox  Number of terms assumed when computing energy functions
+%       exportPlotData   Boolean variable to determine if plots/data are exported
+%       kawanoModel      Boolean variable modifying the output equation for
+%                          the model to match [2]
 %
-%         v,w             are coefficients of the past and future energy
-%                         function approximations, respectively.
+%   Outputs:
+%       v,w              are coefficients of the past and future energy
+%                        function approximations, respectively.
 %
 %   The value of eta is set below.
 %
-%   Reference: Nonlinear Balanced Truncation Model Reduction:
+%   References: [1] Nonlinear Balanced Truncation Model Reduction:
 %        Part 1-Computing Energy Functions, by Kramer, Gugercin, and Borggaard.
 %        arXiv:2209.07645.
-%
-%   This example is motivated by Kawano and Scherpen, IEEE Transactions
-%   on Automatic Control, 2016.  Here we ignore the bilinear term 2*x_2*u.
+%              [2] Y. Kawano and J. M. A. Scherpen, “Model reduction by
+%        differential balancing based on nonlinear hankel operators,”
+%        IEEE Transactions on Automatic Control, vol. 62, no. 7,
+%        pp. 3293–3308, Jul. 2017, doi: 10.1109/tac.2016.2628201.
 %
 %   Part of the NLbalancing repository.
-%%
+%% Process inputs
 if nargin < 8
     if nargin < 7
         if nargin < 6
@@ -58,6 +68,7 @@ else
     dataRange = 1; %0.75;
 end
 
+%% Get model and compute energy functions
 [A, ~, C, N, g, ~, ~] = getSystem2(kawanoModel);
 g(numGTermsModel + 1:end) = deal({0}); % Adjust FOM to be Quadratic, QB, etc.
 fprintf('Running Example 2\n')
@@ -79,9 +90,7 @@ for k = 2:degree
     vT{k} = v{k}.';
 end
 
-%  Plot the future energy function for this example
-%disp('Future energy function for example 2')
-
+%% Plot the past and future energy functions
 if (plotEnergy || plotBalancing)
     nX = 101; nY = 102;
     xPlot = linspace(-dataRange, dataRange, nX);
@@ -129,6 +138,7 @@ if (plotEnergy || plotBalancing)
     figure(2); title('Future Energy Function')
 end
 
+%% Plot something about balancing(?)
 if (plotBalancing)
     [sigma, T] = inputNormalTransformation(v, w, balancingDegree);
     nPts = 201;
