@@ -50,11 +50,40 @@ xlabel('$z_{1,2}$', 'interpreter', 'latex');
 ylabel('$\xi_{1,2}$', 'interpreter', 'latex');
 
 if n == 2
+    % convert singular value functions into a surface by superposition
+    % (they operate independenly in their different directions)
+    nX = length(zRange); nY = nX; % basically z1 and z2
+    [z1, z2] = meshgrid(zRange, zRange);
+    
+    svSurface_z1 = repmat(xi(1,:).',1,nY);
+    svSurface_z2 = repmat(xi(2,:),nX,1);
+    svSurface = svSurface_z1+svSurface_z2;
+    
     figure
-    plot(zRange,xi);
-    legend(sprintfc('$\\xi_%d$',1:n), 'interpreter', 'latex')
-    xlabel('$z_{1,2}$', 'interpreter', 'latex');
-    ylabel('$\xi_{1,2}$', 'interpreter', 'latex');
+    
+    surf(z1,z2,svSurface_z1);
+    title(sprintf('1st singular value function surface, degree %d approx.', maxDegree))
+    xlabel('$z_1$', 'interpreter', 'latex');
+    ylabel('$z_1$', 'interpreter', 'latex');
+    zlabel('$\xi_1(${\boldmath$z$}$)$', 'interpreter', 'latex');
+
+    
+    figure
+    
+    surf(z1,z2,svSurface_z2);
+    title(sprintf('2nd singular value function surface, degree %d approx.', maxDegree))
+    xlabel('$z_1$', 'interpreter', 'latex');
+    ylabel('$z_1$', 'interpreter', 'latex');
+    zlabel('$\xi_2(${\boldmath$z$}$)$', 'interpreter', 'latex');
+
+    
+    figure
+    
+    surf(z1,z2,svSurface);
+    title(sprintf('Singular value function surface, degree %d approx.', maxDegree))
+    xlabel('$z_1$', 'interpreter', 'latex');
+    ylabel('$z_1$', 'interpreter', 'latex');
+    zlabel('$\xi(${\boldmath$z$}$)$', 'interpreter', 'latex');
 end
 
 
