@@ -40,8 +40,8 @@ if nargin == 1 && kawanoModel % Use Kawano model
   C = [1 0]; % Main difference with Kawano model
   G1 = [0 2;
         0 0];
-  G2 = [0 - .05 0 0; % G2 is not in Kawano model, so ignore if desired
-        0 0 0 - .05];
+  G2 = [0 -0.05 0 0; % G2 is not in Kawano model, so ignore if desired
+        0 0 0 -0.05];
 else % Use modified model from Kramer et. al. (default)
   A = [-1 1;
        0 -1];
@@ -52,8 +52,8 @@ else % Use modified model from Kramer et. al. (default)
   C = [1 1];
   G1 = [0 2;
         0 0];
-  G2 = [0 - .05 0 0;
-        0 0 0 - .05];
+  G2 = [0 -0.05 0 0;
+        0 0 0 -0.05];
 end
 
 f = {A, N};
