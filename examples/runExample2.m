@@ -59,7 +59,7 @@ if nargin < 8
         end
         exportPlotData = false;
     end
-    kawanoModel = 0;
+    kawanoModel = false;
 end
 
 if plotBalancing
@@ -83,16 +83,9 @@ fprintf('Simulating for eta=%g (gamma=%g)\n', eta, 1 / sqrt(1 - eta))
 [v] = approxPastEnergy(A, N, g(1:numGTermsApprox), C, eta, degree, true);
 [w] = approxFutureEnergy(A, N, g(1:numGTermsApprox), C, eta, degree, true);
 
-wT{degree} = [];
-vT{degree} = [];
-for k = 2:degree
-    wT{k} = w{k}.';
-    vT{k} = v{k}.';
-end
-
 %% Plot the past and future energy functions
 if (plotEnergy || plotBalancing)
-    nX = 101; nY = 102;
+    nX = 101; nY = nX;
     xPlot = linspace(-dataRange, dataRange, nX);
     yPlot = linspace(-dataRange, dataRange, nY);
     ePast = zeros(nY, nX);
@@ -104,38 +97,41 @@ if (plotEnergy || plotBalancing)
             x = [X(i, j); Y(i, j)];
             %         WBar = vbar(wT,x);
             %         eFuture(i,j) = x.'*WBar*x;
-            ePast(i, j) = 0.5 * kronPolyEval(vT, x, degree);
-            eFuture(i, j) = 0.5 * kronPolyEval(wT, x, degree);
+            ePast(i, j) = 0.5 * kronPolyEval(v, x, degree);
+            eFuture(i, j) = 0.5 * kronPolyEval(w, x, degree);
         end
     end
-    figure
-    contourf(X, Y, ePast)
+    fig1 = figure
+    contourf(X, Y, ePast); hold on;
+    logMaxEPast = log10(max(max(ePast)));
+    contour(X, Y, ePast,[0,logspace(-2,ceil(logMaxEPast),20)]./(10^(ceil(logMaxEPast)-logMaxEPast)))
     %    mesh(X,Y,ePast)
     xlabel('$x_1$', 'interpreter', 'latex');
     ylabel('$x_2$', 'interpreter', 'latex');
     colorbar('FontSize', 16)
     set(gca, 'FontSize', 20)
 
-    figure
-    contourf(X, Y, eFuture)
+    fig2 = figure
+    contourf(X, Y, eFuture); hold on;
+    logMaxEFuture = log10(max(max(eFuture)));
+    contour(X, Y, eFuture,[0,logspace(-3,ceil(logMaxEFuture),20)]./(10^(ceil(logMaxEFuture)-logMaxEFuture)))    
     xlabel('$x_1$', 'interpreter', 'latex');
     ylabel('$x_2$', 'interpreter', 'latex');
     colorbar('FontSize', 16)
     set(gca, 'FontSize', 20)
 
     if exportPlotData
-        fid = fopen('plots/ex2_past_future.txt', 'w');
-        fprintf(fid, '%g %g %g %g\n', [X(:); Y(:); ePast(:); eFuture(:)]);
-        fclose(fid);
         % save('Ex2_RawData.mat', 'v', 'w')
-        figure(1)
-        exportgraphics(gca, 'plots/PEF_p0_1.pdf', 'ContentType', 'vector');
 
-        figure(2)
-        exportgraphics(gca, 'plots/FEF_p0_1.pdf', 'ContentType', 'vector');
+        fid = fopen('plots/ex2_past_future.txt', 'w');
+        fprintf(fid, '%g %g %g %g\n', [X(:), Y(:), ePast(:), eFuture(:)]);
+        fclose(fid);
+        
+        exportgraphics(fig1, 'plots/PEF_p0_1.pdf', 'ContentType', 'vector');
+        exportgraphics(fig2, 'plots/FEF_p0_1.pdf', 'ContentType', 'vector');
     end
-    figure(1); title('Past Energy Function')
-    figure(2); title('Future Energy Function')
+    figure(fig1); title('Past Energy Function')
+    figure(fig2); title('Future Energy Function')
 end
 
 %% Plot something about balancing(?)

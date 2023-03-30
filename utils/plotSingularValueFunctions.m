@@ -1,4 +1,4 @@
-function [] = plotSingularValueFunctions(sigma,c,zRange,n,maxDegree)
+function [f1,f2,xi] = plotSingularValueFunctions(sigma,c,zRange,n,maxDegree)
 %  Plots polynomial approximations to singular value functions.
 %
 %   plotSingularValueFunctions(sigma,c,zRange,n,l)
@@ -43,7 +43,7 @@ for k=1:maxDegree
     xi = xi + c{k}.*repmat(zRange.^k,n,1);
 end
 
-figure
+f1 = figure
 plot(zRange,xi);
 legend(sprintfc('$\\xi_%d$',1:n), 'interpreter', 'latex')
 xlabel('$z_{1,2}$', 'interpreter', 'latex');
@@ -77,13 +77,16 @@ if n == 2
     zlabel('$\xi_2(${\boldmath$z$}$)$', 'interpreter', 'latex');
 
     
-    figure
+    f2 = figure
     
     surf(z1,z2,svSurface);
     title(sprintf('Singular value function surface, degree %d approx.', maxDegree))
     xlabel('$z_1$', 'interpreter', 'latex');
     ylabel('$z_1$', 'interpreter', 'latex');
     zlabel('$\xi(${\boldmath$z$}$)$', 'interpreter', 'latex');
+    colorbar
+else 
+    f2 = [];
 end
 
 
