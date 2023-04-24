@@ -1,6 +1,7 @@
 .DS_Store
 *pdf
 *mat
+*.avi
 *.asv
 obsolete
 development
@@ -11,4 +12,6 @@ approxPastEnergyQB.m
 approxFutureEnergyQB.m 
 memUsed.m 
 testingIndexing.m 
-testingMemoryAllocation.m 
+testing*
+*Test.m
+*Testing.m

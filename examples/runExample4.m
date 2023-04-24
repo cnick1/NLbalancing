@@ -30,7 +30,7 @@ for n=[8,16,32]   % number of elements, the actual number of states is 2*n
   [A,B,C,N,zInit] = getSystem4(n,m,p,1/L^2);
   zInit = z_factor*zInit;
 
-  tic; for i=1:nTest, [w] = approxFutureEnergy(full(A),N,B,C,eta,degree); end, tt=toc/nTest;
+  tic; for i=1:nTest, [w] = approxFutureEnergyQB(full(A),N,B,C,eta,degree); end, tt=toc/nTest;
   fprintf('%10.4e & ',length(w{degree}))
   fprintf('%8.2e & ',tt)
 
