@@ -73,7 +73,11 @@ end
 g(numGTermsModel + 1:end) = deal({0}); % Adjust FOM to be Quadratic, QB, etc.
 fprintf('Running Example 2\n')
 
-eta = 0.1; % values should be between -\infty and 1.
+if kawanoModel
+    eta = 0; % values should be between -\infty and 1.
+else
+    eta = 0.1; % values should be between -\infty and 1.
+end
 % eta=0.1 corresponds to gamma= 1.0541...
 % since eta = 1 - 1/gamma^2;
 
@@ -91,7 +95,7 @@ if (plotEnergy || plotBalancing)
     ePast = zeros(nY, nX);
     eFuture = zeros(nY, nX);
     [X, Y] = meshgrid(xPlot, yPlot);
-
+    
     for i = 1:nY
         for j = 1:nX
             x = [X(i, j); Y(i, j)];
@@ -101,28 +105,39 @@ if (plotEnergy || plotBalancing)
             eFuture(i, j) = 0.5 * kronPolyEval(w, x, degree);
         end
     end
+    set(groot,'defaultAxesTickLabelInterpreter','latex');
+    set(groot,'defaulttextinterpreter','latex');
+    set(groot,'defaultLegendInterpreter','latex');
+    
     fig1 = figure
-    contourf(X, Y, ePast); hold on;
+    contourf(X, Y, ePast,16); hold on;
     logMaxEPast = log10(max(max(ePast)));
     contour(X, Y, ePast,[0,logspace(-2,ceil(logMaxEPast),20)]./(10^(ceil(logMaxEPast)-logMaxEPast)))
     %    mesh(X,Y,ePast)
     xlabel('$x_1$', 'interpreter', 'latex');
     ylabel('$x_2$', 'interpreter', 'latex');
-    colorbar('FontSize', 16)
-    set(gca, 'FontSize', 20)
-
+    colorbar('FontSize', 16, 'TickLabelInterpreter', 'latex')
+    set(gca, 'FontSize', 16)
+    xticks([-1 : 1])
+    yticks([-1 : 1])
+    axis equal
+    
+    
     fig2 = figure
-    contourf(X, Y, eFuture); hold on;
+    contourf(X, Y, eFuture,16); hold on;
     logMaxEFuture = log10(max(max(eFuture)));
-    contour(X, Y, eFuture,[0,logspace(-3,ceil(logMaxEFuture),20)]./(10^(ceil(logMaxEFuture)-logMaxEFuture)))    
+    contour(X, Y, eFuture,[0,logspace(-3,ceil(logMaxEFuture),20)]./(10^(ceil(logMaxEFuture)-logMaxEFuture)))
     xlabel('$x_1$', 'interpreter', 'latex');
     ylabel('$x_2$', 'interpreter', 'latex');
-    colorbar('FontSize', 16)
-    set(gca, 'FontSize', 20)
+    colorbar('FontSize', 16, 'TickLabelInterpreter', 'latex')
+    set(gca, 'FontSize', 16)
+    xticks([-1 : 1])
+    yticks([-1 : 1])
+    axis equal
 
     if exportPlotData
         % save('Ex2_RawData.mat', 'v', 'w')
-
+        
         fid = fopen('plots/ex2_past_future.txt', 'w');
         fprintf(fid, '%g %g %g %g\n', [X(:), Y(:), ePast(:), eFuture(:)]);
         fclose(fid);
@@ -140,12 +155,12 @@ if (plotBalancing)
     nPts = 201;
     s = linspace(-2, 2, nPts);
     lin = T{1}(:, 1) * s;
-
+    
     coord = lin;
     for k = 2:balancingDegree
         coord = coord + T{k}(:, 1) * s .^ k;
     end
-
+    
     idxLin = zeros(1, nPts);
     linCount = 0;
     for i = 1:nPts
@@ -155,7 +170,7 @@ if (plotBalancing)
         end
     end
     idxLin = idxLin(1:linCount);
-
+    
     idxCoord = zeros(1, nPts);
     coordCount = 0;
     for i = 1:nPts
@@ -165,11 +180,11 @@ if (plotBalancing)
         end
     end
     idxCoord = idxCoord(1:coordCount);
-
+    
     figure(1); hold on
     plot(lin(1, idxLin), lin(2, idxLin), 'w+')
     plot(coord(1, idxCoord), coord(2, idxCoord), 'r+')
-
+    
     figure(2); hold on
     plot(lin(1, idxLin), lin(2, idxLin), 'w+')
     plot(coord(1, idxCoord), coord(2, idxCoord), 'r+')

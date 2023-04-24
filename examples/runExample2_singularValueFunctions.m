@@ -93,7 +93,8 @@ if (plotEnergy || plotBalancing)
     nX = 101; nY = 101;
     xPlot = linspace(zmin, zmax, nX);
     yPlot = linspace(zmin, zmax, nY);
-    [X, Y] = meshgrid(xPlot, yPlot);
+    [Z1, Z2] = meshgrid(xPlot, yPlot);
+    [X1, X2] = meshgrid(xPlot, yPlot);
 
     ePastOriginal = zeros(nX, nY);
     ePastInputNormalIdeal = zeros(nX, nY);
@@ -104,14 +105,15 @@ if (plotEnergy || plotBalancing)
 
     for i = 1:nY
         for j = 1:nX
-            z = [X(i, j); Y(i, j)];
+            x = [X1(i, j); X2(i, j)];
             % First in original coordinates...
-            ePastOriginal(i, j) = 0.5 * kronPolyEval(v, z, degree);
-            eFutureOriginal(i, j) = 0.5 * kronPolyEval(w, z, degree);
+            ePastOriginal(i, j) = 0.5 * kronPolyEval(v, x, degree);
+            eFutureOriginal(i, j) = 0.5 * kronPolyEval(w, x, degree);
             % ...then in input-normal coordinates.
-            x = kronPolyEval(T, z, balancingDegree);
-            ePastInputNormal(i, j) = 0.5 * kronPolyEval(v, x, degree);
-            eFutureInputNormal(i, j) = 0.5 * kronPolyEval(w, x, degree);
+            z = [Z1(i, j); Z2(i, j)];
+            xTrans = kronPolyEval(T, z, balancingDegree);
+            ePastInputNormal(i, j) = 0.5 * kronPolyEval(v, xTrans, degree);
+            eFutureInputNormal(i, j) = 0.5 * kronPolyEval(w, xTrans, degree);
             % compute ideal for checking errors
             ePastInputNormalIdeal(i, j) = 0.5 * (z.' * z);
         end
@@ -126,55 +128,77 @@ if (plotEnergy || plotBalancing)
 
     if (plotEnergy)
         figure('Name', sprintf('Past energy function in original coordinates (degree %d approximation)', degree))
-        surf(X, Y, ePastOriginal)
+        surf(X1, X2, ePastOriginal)
         xlabel('$x_1$', 'interpreter', 'latex'); ylabel('$x_2$', 'interpreter', 'latex');
         zlabel('$\mathcal{E}^-_\gamma(${\boldmath$x$}$)$', 'interpreter', 'latex');
         f1 = figure('Name', sprintf('Past energy function in original coordinates (degree %d approximation)', degree))
-        contourf(X, Y, ePastOriginal); hold on;
+        contourf(X1, X2, ePastOriginal,16); hold on;
         logMaxEPast = log10(max(max(ePastOriginal)));
-        contour(X, Y, ePastOriginal, [0, logspace(-2, ceil(logMaxEPast), 20)] ./ (10 ^ (ceil(logMaxEPast) - logMaxEPast)))
+        contour(X1, X2, ePastOriginal, [0, logspace(-2, ceil(logMaxEPast), 20)] ./ (10 ^ (ceil(logMaxEPast) - logMaxEPast)))
         xlabel('$x_1$', 'interpreter', 'latex'); ylabel('$x_2$', 'interpreter', 'latex');
         zlabel('$\mathcal{E}^-_\gamma(${\boldmath$x$}$)$', 'interpreter', 'latex');
-        axis equal; colorbar
+        axis equal; 
+    colorbar('FontSize', 16, 'TickLabelInterpreter', 'latex')
+    set(gca, 'FontSize', 16)
+    xticks([-.2 0 .2])
+    yticks([-.2 0 .2])
+        
 
         figure('Name', sprintf('Past energy function in input-normal coordinates using degree %d transformation', balancingDegree))
-        surf(X, Y, ePastInputNormal)
+        surf(Z1, Z2, ePastInputNormal)
         xlabel('$z_1$', 'interpreter', 'latex'); ylabel('$z_2$', 'interpreter', 'latex');
         zlabel('$\mathcal{E}^-_\gamma(\Phi(${\boldmath$z$}$))$', 'interpreter', 'latex');
         f2 = figure('Name', sprintf('Past energy function in input-normal coordinates using degree %d transformation', balancingDegree))
-        contourf(X, Y, ePastInputNormal); hold on;
+        contourf(Z1, Z2, ePastInputNormal,16); hold on;
         logMaxEPast = log10(max(max(ePastInputNormal)));
-        contour(X, Y, ePastInputNormal, [0, logspace(-2, ceil(logMaxEPast), 20)] ./ (10 ^ (ceil(logMaxEPast) - logMaxEPast)))
-        contour(X, Y, 0.5 * (X .^ 2 + Y .^ 2), 'k:', 'LineWidth', 2)
+        contour(Z1, Z2, ePastInputNormal, [0, logspace(-2, ceil(logMaxEPast), 20)] ./ (10 ^ (ceil(logMaxEPast) - logMaxEPast)))
+        contour(Z1, Z2, 0.5 * (Z1 .^ 2 + Z2 .^ 2), 'k:', 'LineWidth', 2)
         xlabel('$z_1$', 'interpreter', 'latex'); ylabel('$z_2$', 'interpreter', 'latex');
         zlabel('$\mathcal{E}^-_\gamma(\Phi(${\boldmath$z$}$))$', 'interpreter', 'latex');
-        axis equal; colorbar
+        axis equal; 
+    colorbar('FontSize', 16, 'TickLabelInterpreter', 'latex')
+    set(gca, 'FontSize', 16)
+    xticks([-.2 0 .2])
+    yticks([-.2 0 .2])
 
         figure('Name', sprintf('Future energy function in original coordinates (degree %d approximation)', degree))
-        surf(X, Y, eFutureOriginal)
+        surf(X1, X2, eFutureOriginal)
         xlabel('$x_1$', 'interpreter', 'latex'); ylabel('$x_2$', 'interpreter', 'latex');
         zlabel('$\mathcal{E}^+_\gamma(${\boldmath$x$}$)$', 'interpreter', 'latex');
         f3 = figure('Name', sprintf('Future energy function in original coordinates (degree %d approximation)', degree))
-        contourf(X, Y, eFutureOriginal); hold on;
+        contourf(X1, X2, eFutureOriginal,16); hold on;
         logMaxEFuture = log10(max(max(eFutureOriginal)));
-        contour(X, Y, eFutureOriginal, [0, logspace(-3, ceil(logMaxEFuture), 20)] ./ (10 ^ (ceil(logMaxEFuture) - logMaxEFuture)))
+        contour(X1, X2, eFutureOriginal, [0, logspace(-3, ceil(logMaxEFuture), 20)] ./ (10 ^ (ceil(logMaxEFuture) - logMaxEFuture)))
         xlabel('$x_1$', 'interpreter', 'latex'); ylabel('$x_2$', 'interpreter', 'latex');
         zlabel('$\mathcal{E}^+_\gamma(${\boldmath$x$}$)$', 'interpreter', 'latex');
-        axis equal; colorbar
+        axis equal; 
+    colorbar('FontSize', 16, 'TickLabelInterpreter', 'latex')
+    set(gca, 'FontSize', 16)
+    xticks([-.2 0 .2])
+    yticks([-.2 0 .2])
 
         figure('Name', sprintf('Future energy function in input-normal coordinates using degree %d transformation', balancingDegree))
-        surf(X, Y, eFutureInputNormal)
+        surf(Z1, Z2, eFutureInputNormal)
         xlabel('$z_1$', 'interpreter', 'latex'); ylabel('$z_2$', 'interpreter', 'latex');
         zlabel('$\mathcal{E}^+_\gamma(\Phi(${\boldmath$z$}$))$', 'interpreter', 'latex');
         f4 = figure('Name', sprintf('Future energy function in input-normal coordinates using degree %d transformation', balancingDegree))
-        contourf(X, Y, eFutureInputNormal); hold on;
+        contourf(Z1, Z2, eFutureInputNormal,16); hold on;
         logMaxEFuture = log10(max(max(eFutureInputNormal)))
-        contour(X, Y, eFutureInputNormal, [0, logspace(-3, ceil(logMaxEFuture), 20)] ./ (10 ^ (ceil(logMaxEFuture) - logMaxEFuture)))
+        contour(Z1, Z2, eFutureInputNormal, [0, logspace(-3, ceil(logMaxEFuture), 20)] ./ (10 ^ (ceil(logMaxEFuture) - logMaxEFuture)))
         xlabel('$z_1$', 'interpreter', 'latex'); ylabel('$z_2$', 'interpreter', 'latex');
         zlabel('$\mathcal{E}^+_\gamma(\Phi(${\boldmath$z$}$))$', 'interpreter', 'latex');
-        axis equal; colorbar
+        axis equal; 
+    colorbar('FontSize', 16, 'TickLabelInterpreter', 'latex')
+    set(gca, 'FontSize', 16)
+    xticks([-.2 0 .2])
+    yticks([-.2 0 .2])
     end
 end
+
+% xlabel('$x_1$', 'interpreter', 'latex');
+% ylabel('$x_2$', 'interpreter', 'latex');
+% colorbar('FontSize', 16, 'TickLabelInterpreter', 'latex')
+% set(gca, 'FontSize', 16)
 
 %% Approximate the singular value functions using Algorithm 2.
 [c] = approximateSingularValueFunctions(T, w, sigma, degree - 2);
@@ -182,21 +206,31 @@ end
 %% Generate data for plots of singular value functions
 zRange = linspace(-0.2, 0.2, 51);
 [svPlot, svSurface, xi] = plotSingularValueFunctions(sigma, c, zRange);
-plotDifferentialSingularValueFunctions();
+if kawanoModel
+    [ctrbEnergy, obsvEnergy] = plotDifferentialSingularValueFunctions();
+    [ctrbEnergy_zoomed, obsvEnergy_zoomed] = plotDifferentialSingularValueFunctions(.2);
+end
 
-% TODO: Add export plot
 %% Export plots
 if exportPlotData
-    figure(f1); exportgraphics(gca, 'plots/example2_pastEnergy_original.pdf', 'ContentType', 'vector');
-    figure(f2); exportgraphics(gca, sprintf('plots/example2_pastEnergy_inputNormal_deg%d.pdf', balancingDegree), 'ContentType', 'vector');
-    figure(f3); exportgraphics(gca, 'plots/example2_futureEnergy_original.pdf', 'ContentType', 'vector');
-    figure(f4); exportgraphics(gca, sprintf('plots/example2_futureEnergy_inputNormal_deg%d.pdf', balancingDegree), 'ContentType', 'vector');
-    
-    figure(svPlot); exportgraphics(gca, 'plots/example2_singularValueFunctions.pdf', 'ContentType', 'vector');
-    figure(svSurface); exportgraphics(gca, 'plots/example2_singularValueFunctionsSurface.pdf', 'ContentType', 'vector');
-    
+    exportgraphics(f1, 'plots/example2_pastEnergy_original.pdf', 'ContentType', 'vector');
+    exportgraphics(f2, sprintf('plots/example2_pastEnergy_inputNormal_deg%d.pdf', balancingDegree), 'ContentType', 'vector');
+    exportgraphics(f3, 'plots/example2_futureEnergy_original.pdf', 'ContentType', 'vector');
+    exportgraphics(f4, sprintf('plots/example2_futureEnergy_inputNormal_deg%d.pdf', balancingDegree), 'ContentType', 'vector');
+
+    exportgraphics(svPlot, 'plots/example2_singularValueFunctions.pdf', 'ContentType', 'vector');
+    exportgraphics(svSurface, 'plots/example2_singularValueFunctionsSurface.pdf', 'ContentType', 'vector');
+
     fid = fopen('plots/ex2_singularValueFunctions.txt', 'w');
     fprintf(fid, '%g %g %g\n', [zRange; xi]);
     fclose(fid);
+
+    if kawanoModel
+        exportgraphics(ctrbEnergy, 'plots/example2_kawanoCtrbEnergy.pdf', 'ContentType', 'vector');
+        exportgraphics(obsvEnergy, 'plots/example2_kawanoObsvEnergy.pdf', 'ContentType', 'vector');
+        exportgraphics(ctrbEnergy_zoomed, 'plots/example2_kawanoCtrbEnergy_zoomed.pdf', 'ContentType', 'vector');
+        exportgraphics(obsvEnergy_zoomed, 'plots/example2_kawanoObsvEnergy_zoomed.pdf', 'ContentType', 'vector');
+    end
+
 end
 end
