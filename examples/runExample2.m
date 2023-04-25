@@ -110,30 +110,50 @@ if (plotEnergy || plotBalancing)
     set(groot,'defaultLegendInterpreter','latex');
     
     fig1 = figure
-    contourf(X, Y, ePast,16); hold on;
+    contourf(X, Y, ePast,16,'w'); hold on;
     logMaxEPast = log10(max(max(ePast)));
     contour(X, Y, ePast,[0,logspace(-2,ceil(logMaxEPast),20)]./(10^(ceil(logMaxEPast)-logMaxEPast)))
     %    mesh(X,Y,ePast)
     xlabel('$x_1$', 'interpreter', 'latex');
     ylabel('$x_2$', 'interpreter', 'latex');
-    colorbar('FontSize', 16, 'TickLabelInterpreter', 'latex')
+    h = colorbar('FontSize', 16, 'TickLabelInterpreter', 'latex')
     set(gca, 'FontSize', 16)
     xticks([-1 : 1])
     yticks([-1 : 1])
     axis equal
-    
+    if kawanoModel
+        caxis([0 80])
+        set(h, 'ylim', [0 80])
+        load('utils\YlGnBuRescaled.mat')
+        colormap(flip(YlGnBuRescaled))
+    end
     
     fig2 = figure
-    contourf(X, Y, eFuture,16); hold on;
+    contourf(X, Y, eFuture,16,'w'); hold on;
     logMaxEFuture = log10(max(max(eFuture)));
     contour(X, Y, eFuture,[0,logspace(-3,ceil(logMaxEFuture),20)]./(10^(ceil(logMaxEFuture)-logMaxEFuture)))
     xlabel('$x_1$', 'interpreter', 'latex');
     ylabel('$x_2$', 'interpreter', 'latex');
-    colorbar('FontSize', 16, 'TickLabelInterpreter', 'latex')
+    h = colorbar('FontSize', 16, 'TickLabelInterpreter', 'latex')
     set(gca, 'FontSize', 16)
     xticks([-1 : 1])
     yticks([-1 : 1])
     axis equal
+    if kawanoModel
+        caxis([0 1.5])
+        set(h, 'ylim', [0 1.5])
+        load('utils\YlGnBuRescaled.mat')
+        colormap(flip(YlGnBuRescaled))
+    end
+    
+    % Draw square around middle .2
+x1=-.2;
+x2=.2;
+y1=-.2;
+y2=.2;
+x = [x1, x2, x2, x1, x1];
+y = [y1, y1, y2, y2, y1];
+plot(x, y, 'w-');
 
     if exportPlotData
         % save('Ex2_RawData.mat', 'v', 'w')

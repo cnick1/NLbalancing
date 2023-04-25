@@ -42,9 +42,9 @@ x=2;y=2;
 % figure
 % contourf(x1,x2,.5*xPx)
 % colorbar
-
+if dataRange == 1
 f1=figure('Name','Controllability/Past Energy Function')
-contourf(x1,x2,.5*xPinvx,16)
+contourf(x1,x2,.5*xPinvx,16,'w')
 logMaxECTRB = log10(max(max(.5*xPinvx))); hold on;
 contour(x1, x2, .5*xPinvx,[0,logspace(-3,ceil(logMaxECTRB),20)]./(10^(ceil(logMaxECTRB)-logMaxECTRB)))
 xlabel('$x_1$', 'interpreter', 'latex');
@@ -54,19 +54,58 @@ set(gca, 'FontSize', 16)
 xticks([-dataRange 0 dataRange])
 yticks([-dataRange 0 dataRange])
 axis equal
+load('utils\YlGnBuRescaled.mat')
+colormap(flip(YlGnBuRescaled))
+    caxis([0 80])
+
 
 f2=figure('Name','Observability/Future Energy Function')
-contourf(x1,x2,.5*xQx,16)
+contourf(x1,x2,.5*xQx,16,'w')
 logMaxEOBSV = log10(max(max(.5*xQx))); hold on;
 contour(x1, x2, .5*xQx,[0,logspace(-3,ceil(logMaxEOBSV),20)]./(10^(ceil(logMaxEOBSV)-logMaxEOBSV)))
 xlabel('$x_1$', 'interpreter', 'latex');
 ylabel('$x_2$', 'interpreter', 'latex');
-colorbar('FontSize', 16, 'TickLabelInterpreter', 'latex')
+h=colorbar('FontSize', 16, 'TickLabelInterpreter', 'latex')
 set(gca, 'FontSize', 16)
 xticks([-dataRange 0 dataRange])
 yticks([-dataRange 0 dataRange])
 axis equal
+load('utils\YlGnBuRescaled.mat')
+colormap(flip(YlGnBuRescaled))
+    caxis([0 1.5])
+            set(h, 'ylim', [0 1.5])
+else
+   f1=figure('Name','Controllability/Past Energy Function')
+contourf(x1,x2,.5*xPinvx,10,'w:','LineWidth',3)
+% logMaxECTRB = log10(max(max(.5*xPinvx))); hold on;
+% contour(x1, x2, .5*xPinvx,[0,logspace(-3,ceil(logMaxECTRB),20)]./(10^(ceil(logMaxECTRB)-logMaxECTRB)))
+% xlabel('$x_1$', 'interpreter', 'latex');
+% ylabel('$x_2$', 'interpreter', 'latex');
+% colorbar('FontSize', 16, 'TickLabelInterpreter', 'latex')
+% set(gca, 'FontSize', 16)
+xticks([])
+yticks([])
+axis equal
+load('utils\YlGnBuRescaled.mat')
+colormap(flip(YlGnBuRescaled))
+    caxis([0 80])
 
+
+f2=figure('Name','Observability/Future Energy Function')
+contourf(x1,x2,.5*xQx,10,'w:','LineWidth',3)
+% logMaxEOBSV = log10(max(max(.5*xQx))); hold on;
+% contour(x1, x2, .5*xQx,[0,logspace(-3,ceil(logMaxEOBSV),20)]./(10^(ceil(logMaxEOBSV)-logMaxEOBSV)))
+% xlabel('$x_1$', 'interpreter', 'latex');
+% ylabel('$x_2$', 'interpreter', 'latex');
+% colorbar('FontSize', 16, 'TickLabelInterpreter', 'latex')
+% set(gca, 'FontSize', 16)
+xticks([])
+yticks([])
+axis equal
+load('utils\YlGnBuRescaled.mat')
+colormap(flip(YlGnBuRescaled))
+    caxis([0 1.5]) 
+end
 
 a = sqrt(81*x2.^4 + 396*x2.^3 + 844*x2.^2 + 900*x2+405);
 lambda1 = 9/16 + 11*x2/18 + x2.^2/4 + a/36;

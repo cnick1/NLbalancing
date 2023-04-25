@@ -47,8 +47,9 @@ runExample1_regionOfAccuracy(exportData)
 
 %% Example 2: Singular Value Functions
 runExample2_singularValueFunctions(6, true, true, 1, 2, 2, exportData, kawanoModel);
-runExample2_singularValueFunctions(6, true, true, 2, 2, 2, exportData, kawanoModel);
-
+runExample2_singularValueFunctions(6, true, true, 1, 2, 2, exportData, kawanoModel);
+runExample2_singularValueFunctions(6, true, true, 3, 2, 2, exportData, kawanoModel);
+close all
 %% Example 6: Finite Element Beam Convergence
 % [w] = runExample6(2,2,false);
 [w] = runExample6(2,2,exportData,0.01);
