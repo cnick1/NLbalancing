@@ -135,7 +135,7 @@ if exportData
     %print the header
     fprintf(fileID, 'numElements &    n & n^%d           & CPU-sec   & E_%d^+(x_0)     &  exponentCoeff  &  exponentFit \n', degree, degree);
     for i=1:length(numEls)
-        fprintf(fileID, '%5d       &%5d & %10.4e    & %8.2e  & %12.6e   &  %f  &  %f \n', numEls(i),6*numEls(i),nd(i),times(i),energies(i), a, d);
+        fprintf(fileID, '%5d       &%5d & %10.4e    & %8.2e  & %12.6e   &  %2.2f  &  %2.2f \n', numEls(i),6*numEls(i),nd(i),times(i),energies(i), a, d);
     end
     fclose(fileID);
 end
