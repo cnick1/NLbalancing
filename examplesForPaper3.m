@@ -52,5 +52,5 @@ runExample2_singularValueFunctions(6, true, true, 3, 2, 2, exportData, kawanoMod
 close all
 %% Example 6: Finite Element Beam Convergence
 % [w] = runExample6(2,2,false);
-[w] = runExample6(2,2,exportData,0.01);
 [w] = runExample6(2,2,exportData,0.1);
+[w] = runExample6(2,2,exportData,0.01);
