@@ -61,6 +61,7 @@ else
     % Will reduce to Jeff's original code
     A = f;
     lf = 1;
+    f = {A};
 end
 
 if iscell(g)
@@ -82,6 +83,7 @@ else
     % Will reduce to Jeff's original code
     C = h;
     lh = 1;
+    h = {C};
 end
 
 n = size(A, 1); % A should be n-by-n
@@ -170,9 +172,8 @@ if (d > 2)
     end
 
     % New for polynomial output h(x)
-    % TODO: eliminate h terms that don't exist!
     % TODO: use symmetry to cut in half
-    for p = 1:2
+    for p = (3-lh):lh
         q = 3 - p;
         b = b + eta * vec(h{p}.' * h{q}');
     end
@@ -232,9 +233,8 @@ if (d > 2)
         end
 
         % New for polynomial output h(x)
-        % TODO: eliminate h terms that don't exist!
         % TODO: use symmetry to cut in half
-        for p = 1:(k - 1)
+        for p = (k - lh):lh % would be 1:(k-1) but need to truncate only to h{} terms which exist
             q = k - p;
             b = b + eta * vec(h{p}.' * h{q}');
         end
