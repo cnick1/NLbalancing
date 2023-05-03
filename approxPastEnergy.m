@@ -169,7 +169,9 @@ if (d > 2)
         b = -LyapProduct(N.', v{k - 1}, k - 1);
 
         % New for polynomial drift f(x)
-        for i = 2:(k - 2) % would be from 2:k-1 but k-1 was covered in instantiation of b
+
+        iRange = 2:(k - 2); iRange = iRange(end - lf + 2:end); % Need to only do lf last i's; if there are only 2 Ns for example, only need k-2! otherwise f(xi) doesnt exist and would require a bunch of empty f(xi)s
+        for i = iRange % would be from 2:k-1 but k-1 was covered in instantiation of b
             xi = k + 1 - i;
             b = b - LyapProduct(f{xi}.', v{i}, i);
         end
