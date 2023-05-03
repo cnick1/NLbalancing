@@ -1,4 +1,4 @@
-function [v] = approxPastEnergy(A, N, g, C, eta, d, verbose)
+function [v] = approxPastEnergy(f, N, g, C, eta, d, verbose)
 %  Calculates a polynomial approximation to the past energy function
 %  for a quadratic drift, polynomial input system. The default usage is
 %
@@ -48,19 +48,30 @@ function [v] = approxPastEnergy(A, N, g, C, eta, d, verbose)
 %%
 
 if (nargin < 7)
-  verbose = false;
+    verbose = false;
 end
 
 % Create pointer/shortcuts for dynamical system polynomial coefficients
-if iscell(g)
-  % QB or polynomial input balancing
-  B = g{1};
-  l = length(g) - 1;
+if iscell(f)
+    % QB or polynomial input balancing
+    A = f{1};
+    N = f{2}; % maybe don't do this here? Well if N is missing the code would break anyways
+    lf = length(f);
 else
-  % Will reduce to Jeff's original code
-  B = g;
-  l = 0;
-  g = {B};
+    % Will reduce to Jeff's original code
+    A = f;
+    lf = 1;
+end
+
+if iscell(g)
+    % QB or polynomial input balancing
+    B = g{1};
+    lg = length(g) - 1;
+else
+    % Will reduce to Jeff's original code
+    B = g;
+    lg = 0;
+    g = {B};
 end
 
 n = size(A, 1); % A should be n-by-n
@@ -74,58 +85,58 @@ vec = @(X) X(:);
 R = eye(m);
 
 if (eta ~= 0)
-  %  We multiply the ARE by -1 to put it into the standard form in icare,
-  %  and know (-A,-B) is a controllable pair if (A,B) is.
-  [V2] = icare(-A, -B, eta * (C.' * C), R);
+    %  We multiply the ARE by -1 to put it into the standard form in icare,
+    %  and know (-A,-B) is a controllable pair if (A,B) is.
+    [V2] = icare(-A, -B, eta * (C.' * C), R);
 
-  if (isempty(V2) && verbose)
-    warning('approxPastEnergy: icare couldn''t find stabilizing solution')
-  end
-
-  if (isempty(V2))
-
-    if (verbose)
-      warning('approxPastEnergy: using matrix inverse')
+    if (isempty(V2) && verbose)
+        warning('approxPastEnergy: icare couldn''t find stabilizing solution')
     end
 
-    [Yinf] = icare(A.', C.', B * B.', eye(p) / eta);
+    if (isempty(V2))
 
-    if (isempty(Yinf))
-      V2 = [];
-    else
-      V2 = inv(Yinf); % yikes!!!
+        if (verbose)
+            warning('approxPastEnergy: using matrix inverse')
+        end
+
+        [Yinf] = icare(A.', C.', B * B.', eye(p) / eta);
+
+        if (isempty(Yinf))
+            V2 = [];
+        else
+            V2 = inv(Yinf); % yikes!!!
+        end
+
     end
 
-  end
-
-  if (isempty(V2))
-    if (verbose), fprintf("trying the anti-solution\n"), end
-    [V2] = icare(-A, B, eta * (C.' * C), R, 'anti');
-  end
-
-  if (isempty(V2))
-
-    if (verbose)
-      warning('approxPastEnergy: icare couldn''t find stabilizing solution')
-      fprintf('approxPastEnergy: using the hamiltonian\n')
+    if (isempty(V2))
+        if (verbose), fprintf("trying the anti-solution\n"), end
+        [V2] = icare(-A, B, eta * (C.' * C), R, 'anti');
     end
 
-    [~, V2, ~] = hamiltonian(-A, B, eta * (C.' * C), R, true);
-    V2 = real(V2);
-  end
+    if (isempty(V2))
 
-  if (isempty(V2))
-    error('Could not find a solution to the ARE, adjust the eta parameter')
-  end
+        if (verbose)
+            warning('approxPastEnergy: icare couldn''t find stabilizing solution')
+            fprintf('approxPastEnergy: using the hamiltonian\n')
+        end
+
+        [~, V2, ~] = hamiltonian(-A, B, eta * (C.' * C), R, true);
+        V2 = real(V2);
+    end
+
+    if (isempty(V2))
+        error('Could not find a solution to the ARE, adjust the eta parameter')
+    end
 
 else % eta==0
-  %  This case is described in Section II.B of the paper and requires a
-  %  matrix inverse to calculate E_c.
-  [V2] = lyap(A, (B * B.'));
-  V2 = inv(V2); % yikes!!!!!!!!
+    %  This case is described in Section II.B of the paper and requires a
+    %  matrix inverse to calculate E_c.
+    [V2] = lyap(A, (B * B.'));
+    V2 = inv(V2); % yikes!!!!!!!!
 
-  %  To do: look at approximating this by [V2] = icare(-A,-B,eta*(C.'*C),R)
-  %  with a small value of eta (and perhaps other choices for C.'*C)
+    %  To do: look at approximating this by [V2] = icare(-A,-B,eta*(C.'*C),R)
+    %  with a small value of eta (and perhaps other choices for C.'*C)
 
 end
 
@@ -134,67 +145,75 @@ v{2} = vec(V2);
 
 %% k=3 case
 if (d > 2)
-  GaVb = cell(2 * l + 1, d - 1); % Pre-compute G_a.'*V_b, etc for all the a,b we need
-  GaVb{1, 2} = B.' * V2; % Recall g{1} = B
-  % set up the generalized Lyapunov solver
-  [Acell{1:d}] = deal(A.' + V2 * (B * B.'));
+    GaVb = cell(2 * lg + 1, d - 1); % Pre-compute G_a.'*V_b, etc for all the a,b we need
+    GaVb{1, 2} = B.' * V2; % Recall g{1} = B
+    % set up the generalized Lyapunov solver
+    [Acell{1:d}] = deal(A.' + V2 * (B * B.'));
 
-  b = -LyapProduct(N.', v{2}, 2);
+    % Form RHS b by successively adding terms
+    b = -LyapProduct(N.', v{2}, 2);
 
-  if l > 0 % New for QB/polynomial input
-    Im = speye(m);
-    GaVb{2, 2} = g{2}.' * V2;
-    b = b - 2 * kron(speye(n ^ 3), vec(Im).') * vec(kron(GaVb{2, 2}, GaVb{1, 2}));
-  end
-
-  [v{3}] = KroneckerSumSolver(Acell(1:3), b, 3);
-  [v{3}] = kronMonomialSymmetrize(v{3}, n, 3);
-
-  %% k>3 case (up to d)
-  for k = 4:d
-    GaVb{1, k - 1} = B.' * reshape(v{k - 1}, n, n ^ (k - 2));
-
-    b = -LyapProduct(N.', v{k - 1}, k - 1);
-
-    for i = 3:(k + 1) / 2
-      j = k + 2 - i;
-      tmp = GaVb{1, i}.' * GaVb{1, j};
-      b = b - 0.25 * i * j * (vec(tmp) + vec(tmp.'));
+    if lg > 0 % New for QB/polynomial input
+        Im = speye(m);
+        GaVb{2, 2} = g{2}.' * V2;
+        b = b - 2 * kron(speye(n ^ 3), vec(Im).') * vec(kron(GaVb{2, 2}, GaVb{1, 2}));
     end
 
-    if ~mod(k, 2) % k is even
-      i = (k + 2) / 2;
-      j = i;
-      tmp = GaVb{1, i}.' * GaVb{1, j};
-      b = b - 0.25 * i * j * vec(tmp);
-    end
+    [v{3}] = KroneckerSumSolver(Acell(1:3), b, 3);
+    [v{3}] = kronMonomialSymmetrize(v{3}, n, 3);
 
-    % Now add the higher order polynomial terms by iterating through the sums
-    [g{l + 2:2 * l + 1}] = deal(0); % Need extra space in g because of GaVb indexing
+    %% k>3 case (up to d)
+    for k = 4:d
+        GaVb{1, k - 1} = B.' * reshape(v{k - 1}, n, n ^ (k - 2));
 
-    for o = 1:2 * l
-        for idx = 2:k-1 % Might be repetitive
-            GaVb{o + 1, idx} = g{o + 1}.' * reshape(v{idx}, n, n ^ (idx - 1));
-        end
-      for p = max(0, o - l):min(o, l)
+        b = -LyapProduct(N.', v{k - 1}, k - 1);
 
-        for i = 2:k - o
-          q = o - p;
-          j = k - o - i + 2;
-          tmp = kron(speye(n ^ p), vec(Im).') ...
-            * kron(vec(GaVb{q + 1, j}).', kron(GaVb{p + 1, i}, Im)) ...
-            * kron(speye(n ^ (j - 1)), kron(perfectShuffle(n ^ (i - 1), n ^ q * m), Im)) ...
-            * kron(speye(n ^ (k - p)), vec(Im));
-          b = b - 0.25 * i * j * vec(tmp);
+        % New for polynomial drift f(x)
+        for i = 2:(k - 2) % would be from 2:k-1 but k-1 was covered in instantiation of b
+            xi = k + 1 - i;
+            b = b - LyapProduct(f{xi}.', v{i}, i);
         end
 
-      end
+        % B contributions
+        for i = 3:(k + 1) / 2
+            j = k + 2 - i;
+            tmp = GaVb{1, i}.' * GaVb{1, j};
+            b = b - 0.25 * i * j * (vec(tmp) + vec(tmp.'));
+        end
 
+        if ~mod(k, 2) % k is even
+            i = (k + 2) / 2;
+            j = i;
+            tmp = GaVb{1, i}.' * GaVb{1, j};
+            b = b - 0.25 * i * j * vec(tmp);
+        end
+
+        % Now add the higher order polynomial input G(x) terms by iterating through the sums
+        [g{lg + 2:2 * lg + 1}] = deal(0); % Need extra space in g because of GaVb indexing
+
+        for o = 1:2 * lg
+            for idx = 2:k - 1 % Might be repetitive
+                GaVb{o + 1, idx} = g{o + 1}.' * reshape(v{idx}, n, n ^ (idx - 1));
+            end
+            for p = max(0, o - lg):min(o, lg)
+
+                for i = 2:k - o
+                    q = o - p;
+                    j = k - o - i + 2;
+                    tmp = kron(speye(n ^ p), vec(Im).') ...
+                        * kron(vec(GaVb{q + 1, j}).', kron(GaVb{p + 1, i}, Im)) ...
+                        * kron(speye(n ^ (j - 1)), kron(perfectShuffle(n ^ (i - 1), n ^ q * m), Im)) ...
+                        * kron(speye(n ^ (k - p)), vec(Im));
+                    b = b - 0.25 * i * j * vec(tmp);
+                end
+
+            end
+
+        end
+
+        [v{k}] = KroneckerSumSolver(Acell(1:k), b, k);
+        [v{k}] = kronMonomialSymmetrize(v{k}, n, k);
     end
-
-    [v{k}] = KroneckerSumSolver(Acell(1:k), b, k);
-    [v{k}] = kronMonomialSymmetrize(v{k}, n, k);
-  end
 
 end
 
