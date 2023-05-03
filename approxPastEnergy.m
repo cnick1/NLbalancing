@@ -173,7 +173,7 @@ if (d > 2)
 
     % New for polynomial output h(x)
     % TODO: use symmetry to cut in half
-    for p = (3-lh):lh
+    for p = (3 - lh):lh
         q = 3 - p;
         b = b + eta * vec(h{p}.' * h{q}');
     end
