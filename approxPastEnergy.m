@@ -1,4 +1,4 @@
-function [v] = approxPastEnergy(f, N, g, C, eta, d, verbose)
+function [v] = approxPastEnergy(f, N, g, h, eta, d, verbose)
 %  Calculates a polynomial approximation to the past energy function
 %  for a quadratic drift, polynomial input system. The default usage is
 %
@@ -53,7 +53,7 @@ end
 
 % Create pointer/shortcuts for dynamical system polynomial coefficients
 if iscell(f)
-    % QB or polynomial input balancing
+    % polynomial drift balancing
     A = f{1};
     N = f{2}; % maybe don't do this here? Well if N is missing the code would break anyways
     lf = length(f);
@@ -72,6 +72,16 @@ else
     B = g;
     lg = 0;
     g = {B};
+end
+
+if iscell(h)
+    % polynomial output balancing
+    C = h{1};
+    lh = length(h);
+else
+    % Will reduce to Jeff's original code
+    C = h;
+    lh = 1;
 end
 
 n = size(A, 1); % A should be n-by-n
@@ -159,6 +169,14 @@ if (d > 2)
         b = b - 2 * kron(speye(n ^ 3), vec(Im).') * vec(kron(GaVb{2, 2}, GaVb{1, 2}));
     end
 
+    % New for polynomial output h(x)
+    % TODO: eliminate h terms that don't exist!
+    % TODO: use symmetry to cut in half
+    for p = 1:2
+        q = 3 - p;
+        b = b + eta * vec(h{p}.' * h{q}');
+    end
+
     [v{3}] = KroneckerSumSolver(Acell(1:3), b, 3);
     [v{3}] = kronMonomialSymmetrize(v{3}, n, 3);
 
@@ -170,7 +188,7 @@ if (d > 2)
 
         % New for polynomial drift f(x)
 
-        iRange = 2:(k - 2); iRange = iRange(end - lf + 2:end); % Need to only do lf last i's; if there are only 2 Ns for example, only need k-2! otherwise f(xi) doesnt exist and would require a bunch of empty f(xi)s
+        iRange = 2:(k - 2); iRange = iRange(end - lf + 2:end); % Need to only do lf last i's; if there are only 2 Ns for example, only need k-2! otherwise f(xi) doesnt exist and would require a bunch of empty f(xi)s TODO: may be better to write directly in terms of xi, but then how to get rid of i=k-1...?
         for i = iRange % would be from 2:k-1 but k-1 was covered in instantiation of b
             xi = k + 1 - i;
             b = b - LyapProduct(f{xi}.', v{i}, i);
@@ -213,6 +231,15 @@ if (d > 2)
 
         end
 
+        % New for polynomial output h(x)
+        % TODO: eliminate h terms that don't exist!
+        % TODO: use symmetry to cut in half
+        for p = 1:(k - 1)
+            q = k - p;
+            b = b + eta * vec(h{p}.' * h{q}');
+        end
+
+        % Done with RHS! Now solve and symmetrize!
         [v{k}] = KroneckerSumSolver(Acell(1:k), b, k);
         [v{k}] = kronMonomialSymmetrize(v{k}, n, k);
     end
