@@ -1,4 +1,4 @@
-function [A, B, C, N, g, f, h] = getSystem2(kawanoModel, varargin)
+function [A, B, C, N, f, g, h] = getSystem2(kawanoModel, varargin)
 %getSystem2  Generates a 2D polynomial system for testing energy functions.
 %            Model based on systems taken from [1,2].
 %
