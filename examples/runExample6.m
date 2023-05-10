@@ -63,7 +63,7 @@ for numEl = numEls
     [A, B, C, N, f, g, h] = getSystem6(numEl,2);
     g(numGTermsModel + 1:end) = deal({0}); % Adjust FOM to be Quadratic, QB, etc.
     
-    tic; for i = 1:nTest, [w] = approxFutureEnergy(A, N, g(1:numGTermsApprox), C, eta, degree); end, tt = toc / nTest;
+    tic; for i = 1:nTest, [w] = approxFutureEnergy(f, N, g(1:numGTermsApprox), C, eta, degree); end, tt = toc / nTest;
     
     fprintf(fileID, '%10.4e    & ', length(w{degree}));
     nd = [nd, length(w{degree})];
@@ -97,7 +97,7 @@ if exportData
         [A, B, C, N, f, g, h] = getSystem6(numEl);
         g(numGTermsModel + 1:end) = deal({0}); % Adjust FOM to be Quadratic, QB, etc.
         
-        tic; for i = 1:nTest, [w] = approxFutureEnergy(A, N, g(1:numGTermsApprox), C, eta, degree); end, tt = toc / nTest;
+        tic; for i = 1:nTest, [w] = approxFutureEnergy(f, N, g(1:numGTermsApprox), C, eta, degree); end, tt = toc / nTest;
         
         fprintf(fileID, '%10.4e    & ', length(w{degree}));
         nd = [nd, length(w{degree})];
@@ -165,7 +165,7 @@ for numEl = numEls
     [A, B, C, N, f, g, h] = getSystem6(numEl);
     g(numGTermsModel + 1:end) = deal({0}); % Adjust FOM to be Quadratic, QB, etc.
     
-    tic; for i = 1:nTest, [w] = approxFutureEnergy(A, N, g(1:numGTermsApprox), C, eta, degree); end, tt = toc / nTest;
+    tic; for i = 1:nTest, [w] = approxFutureEnergy(f, N, g(1:numGTermsApprox), C, eta, degree); end, tt = toc / nTest;
     
     fprintf(fileID, '%10.4e    & ', length(w{degree}));
     nd = [nd, length(w{degree})];
@@ -199,7 +199,7 @@ if exportData
         [A, B, C, N, f, g, h] = getSystem6(numEl);
         g(numGTermsModel + 1:end) = deal({0}); % Adjust FOM to be Quadratic, QB, etc.
         
-        tic; for i = 1:nTest, [w] = approxFutureEnergy(A, N, g(1:numGTermsApprox), C, eta, degree); end, tt = toc / nTest;
+        tic; for i = 1:nTest, [w] = approxFutureEnergy(f, N, g(1:numGTermsApprox), C, eta, degree); end, tt = toc / nTest;
         
         fprintf(fileID, '%10.4e    & ', length(w{degree}));
         nd = [nd, length(w{degree})];
@@ -301,7 +301,7 @@ for degree = degrees
     
     % Future
     tic; for i = 1:nTest,
-        [w] = approxFutureEnergy(A, N, g(1:numGTermsApprox), C, eta, degree);
+        [w] = approxFutureEnergy(f, N, g(1:numGTermsApprox), C, eta, degree);
     end, tt = toc / nTest;
     
     fprintf(fileID, '%8.2e  & ', tt);
@@ -336,7 +336,7 @@ if exportData
         
         % Future
         tic; for i = 1:nTest,
-            [w] = approxFutureEnergy(A, N, g(1:numGTermsApprox), C, eta, degree);
+            [w] = approxFutureEnergy(f, N, g(1:numGTermsApprox), C, eta, degree);
         end, tt = toc / nTest;
         
         fprintf(fileID, '%8.2e  & ', tt);
