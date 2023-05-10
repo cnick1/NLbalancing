@@ -1,4 +1,4 @@
-function [w] = approxFutureEnergy(f, N, g, h, eta, d, verbose)
+function [w, RES] = approxFutureEnergy(f, N, g, h, eta, d, verbose)
 %  Calculates a polynomial approximation to the future energy function
 %  for a quadratic drift, polynomial input system. The default usage is
 %
@@ -163,7 +163,9 @@ if (d > 2)
 
         % New for polynomial drift f(x)
 
-        iRange = 2:(k - 2); iRange = iRange(end - lf + 2:end); % Need to only do lf last i's; if there are only 2 Ns for example, only need k-2! otherwise f(xi) doesnt exist and would require a bunch of empty f(xi)s TODO: may be better to write directly in terms of xi, but then how to get rid of i=k-1...?
+        iRange = 2:(k - 2);
+        iRange = iRange(max(k - lf, 1):end); % Need to only do lf last i's; if there are only 2 Ns for example, only need k-2! otherwise f(xi) doesnt exist and would require a bunch of empty f(xi)s
+        %         TODO: may be better to write directly in terms of xi, but then how to get rid of i=k-1...?
         for i = iRange % would be from 2:k-1 but k-1 was covered in instantiation of b
             xi = k + 1 - i;
             b = b - LyapProduct(f{xi}.', w{i}, i);
@@ -218,6 +220,30 @@ if (d > 2)
         [w{k}] = kronMonomialSymmetrize(w{k}, n, k);
     end
 
+end
+
+if verbose % Check HJB Residual
+    % Compute "residual":
+    nX = 301; nY = nX;
+    xPlot = linspace(-1, 1, nX);
+    yPlot = linspace(-1, 1, nY);
+    [X, Y] = meshgrid(xPlot, yPlot);
+    RES = zeros(nY, nX);
+    degree = length(w);
+    for i = 1:nY
+        for j = 1:nX
+            x = [X(i, j); Y(i, j)];
+
+            RES(i, j) = (0.5 * kronPolyDerivEval(w, x, degree)) * (f{1} * x + f{2} * kron(x, x)) ...
+                - eta / 2 * 0.25 * kronPolyDerivEval(w, x, degree) * (g{1} + g{2} * x) * (g{1} + g{2} * x).' * kronPolyDerivEval(w, x, degree).' ...
+                + 0.5 * (C * x).' * (C * x);
+        end
+    end
+    % RES = sum(sum(abs(RES))) / (nX * nY);
+
+    fprintf('The residual of the HJB equation on the unit square is %g\n', norm(RES, 'inf'));
+else
+    RES = [];
 end
 
 end
