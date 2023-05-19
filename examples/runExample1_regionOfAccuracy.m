@@ -266,8 +266,19 @@ if exportData
         fprintf(fileID, '%12.6e         & %12.6e         & %12.6e         & %12.6e         & %12.6e       & %12.6e       & %12.6e       & %12.6e       & %12.6e      & %12.6e      & %12.6e      & %12.6e     \n', Ef2_errorFun_full(i), Ef4_errorFun_full(i), Ef6_errorFun_full(i), Ef8_errorFun_full(i), Ef2_errorFun_QB(i), Ef4_errorFun_QB(i), Ef6_errorFun_QB(i), Ef8_errorFun_QB(i), Ef2_errorFun_Q(i), Ef4_errorFun_Q(i), Ef6_errorFun_Q(i), Ef8_errorFun_Q(i));
     end
     fclose(fileID);
-    type(fileName)
+    type(fileName);
 end
+
+
+%% HJB Residual Error
+xd = linspace(-6, 6, 301);
+eta = 0.5; % values should be between -\infty and 1.
+% eta=0.5 corresponds to gamma= sqrt(2)
+% since eta = 1 - 1/gamma^2;
+
+[A, B, C, N, f, g, h] = getSystem1();
+
+
 
 end
 

@@ -42,7 +42,7 @@ fprintf('Simulating for eta=%g (gamma=%g)\n', eta, 1 / sqrt(1 - eta))
 
 %  Compute the polynomial approximations to the future energy function
 d = 8;
-[w] = approxFutureEnergy(f, N, g(1:numGTermsApprox), C, eta, d);
+[w, RES] = approxFutureEnergy(f, N, g(1:numGTermsApprox), C, eta, d, true);
 
 w2 = w{2}; w3 = w{3}; w4 = w{4}; w5 = w{5}; w6 = w{6}; w7 = w{7}; w8 = w{8};
 
@@ -63,7 +63,7 @@ Ef8 = Ef7 + 0.5 * w8 * x .^ 8;
 
 %  Compute the analytical solution for comparison
 
-EPlusAnalytic = EgammaPlusNumerical(x, A, B, C, N, g, eta);
+EPlusAnalytic = EgammaPlusNumerical(x,f,g,h, eta);
 
 figure
 plot(x(1:10:end), EPlusAnalytic(1:10:end), '+', ...
@@ -127,7 +127,7 @@ Ep7 = Ep6 + 0.5 * v7 * x .^ 7;
 Ep8 = Ep7 + 0.5 * v8 * x .^ 8;
 
 %  Compute the analytical solution for comparison
-EMinusAnalytic = EgammaMinusNumerical(x, A, B, C, N, g, eta);
+EMinusAnalytic = EgammaMinusNumerical(x, f, g, h, eta);
 
 figure
 plot(x(1:10:end), EMinusAnalytic(1:10:end), '+', ...
@@ -196,13 +196,13 @@ if exportPlotData
 end
 end
 
-function [Ex] = EgammaPlusNumerical(xd, A, B, C, N, g, eta)
+function [Ex] = EgammaPlusNumerical(xd, f, g, h, eta)
 
 syms x;
 
-a = -eta / 2 * (g{1} + g{2} * x + g{3} * x ^ 2) ^ 2;
-b = A * x + N * x ^ 2;
-c = 1/2 * C ^ 2 * x ^ 2;
+a = -eta/2 * (g{1} + kronPolyEval(g(2:end),x)) ^ 2;
+b = kronPolyEval(f,x);
+c = 1/2 * kronPolyEval(h,x) ^ 2;
 
 dEx2 = (-b - sqrt(b ^ 2 - 4 * a * c)) / (2 * a);
 dEx1 = (-b + sqrt(b ^ 2 - 4 * a * c)) / (2 * a);
@@ -228,13 +228,13 @@ end
 
 end
 
-function [Ex] = EgammaMinusNumerical(xd, A, B, C, N, g, eta)
+function [Ex] = EgammaMinusNumerical(xd, f, g, h, eta)
 
 syms x;
 
-a = -1/2 * (g{1} + g{2} * x + g{3} * x ^ 2) ^ 2;
-b = -A * x - N * x ^ 2;
-c = eta / 2 * C ^ 2 * x ^ 2;
+a = -1/2 * (g{1} + kronPolyEval(g(2:end),x)) ^ 2;
+b = -kronPolyEval(f,x);
+c = eta/2 * kronPolyEval(h,x) ^ 2;
 
 dEx2 = (-b - sqrt(b ^ 2 - 4 * a * c)) / (2 * a);
 dEx1 = (-b + sqrt(b ^ 2 - 4 * a * c)) / (2 * a);
@@ -259,46 +259,4 @@ end
 
 end
 
-function [E] = EgammaPlus(x, A, B, C, N, g, eta)
 
-syms x;
-
-a = -eta / 2 * (g{1} + g{2} * x + g{3} * x ^ 2) ^ 2;
-b = A * x + N * x ^ 2;
-c = 1/2 * C ^ 2 * x ^ 2;
-
-dEx1 = (-b - sqrt(b ^ 2 - 4 * a * c)) / (2 * a);
-dEx2 = (-b + sqrt(b ^ 2 - 4 * a * c)) / (2 * a);
-
-Ex1 = int(dEx1, x);
-Ex2 = int(dEx2, x);
-
-y = piecewise(x < 0, Ex2, x > 0, Ex1);
-
-fplot(y, [-6, 6], '-.+', 'LineWidth', 2)
-hold on
-
-E = y;
-end
-
-function [E] = EgammaMinus(x, A, B, C, N, g, eta)
-
-syms x;
-
-a = -1/2 * (g{1} + g{2} * x + g{3} * x ^ 2) ^ 2;
-b = -A * x - N * x ^ 2;
-c = eta / 2 * C ^ 2 * x ^ 2;
-
-dEx1 = (-b - sqrt(b ^ 2 - 4 * a * c)) / (2 * a);
-dEx2 = (-b + sqrt(b ^ 2 - 4 * a * c)) / (2 * a);
-
-Ex1 = int(dEx1, x);
-Ex2 = int(dEx2, x);
-
-y = piecewise(x < 0, Ex2, x > 0, Ex1);
-
-fplot(y, [-6, 6], '-.+', 'LineWidth', 2)
-hold on
-
-E = y;
-end

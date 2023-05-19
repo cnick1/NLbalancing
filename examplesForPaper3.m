@@ -20,7 +20,7 @@ exportData = true;
 kawanoModel = true;
 %%  Example 1: 1D ODE with analytical energy functions
 % runExample1(1);
-runExample1(2,2,exportData);
+runExample1(3,3,exportData);
 % runExample1(3);
 
 % Compare all 4 cases
@@ -36,21 +36,26 @@ runExample1(2,2,exportData);
 % title('polynomial system, polynomial assumed ***')
 %
 
-runExample1_regionOfAccuracy(exportData)
+runExample1_regionOfAccuracy(exportData);
 
 %%  Example 2: 2D Energy Functions
 % For Table 1, please use energyFunctionValidation in the tests directory.
 % [v, w] = runExample2(6, true, false, 6, 1, 1, false, kawanoModel);
-[v, w] = runExample2(6, true, false, 6, 2, 2, exportData, kawanoModel);
+[v, w] = runExample2(4, true, false, 4, 2, 2, exportData, kawanoModel);
 % [v, w] = runExample2(6, true, false, 6, 3, 3, false, kawanoModel);
 
 
-%% Example 2: Singular Value Functions
-runExample2_singularValueFunctions(6, true, true, 1, 2, 2, exportData, kawanoModel);
-runExample2_singularValueFunctions(6, true, true, 1, 2, 2, exportData, kawanoModel);
-runExample2_singularValueFunctions(6, true, true, 3, 2, 2, exportData, kawanoModel);
+% Example 2: Singular Value Functions
+runExample2_singularValueFunctions(4, true, true, 1, 2, 2, exportData, kawanoModel);
+runExample2_singularValueFunctions(4, true, true, 1, 2, 2, exportData, kawanoModel);
+runExample2_singularValueFunctions(4, true, true, 3, 2, 2, exportData, kawanoModel);
 close all
+
+% Example 2: residuals
+
+
 %% Example 6: Finite Element Beam Convergence
 % [w] = runExample6(2,2,false);
 [w] = runExample6(2,2,exportData,0.1);
+[w] = runExample6(3,3,false,0.01);
 [w] = runExample6(2,2,exportData,0.01);
