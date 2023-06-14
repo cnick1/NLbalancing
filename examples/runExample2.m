@@ -147,13 +147,13 @@ if (plotEnergy || plotBalancing)
     end
 
     % Draw square around middle .2
-    x1 =- .2;
-    x2 = .2;
-    y1 =- .2;
-    y2 = .2;
-    x = [x1, x2, x2, x1, x1];
-    y = [y1, y1, y2, y2, y1];
-    plot(x, y, 'w-');
+%     x1 =- .2;
+%     x2 = .2;
+%     y1 =- .2;
+%     y2 = .2;
+%     x = [x1, x2, x2, x1, x1];
+%     y = [y1, y1, y2, y2, y1];
+%     plot(x, y, 'w-');
 
     if exportPlotData
         % save('Ex2_RawData.mat', 'v', 'w')

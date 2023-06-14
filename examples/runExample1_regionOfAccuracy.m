@@ -21,26 +21,26 @@ eta = 0.5; % values should be between -\infty and 1.
 % since eta = 1 - 1/gamma^2;
 
 [A, B, C, N, f, g, h] = getSystem1();
-EPlusAnalytic = EgammaPlusNumerical(xd, A, B, C, N, g, eta);
+EMinusAnalytic = EgammaMinusNumerical(xd, f, g, h, eta);
 
 figure(1); colororder({'#0072BD', '#D95319', '#EDB120', '#7E2F8E', '#77AC30'});
-set(gca, 'DefaultLineLineWidth', 2);
-set(gca, 'DefaultAxesLineStyleOrder', {'-', '--', ':'});
+set(figure(1), 'DefaultLineLineWidth', 2);
+set(figure(1), 'DefaultAxesLineStyleOrder', {'-', '--', ':'});
 
 for numGTermsModel = 3:-1:1
     g(numGTermsModel + 1:end) = deal({0}); % Adjust FOM to be Quadratic, QB, etc.
 
-    %  Compute the polynomial approximations to the future energy function
+    %  Compute the polynomial approximations to the Past energy function
     d = 8;
-    [w] = approxFutureEnergy(A, N, g, C, eta, d);
-    w2 = w{2}; w3 = w{3}; w4 = w{4}; w5 = w{5}; w6 = w{6}; w7 = w{7}; w8 = w{8};
-    Ef2 = 0.5 * w2 * xd .^ 2; Ef3 = Ef2 + 0.5 * w3 * xd .^ 3; Ef4 = Ef3 + 0.5 * w4 * xd .^ 4; Ef5 = Ef4 + 0.5 * w5 * xd .^ 5; Ef6 = Ef5 + 0.5 * w6 * xd .^ 6; Ef7 = Ef6 + 0.5 * w7 * xd .^ 7; Ef8 = Ef7 + 0.5 * w8 * xd .^ 8;
+    [v] = approxPastEnergy(A, N, g, C, eta, d);
+    v2 = v{2}; v3 = v{3}; v4 = v{4}; v5 = v{5}; v6 = v{6}; v7 = v{7}; v8 = v{8};
+    Ep2 = 0.5 * v2 * xd .^ 2; Ep3 = Ep2 + 0.5 * v3 * xd .^ 3; Ep4 = Ep3 + 0.5 * v4 * xd .^ 4; Ep5 = Ep4 + 0.5 * v5 * xd .^ 5; Ep6 = Ep5 + 0.5 * v6 * xd .^ 6; Ep7 = Ep6 + 0.5 * v7 * xd .^ 7; Ep8 = Ep7 + 0.5 * v8 * xd .^ 8;
 
-    figure(1); plot(xd(1:10:end), EPlusAnalytic(1:10:end), '+', 'LineWidth', 1); hold on;
-    plot(xd, Ef2, ...
-        xd, Ef4, ...
-        xd, Ef6, ...
-        xd, Ef8, ...
+    figure(1); plot(xd(1:10:end), EMinusAnalytic(1:10:end), '+', 'LineWidth', 1); hold on;
+    plot(xd, Ep2, ...
+        xd, Ep4, ...
+        xd, Ep6, ...
+        xd, Ep8, ...
         'LineWidth', 2)
 end
 
@@ -57,40 +57,40 @@ eta = 0.5; % values should be between -\infty and 1.
 [A, B, C, N, f, g, h] = getSystem1();
 
 figure(2); colororder({'#D95319', '#EDB120', '#7E2F8E', '#77AC30'});
-set(gca, 'DefaultLineLineWidth', 2);
-set(gca, 'DefaultAxesLineStyleOrder', {'-', '--', ':'});
+set(figure(2), 'DefaultLineLineWidth', 2);
+set(figure(2), 'DefaultAxesLineStyleOrder', {'-', '--', ':'});
 
 for numGTermsModel = 3:-1:1
     g(numGTermsModel + 1:end) = deal({0}); % Adjust FOM to be Quadratic, QB, etc.
 
-    %  Compute the polynomial approximations to the future energy function
+    %  Compute the polynomial approximations to the Past energy function
     d = 8;
-    [w] = approxFutureEnergy(A, N, g, C, eta, d);
-    w2 = w{2}; w3 = w{3}; w4 = w{4}; w5 = w{5}; w6 = w{6}; w7 = w{7}; w8 = w{8};
-    Ef2 = 0.5 * w2 * xd .^ 2; Ef3 = Ef2 + 0.5 * w3 * xd .^ 3; Ef4 = Ef3 + 0.5 * w4 * xd .^ 4; Ef5 = Ef4 + 0.5 * w5 * xd .^ 5; Ef6 = Ef5 + 0.5 * w6 * xd .^ 6; Ef7 = Ef6 + 0.5 * w7 * xd .^ 7; Ef8 = Ef7 + 0.5 * w8 * xd .^ 8;
+    [v] = approxPastEnergy(A, N, g, C, eta, d);
+    v2 = v{2}; v3 = v{3}; v4 = v{4}; v5 = v{5}; v6 = v{6}; v7 = v{7}; v8 = v{8};
+    Ep2 = 0.5 * v2 * xd .^ 2; Ep3 = Ep2 + 0.5 * v3 * xd .^ 3; Ep4 = Ep3 + 0.5 * v4 * xd .^ 4; Ep5 = Ep4 + 0.5 * v5 * xd .^ 5; Ep6 = Ep5 + 0.5 * v6 * xd .^ 6; Ep7 = Ep6 + 0.5 * v7 * xd .^ 7; Ep8 = Ep7 + 0.5 * v8 * xd .^ 8;
 
-    Ef2_error = Ef2.' - EPlusAnalytic; Ef2_error = Ef2_error .^ 2;
-    Ef4_error = Ef4.' - EPlusAnalytic; Ef4_error = Ef4_error .^ 2;
-    Ef6_error = Ef6.' - EPlusAnalytic; Ef6_error = Ef6_error .^ 2;
-    Ef8_error = Ef8.' - EPlusAnalytic; Ef8_error = Ef8_error .^ 2;
+    Ep2_error = Ep2 - EMinusAnalytic; Ep2_error = Ep2_error .^ 2;
+    Ep4_error = Ep4 - EMinusAnalytic; Ep4_error = Ep4_error .^ 2;
+    Ep6_error = Ep6 - EMinusAnalytic; Ep6_error = Ep6_error .^ 2;
+    Ep8_error = Ep8 - EMinusAnalytic; Ep8_error = Ep8_error .^ 2;
 
     intervalSize = xd(126:end);
-    Ef2_errorFun = zeros(length(intervalSize), 1);
-    Ef4_errorFun = zeros(length(intervalSize), 1);
-    Ef6_errorFun = zeros(length(intervalSize), 1);
-    Ef8_errorFun = zeros(length(intervalSize), 1);
+    Ep2_errorFun = zeros(length(intervalSize), 1);
+    Ep4_errorFun = zeros(length(intervalSize), 1);
+    Ep6_errorFun = zeros(length(intervalSize), 1);
+    Ep8_errorFun = zeros(length(intervalSize), 1);
     for idx = 0:124
-        Ef2_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ef2_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
-        Ef4_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ef4_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
-        Ef6_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ef6_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
-        Ef8_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ef8_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
+        Ep2_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep2_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
+        Ep4_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep4_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
+        Ep6_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep6_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
+        Ep8_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep8_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
     end
 
-    semilogy(intervalSize, Ef2_errorFun)
+    semilogy(intervalSize, Ep2_errorFun)
     hold on;
-    semilogy(intervalSize, Ef4_errorFun)
-    semilogy(intervalSize, Ef6_errorFun)
-    semilogy(intervalSize, Ef8_errorFun)
+    semilogy(intervalSize, Ep4_errorFun)
+    semilogy(intervalSize, Ep6_errorFun)
+    semilogy(intervalSize, Ep8_errorFun)
 end
 legend('degree 2', 'degree 4', 'degree 6', 'degree 8', 'Location', 'southeast')
 xlabel('Region radius from origin', 'interpreter', 'latex', 'FontSize', 12, 'fontweight', 'bold')
@@ -105,50 +105,50 @@ eta = 0.5; % values should be between -\infty and 1.
 [A, B, C, N, f, g, h] = getSystem1();
 
 figure(3); colororder({'#D95319', '#EDB120', '#7E2F8E', '#77AC30'});
-set(gca, 'DefaultLineLineWidth', 2);
-set(gca, 'DefaultAxesLineStyleOrder', {'-', '--', ':'});
+set(figure(3), 'DefaultLineLineWidth', 2);
+set(figure(3), 'DefaultAxesLineStyleOrder', {'-', '--', ':'});
 
 for numGTermsModel = 3
     g(numGTermsModel + 1:end) = deal({0}); % Adjust FOM to be Quadratic, QB, etc.
 
-    %  Compute the polynomial approximations to the future energy function
+    %  Compute the polynomial approximations to the Past energy function
     d = 8;
-    [w] = approxFutureEnergy(A, N, g, C, eta, d);
-    w2 = w{2}; w3 = w{3}; w4 = w{4}; w5 = w{5}; w6 = w{6}; w7 = w{7}; w8 = w{8};
-    Ef2 = 0.5 * w2 * xd .^ 2; Ef3 = Ef2 + 0.5 * w3 * xd .^ 3; Ef4 = Ef3 + 0.5 * w4 * xd .^ 4; Ef5 = Ef4 + 0.5 * w5 * xd .^ 5; Ef6 = Ef5 + 0.5 * w6 * xd .^ 6; Ef7 = Ef6 + 0.5 * w7 * xd .^ 7; Ef8 = Ef7 + 0.5 * w8 * xd .^ 8;
+    [v] = approxPastEnergy(A, N, g, C, eta, d);
+    v2 = v{2}; v3 = v{3}; v4 = v{4}; v5 = v{5}; v6 = v{6}; v7 = v{7}; v8 = v{8};
+    Ep2 = 0.5 * v2 * xd .^ 2; Ep3 = Ep2 + 0.5 * v3 * xd .^ 3; Ep4 = Ep3 + 0.5 * v4 * xd .^ 4; Ep5 = Ep4 + 0.5 * v5 * xd .^ 5; Ep6 = Ep5 + 0.5 * v6 * xd .^ 6; Ep7 = Ep6 + 0.5 * v7 * xd .^ 7; Ep8 = Ep7 + 0.5 * v8 * xd .^ 8;
 
-    Ef2_error = Ef2.' - EPlusAnalytic; Ef2_error = Ef2_error .^ 2;
-    Ef4_error = Ef4.' - EPlusAnalytic; Ef4_error = Ef4_error .^ 2;
-    Ef6_error = Ef6.' - EPlusAnalytic; Ef6_error = Ef6_error .^ 2;
-    Ef8_error = Ef8.' - EPlusAnalytic; Ef8_error = Ef8_error .^ 2;
+    Ep2_error = Ep2 - EMinusAnalytic; Ep2_error = Ep2_error .^ 2;
+    Ep4_error = Ep4 - EMinusAnalytic; Ep4_error = Ep4_error .^ 2;
+    Ep6_error = Ep6 - EMinusAnalytic; Ep6_error = Ep6_error .^ 2;
+    Ep8_error = Ep8 - EMinusAnalytic; Ep8_error = Ep8_error .^ 2;
 
     intervalSize = xd(126:end);
-    Ef2_errorFun = zeros(length(intervalSize), 1);
-    Ef4_errorFun = zeros(length(intervalSize), 1);
-    Ef6_errorFun = zeros(length(intervalSize), 1);
-    Ef8_errorFun = zeros(length(intervalSize), 1);
+    Ep2_errorFun = zeros(length(intervalSize), 1);
+    Ep4_errorFun = zeros(length(intervalSize), 1);
+    Ep6_errorFun = zeros(length(intervalSize), 1);
+    Ep8_errorFun = zeros(length(intervalSize), 1);
     for idx = 0:124
-        Ef2_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ef2_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
-        Ef4_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ef4_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
-        Ef6_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ef6_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
-        Ef8_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ef8_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
+        Ep2_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep2_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
+        Ep4_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep4_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
+        Ep6_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep6_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
+        Ep8_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep8_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
     end
 
-    semilogy(intervalSize, Ef2_errorFun)
+    semilogy(intervalSize, Ep2_errorFun)
     hold on;
-    semilogy(intervalSize, Ef4_errorFun)
-    semilogy(intervalSize, Ef6_errorFun)
-    semilogy(intervalSize, Ef8_errorFun)
+    semilogy(intervalSize, Ep4_errorFun)
+    semilogy(intervalSize, Ep6_errorFun)
+    semilogy(intervalSize, Ep8_errorFun)
 end
 legend('degree 2', 'degree 4', 'degree 6', 'degree 8', 'Location', 'southeast')
 xlabel('Region radius from origin', 'interpreter', 'latex', 'FontSize', 12, 'fontweight', 'bold')
 ylabel('L2 error for energy function approximation', 'interpreter', 'latex', 'FontSize', 12, 'fontweight', 'bold')
 grid on;
 
-Ef2_errorFun_full = Ef2_errorFun;
-Ef4_errorFun_full = Ef4_errorFun;
-Ef6_errorFun_full = Ef6_errorFun;
-Ef8_errorFun_full = Ef8_errorFun;
+Ep2_errorFun_full = Ep2_errorFun;
+Ep4_errorFun_full = Ep4_errorFun;
+Ep6_errorFun_full = Ep6_errorFun;
+Ep8_errorFun_full = Ep8_errorFun;
 
 %% 4th Figure: only QB model errors
 
@@ -158,49 +158,49 @@ eta = 0.5; % values should be between -\infty and 1.
 [A, B, C, N, f, g, h] = getSystem1();
 
 figure(4); colororder({'#D95319', '#EDB120', '#7E2F8E', '#77AC30'});
-set(gca, 'DefaultLineLineWidth', 2);
+set(figure(4), 'DefaultLineLineWidth', 2);
 
 for numGTermsModel = 2
     g(numGTermsModel + 1:end) = deal({0}); % Adjust FOM to be Quadratic, QB, etc.
 
-    %  Compute the polynomial approximations to the future energy function
+    %  Compute the polynomial approximations to the Past energy function
     d = 8;
-    [w] = approxFutureEnergy(A, N, g, C, eta, d);
-    w2 = w{2}; w3 = w{3}; w4 = w{4}; w5 = w{5}; w6 = w{6}; w7 = w{7}; w8 = w{8};
-    Ef2 = 0.5 * w2 * xd .^ 2; Ef3 = Ef2 + 0.5 * w3 * xd .^ 3; Ef4 = Ef3 + 0.5 * w4 * xd .^ 4; Ef5 = Ef4 + 0.5 * w5 * xd .^ 5; Ef6 = Ef5 + 0.5 * w6 * xd .^ 6; Ef7 = Ef6 + 0.5 * w7 * xd .^ 7; Ef8 = Ef7 + 0.5 * w8 * xd .^ 8;
+    [v] = approxPastEnergy(A, N, g, C, eta, d);
+    v2 = v{2}; v3 = v{3}; v4 = v{4}; v5 = v{5}; v6 = v{6}; v7 = v{7}; v8 = v{8};
+    Ep2 = 0.5 * v2 * xd .^ 2; Ep3 = Ep2 + 0.5 * v3 * xd .^ 3; Ep4 = Ep3 + 0.5 * v4 * xd .^ 4; Ep5 = Ep4 + 0.5 * v5 * xd .^ 5; Ep6 = Ep5 + 0.5 * v6 * xd .^ 6; Ep7 = Ep6 + 0.5 * v7 * xd .^ 7; Ep8 = Ep7 + 0.5 * v8 * xd .^ 8;
 
-    Ef2_error = Ef2.' - EPlusAnalytic; Ef2_error = Ef2_error .^ 2;
-    Ef4_error = Ef4.' - EPlusAnalytic; Ef4_error = Ef4_error .^ 2;
-    Ef6_error = Ef6.' - EPlusAnalytic; Ef6_error = Ef6_error .^ 2;
-    Ef8_error = Ef8.' - EPlusAnalytic; Ef8_error = Ef8_error .^ 2;
+    Ep2_error = Ep2 - EMinusAnalytic; Ep2_error = Ep2_error .^ 2;
+    Ep4_error = Ep4 - EMinusAnalytic; Ep4_error = Ep4_error .^ 2;
+    Ep6_error = Ep6 - EMinusAnalytic; Ep6_error = Ep6_error .^ 2;
+    Ep8_error = Ep8 - EMinusAnalytic; Ep8_error = Ep8_error .^ 2;
 
     intervalSize = xd(126:end);
-    Ef2_errorFun = zeros(length(intervalSize), 1);
-    Ef4_errorFun = zeros(length(intervalSize), 1);
-    Ef6_errorFun = zeros(length(intervalSize), 1);
-    Ef8_errorFun = zeros(length(intervalSize), 1);
+    Ep2_errorFun = zeros(length(intervalSize), 1);
+    Ep4_errorFun = zeros(length(intervalSize), 1);
+    Ep6_errorFun = zeros(length(intervalSize), 1);
+    Ep8_errorFun = zeros(length(intervalSize), 1);
     for idx = 0:124
-        Ef2_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ef2_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
-        Ef4_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ef4_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
-        Ef6_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ef6_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
-        Ef8_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ef8_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
+        Ep2_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep2_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
+        Ep4_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep4_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
+        Ep6_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep6_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
+        Ep8_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep8_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
     end
 
-    semilogy(intervalSize, Ef2_errorFun)
+    semilogy(intervalSize, Ep2_errorFun)
     hold on;
-    semilogy(intervalSize, Ef4_errorFun, '--')
-    semilogy(intervalSize, Ef6_errorFun, '--')
-    semilogy(intervalSize, Ef8_errorFun, '--')
+    semilogy(intervalSize, Ep4_errorFun, '--')
+    semilogy(intervalSize, Ep6_errorFun, '--')
+    semilogy(intervalSize, Ep8_errorFun, '--')
 end
 legend('degree 2', 'degree 4', 'degree 6', 'degree 8', 'Location', 'southeast')
 xlabel('Region radius from origin', 'interpreter', 'latex', 'FontSize', 12, 'fontweight', 'bold')
 ylabel('L2 error for energy function approximation', 'interpreter', 'latex', 'FontSize', 12, 'fontweight', 'bold')
 grid on;
 
-Ef2_errorFun_QB = Ef2_errorFun;
-Ef4_errorFun_QB = Ef4_errorFun;
-Ef6_errorFun_QB = Ef6_errorFun;
-Ef8_errorFun_QB = Ef8_errorFun;
+Ep2_errorFun_QB = Ep2_errorFun;
+Ep4_errorFun_QB = Ep4_errorFun;
+Ep6_errorFun_QB = Ep6_errorFun;
+Ep8_errorFun_QB = Ep8_errorFun;
 
 %% 5th Figure: only Q model errors
 
@@ -210,49 +210,49 @@ eta = 0.5; % values should be between -\infty and 1.
 [A, B, C, N, f, g, h] = getSystem1();
 
 figure(5); colororder({'#D95319', '#EDB120', '#7E2F8E', '#77AC30'});
-set(gca, 'DefaultLineLineWidth', 2);
+set(figure(5), 'DefaultLineLineWidth', 2);
 
 for numGTermsModel = 1
     g(numGTermsModel + 1:end) = deal({0}); % Adjust FOM to be Quadratic, QB, etc.
 
-    %  Compute the polynomial approximations to the future energy function
+    %  Compute the polynomial approximations to the Past energy function
     d = 8;
-    [w] = approxFutureEnergy(A, N, g, C, eta, d);
-    w2 = w{2}; w3 = w{3}; w4 = w{4}; w5 = w{5}; w6 = w{6}; w7 = w{7}; w8 = w{8};
-    Ef2 = 0.5 * w2 * xd .^ 2; Ef3 = Ef2 + 0.5 * w3 * xd .^ 3; Ef4 = Ef3 + 0.5 * w4 * xd .^ 4; Ef5 = Ef4 + 0.5 * w5 * xd .^ 5; Ef6 = Ef5 + 0.5 * w6 * xd .^ 6; Ef7 = Ef6 + 0.5 * w7 * xd .^ 7; Ef8 = Ef7 + 0.5 * w8 * xd .^ 8;
+    [v] = approxPastEnergy(A, N, g, C, eta, d);
+    v2 = v{2}; v3 = v{3}; v4 = v{4}; v5 = v{5}; v6 = v{6}; v7 = v{7}; v8 = v{8};
+    Ep2 = 0.5 * v2 * xd .^ 2; Ep3 = Ep2 + 0.5 * v3 * xd .^ 3; Ep4 = Ep3 + 0.5 * v4 * xd .^ 4; Ep5 = Ep4 + 0.5 * v5 * xd .^ 5; Ep6 = Ep5 + 0.5 * v6 * xd .^ 6; Ep7 = Ep6 + 0.5 * v7 * xd .^ 7; Ep8 = Ep7 + 0.5 * v8 * xd .^ 8;
 
-    Ef2_error = Ef2.' - EPlusAnalytic; Ef2_error = Ef2_error .^ 2;
-    Ef4_error = Ef4.' - EPlusAnalytic; Ef4_error = Ef4_error .^ 2;
-    Ef6_error = Ef6.' - EPlusAnalytic; Ef6_error = Ef6_error .^ 2;
-    Ef8_error = Ef8.' - EPlusAnalytic; Ef8_error = Ef8_error .^ 2;
+    Ep2_error = Ep2 - EMinusAnalytic; Ep2_error = Ep2_error .^ 2;
+    Ep4_error = Ep4 - EMinusAnalytic; Ep4_error = Ep4_error .^ 2;
+    Ep6_error = Ep6 - EMinusAnalytic; Ep6_error = Ep6_error .^ 2;
+    Ep8_error = Ep8 - EMinusAnalytic; Ep8_error = Ep8_error .^ 2;
 
     intervalSize = xd(126:end);
-    Ef2_errorFun = zeros(length(intervalSize), 1);
-    Ef4_errorFun = zeros(length(intervalSize), 1);
-    Ef6_errorFun = zeros(length(intervalSize), 1);
-    Ef8_errorFun = zeros(length(intervalSize), 1);
+    Ep2_errorFun = zeros(length(intervalSize), 1);
+    Ep4_errorFun = zeros(length(intervalSize), 1);
+    Ep6_errorFun = zeros(length(intervalSize), 1);
+    Ep8_errorFun = zeros(length(intervalSize), 1);
     for idx = 0:124
-        Ef2_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ef2_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
-        Ef4_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ef4_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
-        Ef6_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ef6_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
-        Ef8_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ef8_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
+        Ep2_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep2_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
+        Ep4_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep4_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
+        Ep6_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep6_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
+        Ep8_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep8_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
     end
 
-    semilogy(intervalSize, Ef2_errorFun)
+    semilogy(intervalSize, Ep2_errorFun)
     hold on;
-    semilogy(intervalSize, Ef4_errorFun, ':')
-    semilogy(intervalSize, Ef6_errorFun, ':')
-    semilogy(intervalSize, Ef8_errorFun, ':')
+    semilogy(intervalSize, Ep4_errorFun, ':')
+    semilogy(intervalSize, Ep6_errorFun, ':')
+    semilogy(intervalSize, Ep8_errorFun, ':')
 end
 legend('degree 2', 'degree 4', 'degree 6', 'degree 8', 'Location', 'southeast')
 xlabel('Region radius from origin', 'interpreter', 'latex', 'FontSize', 12, 'fontweight', 'bold')
 ylabel('L2 error for energy function approximation', 'interpreter', 'latex', 'FontSize', 12, 'fontweight', 'bold')
 grid on;
 
-Ef2_errorFun_Q = Ef2_errorFun;
-Ef4_errorFun_Q = Ef4_errorFun;
-Ef6_errorFun_Q = Ef6_errorFun;
-Ef8_errorFun_Q = Ef8_errorFun;
+Ep2_errorFun_Q = Ep2_errorFun;
+Ep4_errorFun_Q = Ep4_errorFun;
+Ep6_errorFun_Q = Ep6_errorFun;
+Ep8_errorFun_Q = Ep8_errorFun;
 
 if exportData
     fileName = sprintf('plots/example1_regionOfAccuracy.dat');
@@ -260,57 +260,24 @@ if exportData
     fileID = fopen(fileName, 'w');
 
     %print the header
-    fprintf(fileID, 'intervalSize      & Ef2_errorFun_full    & Ef4_errorFun_full    & Ef6_errorFun_full    & Ef8_errorFun_full    & Ef2_errorFun_QB    & Ef4_errorFun_QB    & Ef6_errorFun_QB    & Ef8_errorFun_QB    & Ef2_errorFun_Q    & Ef4_errorFun_Q    & Ef6_errorFun_Q    & Ef8_errorFun_Q        \n');
+    fprintf(fileID, 'intervalSize      & Ep2_errorFun_full    & Ep4_errorFun_full    & Ep6_errorFun_full    & Ep8_errorFun_full    & Ep2_errorFun_QB    & Ep4_errorFun_QB    & Ep6_errorFun_QB    & Ep8_errorFun_QB    & Ep2_errorFun_Q    & Ep4_errorFun_Q    & Ep6_errorFun_Q    & Ep8_errorFun_Q        \n');
     for i = 1:length(intervalSize)
         fprintf(fileID, '%12.6e      & ', intervalSize(i));
-        fprintf(fileID, '%12.6e         & %12.6e         & %12.6e         & %12.6e         & %12.6e       & %12.6e       & %12.6e       & %12.6e       & %12.6e      & %12.6e      & %12.6e      & %12.6e     \n', Ef2_errorFun_full(i), Ef4_errorFun_full(i), Ef6_errorFun_full(i), Ef8_errorFun_full(i), Ef2_errorFun_QB(i), Ef4_errorFun_QB(i), Ef6_errorFun_QB(i), Ef8_errorFun_QB(i), Ef2_errorFun_Q(i), Ef4_errorFun_Q(i), Ef6_errorFun_Q(i), Ef8_errorFun_Q(i));
+        fprintf(fileID, '%12.6e         & %12.6e         & %12.6e         & %12.6e         & %12.6e       & %12.6e       & %12.6e       & %12.6e       & %12.6e      & %12.6e      & %12.6e      & %12.6e     \n', Ep2_errorFun_full(i), Ep4_errorFun_full(i), Ep6_errorFun_full(i), Ep8_errorFun_full(i), Ep2_errorFun_QB(i), Ep4_errorFun_QB(i), Ep6_errorFun_QB(i), Ep8_errorFun_QB(i), Ep2_errorFun_Q(i), Ep4_errorFun_Q(i), Ep6_errorFun_Q(i), Ep8_errorFun_Q(i));
     end
     fclose(fileID);
     type(fileName);
 end
 
-
-%% HJB Residual Error
-xd = linspace(-6, 6, 301);
-eta = 0.5; % values should be between -\infty and 1.
-% eta=0.5 corresponds to gamma= sqrt(2)
-% since eta = 1 - 1/gamma^2;
-
-[A, B, C, N, f, g, h] = getSystem1();
-
-
-
 end
 
-function [E] = EgammaPlusOG(xd, A, B, C, N, g, eta)
+function [Ex] = EgammaMinusNumerical(xd, f, g, h, eta)
 
 syms x;
 
-a = -eta / 2 * (g{1} + g{2} * x + g{3} * x ^ 2) ^ 2;
-b = A * x + N * x ^ 2;
-c = 1/2 * C ^ 2 * x ^ 2;
-
-dEx1 = (-b - sqrt(b ^ 2 - 4 * a * c)) / (2 * a);
-dEx2 = (-b + sqrt(b ^ 2 - 4 * a * c)) / (2 * a);
-
-Ex1 = int(dEx1, x);
-Ex2 = int(dEx2, x);
-
-y = piecewise(x < 0, Ex2, x >= 0, Ex1);
-
-fplot(y, [-6, 6], '-.+', 'LineWidth', 2)
-hold on
-
-E = y;
-end
-
-function [Ex] = EgammaPlusNumerical(xd, A, B, C, N, g, eta)
-
-x = sym('x');
-
-a = -eta / 2 * (g{1} + g{2} * x + g{3} * x ^ 2) ^ 2;
-b = A * x + N * x ^ 2;
-c = 1/2 * C ^ 2 * x ^ 2;
+a = -1/2 * (g{1} + kronPolyEval(g(2:end), x)) ^ 2;
+b = -kronPolyEval(f, x);
+c = eta / 2 * kronPolyEval(h, x) ^ 2;
 
 dEx2 = (-b - sqrt(b ^ 2 - 4 * a * c)) / (2 * a);
 dEx1 = (-b + sqrt(b ^ 2 - 4 * a * c)) / (2 * a);
@@ -320,7 +287,7 @@ dEx1 = (-b + sqrt(b ^ 2 - 4 * a * c)) / (2 * a);
 
 % y = piecewise(x < 0, Ex1, x >= 0, Ex2);
 
-i = 1; Ex = zeros(length(xd), 1);
+i = 1; Ex = zeros(1, length(xd));
 for xi = xd
     if xi < 0
         Ex(i) = vpaintegral(dEx1, x, 0, xi);
@@ -330,7 +297,6 @@ for xi = xd
     i = i + 1;
 end
 
-% fplot(y, [-6, 6], '-.+', 'LineWidth', 2)
 % hold on
 % plot(xd(1:10:end),Ex(1:10:end),'+', 'LineWidth', 1)
 

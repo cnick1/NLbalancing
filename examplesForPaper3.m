@@ -37,6 +37,7 @@ runExample1(3,3,exportData);
 %
 
 runExample1_regionOfAccuracy(exportData);
+runExample1_regionOfAccuracy_res(exportData);
 
 %%  Example 2: 2D Energy Functions
 % For Table 1, please use energyFunctionValidation in the tests directory.
