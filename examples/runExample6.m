@@ -61,7 +61,9 @@ for numEl = numEls
     fprintf(fileID, '%5d       &', numEl);
     fprintf(fileID, '%5d & ', 6 * numEl);
     [A, B, C, N, f, g, h] = getSystem6(numEl,2);
-    g(numGTermsModel + 1:end) = deal({0}); % Adjust FOM to be Quadratic, QB, etc.
+    f{4} = sparse(length(A),length(A)^4);
+    f = f(1:numGTermsModel); % Adjust FOM to be Quadratic, QB, etc.
+    g = g(1:numGTermsModel); % Adjust FOM to be Quadratic, QB, etc.
     
     tic; for i = 1:nTest, [w] = approxFutureEnergy(f, N, g(1:numGTermsApprox), C, eta, degree); end, tt = toc / nTest;
     
@@ -95,8 +97,9 @@ if exportData
         fprintf(fileID, '%5d       &', numEl);
         fprintf(fileID, '%5d & ', 6 * numEl);
         [A, B, C, N, f, g, h] = getSystem6(numEl);
-        g(numGTermsModel + 1:end) = deal({0}); % Adjust FOM to be Quadratic, QB, etc.
-        
+%     f{4} = sparse(length(A),length(A)^4);
+%     f = f(1:numGTermsModel); % Adjust FOM to be Quadratic, QB, etc.
+    g = g(1:numGTermsModel); % Adjust FOM to be Quadratic, QB, etc.        
         tic; for i = 1:nTest, [w] = approxFutureEnergy(f, N, g(1:numGTermsApprox), C, eta, degree); end, tt = toc / nTest;
         
         fprintf(fileID, '%10.4e    & ', length(w{degree}));
@@ -163,8 +166,9 @@ for numEl = numEls
     fprintf(fileID, '%5d       &', numEl);
     fprintf(fileID, '%5d & ', 6 * numEl);
     [A, B, C, N, f, g, h] = getSystem6(numEl);
-    g(numGTermsModel + 1:end) = deal({0}); % Adjust FOM to be Quadratic, QB, etc.
-    
+%     f{4} = sparse(length(A),length(A)^4);
+%     f = f(1:numGTermsModel); % Adjust FOM to be Quadratic, QB, etc.
+    g = g(1:numGTermsModel); % Adjust FOM to be Quadratic, QB, etc.    
     tic; for i = 1:nTest, [w] = approxFutureEnergy(f, N, g(1:numGTermsApprox), C, eta, degree); end, tt = toc / nTest;
     
     fprintf(fileID, '%10.4e    & ', length(w{degree}));
@@ -197,8 +201,9 @@ if exportData
         fprintf(fileID, '%5d       &', numEl);
         fprintf(fileID, '%5d & ', 6 * numEl);
         [A, B, C, N, f, g, h] = getSystem6(numEl);
-        g(numGTermsModel + 1:end) = deal({0}); % Adjust FOM to be Quadratic, QB, etc.
-        
+    f{4} = sparse(length(A),length(A)^4);
+    f = f(1:numGTermsModel); % Adjust FOM to be Quadratic, QB, etc.
+    g = g(1:numGTermsModel); % Adjust FOM to be Quadratic, QB, etc.        
         tic; for i = 1:nTest, [w] = approxFutureEnergy(f, N, g(1:numGTermsApprox), C, eta, degree); end, tt = toc / nTest;
         
         fprintf(fileID, '%10.4e    & ', length(w{degree}));
@@ -267,8 +272,9 @@ fprintf(fileID, '& CPU-sec-2    & E_d^+(x_0)      \n');
 nTest = 3;
 
 [A, B, C, N, f, g, h] = getSystem6(numEl);
-g(numGTermsModel + 1:end) = deal({0}); % Adjust FOM to be Quadratic, QB, etc.
-
+    f{4} = sparse(length(A),length(A)^4);
+    f = f(1:numGTermsModel); % Adjust FOM to be Quadratic, QB, etc.
+    g = g(1:numGTermsModel); % Adjust FOM to be Quadratic, QB, etc.
 % Initial condition where the nodes are displaced but have no initial
 % velocity or "rotation"
 numNodes = numEl + 1;

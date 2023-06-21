@@ -56,7 +56,8 @@ close all
 
 
 %% Example 6: Finite Element Beam Convergence
-% [w] = runExample6(2,2,false);
-[w] = runExample6(2,2,exportData,0.1);
-[w] = runExample6(3,3,false,0.01);
-[w] = runExample6(2,2,exportData,0.01);
+% [w1] = runExample6(2,2,false,0.1);
+[w] = runExample6(4,4,exportData,0.1);
+% [w2] = runExample6(3,3,false,0.1);
+% [w3] = runExample6(4,4,false,0.1); % THIS is what would need to run for the paper 
+[w] = runExample6(4,4,exportData,0.01);

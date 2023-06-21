@@ -191,7 +191,11 @@ if (d > 2)
         
         for o = 1:2 * lg
             for idx = 2:k - 1 % Might be repetitive
-                GaWb{o + 1, idx} = g{o + 1}.' * reshape(w{idx}, n, n ^ (idx - 1));
+                if o+1 < lg+2
+                    GaWb{o + 1, idx} = g{o + 1}.' * sparse(reshape(w{idx}, n, n ^ (idx - 1)));
+                else
+                    GaWb{o + 1, idx} = 0;
+                end
             end
             for p = max(0, o - lg):min(o, lg)
                 
