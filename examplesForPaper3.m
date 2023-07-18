@@ -37,7 +37,7 @@ runExample1(3,3,exportData);
 %
 
 runExample1_regionOfAccuracy(exportData);
-runExample1_regionOfAccuracy_res(exportData);
+% runExample1_regionOfAccuracy_res(exportData);
 
 %%  Example 2: 2D Energy Functions
 % For Table 1, please use energyFunctionValidation in the tests directory.
@@ -54,10 +54,8 @@ close all
 
 % Example 2: residuals
 
-
 %% Example 6: Finite Element Beam Convergence
 % [w1] = runExample6(2,2,false,0.1);
-[w] = runExample6(4,4,exportData,0.1);
 % [w2] = runExample6(3,3,false,0.1);
-% [w3] = runExample6(4,4,false,0.1); % THIS is what would need to run for the paper 
+[w] = runExample6(4,4,exportData,0.1);
 [w] = runExample6(4,4,exportData,0.01);

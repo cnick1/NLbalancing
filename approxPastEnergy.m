@@ -221,7 +221,7 @@ if (d > 2)
         
         for o = 1:2 * lg
             for idx = 2:k - 1 % Might be repetitive
-                GaVb{o + 1, idx} = g{o + 1}.' * reshape(v{idx}, n, n ^ (idx - 1));
+                GaVb{o + 1, idx} = g{o + 1}.' * sparse(reshape(v{idx}, n, n ^ (idx - 1)));
             end
             for p = max(0, o - lg):min(o, lg)
                 

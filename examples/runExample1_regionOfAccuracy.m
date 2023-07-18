@@ -69,10 +69,29 @@ for numGTermsModel = 3:-1:1
     v2 = v{2}; v3 = v{3}; v4 = v{4}; v5 = v{5}; v6 = v{6}; v7 = v{7}; v8 = v{8};
     Ep2 = 0.5 * v2 * xd .^ 2; Ep3 = Ep2 + 0.5 * v3 * xd .^ 3; Ep4 = Ep3 + 0.5 * v4 * xd .^ 4; Ep5 = Ep4 + 0.5 * v5 * xd .^ 5; Ep6 = Ep5 + 0.5 * v6 * xd .^ 6; Ep7 = Ep6 + 0.5 * v7 * xd .^ 7; Ep8 = Ep7 + 0.5 * v8 * xd .^ 8;
 
-    Ep2_error = Ep2 - EMinusAnalytic; Ep2_error = Ep2_error .^ 2;
-    Ep4_error = Ep4 - EMinusAnalytic; Ep4_error = Ep4_error .^ 2;
-    Ep6_error = Ep6 - EMinusAnalytic; Ep6_error = Ep6_error .^ 2;
-    Ep8_error = Ep8 - EMinusAnalytic; Ep8_error = Ep8_error .^ 2;
+%         %L2 error
+%     Ep2_error = Ep2 - EMinusAnalytic; Ep2_error = Ep2_error .^ 2;
+%     Ep4_error = Ep4 - EMinusAnalytic; Ep4_error = Ep4_error .^ 2;
+%     Ep6_error = Ep6 - EMinusAnalytic; Ep6_error = Ep6_error .^ 2;
+%     Ep8_error = Ep8 - EMinusAnalytic; Ep8_error = Ep8_error .^ 2;
+% 
+%     intervalSize = xd(126:end);
+%     Ep2_errorFun = zeros(length(intervalSize), 1);
+%     Ep4_errorFun = zeros(length(intervalSize), 1);
+%     Ep6_errorFun = zeros(length(intervalSize), 1);
+%     Ep8_errorFun = zeros(length(intervalSize), 1);
+    %     for idx = 0:124
+    %         Ep2_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep2_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
+    %         Ep4_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep4_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
+    %         Ep6_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep6_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
+    %         Ep8_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep8_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
+    %     end
+    % Linfty error
+    
+    Ep2_error = abs(EMinusAnalytic - Ep2);
+    Ep4_error = abs(EMinusAnalytic - Ep4);
+    Ep6_error = abs(EMinusAnalytic - Ep6);
+    Ep8_error = abs(EMinusAnalytic - Ep8);
 
     intervalSize = xd(126:end);
     Ep2_errorFun = zeros(length(intervalSize), 1);
@@ -80,10 +99,10 @@ for numGTermsModel = 3:-1:1
     Ep6_errorFun = zeros(length(intervalSize), 1);
     Ep8_errorFun = zeros(length(intervalSize), 1);
     for idx = 0:124
-        Ep2_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep2_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
-        Ep4_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep4_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
-        Ep6_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep6_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
-        Ep8_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep8_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
+        Ep2_errorFun(idx + 1) = max(Ep2_error(125 - idx:126 + idx)) ;
+        Ep4_errorFun(idx + 1) = max(Ep4_error(125 - idx:126 + idx)) ;
+        Ep6_errorFun(idx + 1) = max(Ep6_error(125 - idx:126 + idx)) ;
+        Ep8_errorFun(idx + 1) = max(Ep8_error(125 - idx:126 + idx)) ;
     end
 
     semilogy(intervalSize, Ep2_errorFun)
@@ -117,10 +136,28 @@ for numGTermsModel = 3
     v2 = v{2}; v3 = v{3}; v4 = v{4}; v5 = v{5}; v6 = v{6}; v7 = v{7}; v8 = v{8};
     Ep2 = 0.5 * v2 * xd .^ 2; Ep3 = Ep2 + 0.5 * v3 * xd .^ 3; Ep4 = Ep3 + 0.5 * v4 * xd .^ 4; Ep5 = Ep4 + 0.5 * v5 * xd .^ 5; Ep6 = Ep5 + 0.5 * v6 * xd .^ 6; Ep7 = Ep6 + 0.5 * v7 * xd .^ 7; Ep8 = Ep7 + 0.5 * v8 * xd .^ 8;
 
-    Ep2_error = Ep2 - EMinusAnalytic; Ep2_error = Ep2_error .^ 2;
-    Ep4_error = Ep4 - EMinusAnalytic; Ep4_error = Ep4_error .^ 2;
-    Ep6_error = Ep6 - EMinusAnalytic; Ep6_error = Ep6_error .^ 2;
-    Ep8_error = Ep8 - EMinusAnalytic; Ep8_error = Ep8_error .^ 2;
+%     Ep2_error = Ep2 - EMinusAnalytic; Ep2_error = Ep2_error .^ 2;
+%     Ep4_error = Ep4 - EMinusAnalytic; Ep4_error = Ep4_error .^ 2;
+%     Ep6_error = Ep6 - EMinusAnalytic; Ep6_error = Ep6_error .^ 2;
+%     Ep8_error = Ep8 - EMinusAnalytic; Ep8_error = Ep8_error .^ 2;
+% 
+%     intervalSize = xd(126:end);
+%     Ep2_errorFun = zeros(length(intervalSize), 1);
+%     Ep4_errorFun = zeros(length(intervalSize), 1);
+%     Ep6_errorFun = zeros(length(intervalSize), 1);
+%     Ep8_errorFun = zeros(length(intervalSize), 1);
+%     for idx = 0:124
+%         Ep2_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep2_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
+%         Ep4_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep4_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
+%         Ep6_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep6_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
+%         Ep8_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep8_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
+%     end
+% Linfty error
+    
+    Ep2_error = abs(EMinusAnalytic - Ep2);
+    Ep4_error = abs(EMinusAnalytic - Ep4);
+    Ep6_error = abs(EMinusAnalytic - Ep6);
+    Ep8_error = abs(EMinusAnalytic - Ep8);
 
     intervalSize = xd(126:end);
     Ep2_errorFun = zeros(length(intervalSize), 1);
@@ -128,12 +165,12 @@ for numGTermsModel = 3
     Ep6_errorFun = zeros(length(intervalSize), 1);
     Ep8_errorFun = zeros(length(intervalSize), 1);
     for idx = 0:124
-        Ep2_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep2_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
-        Ep4_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep4_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
-        Ep6_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep6_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
-        Ep8_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep8_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
+        Ep2_errorFun(idx + 1) = max(Ep2_error(125 - idx:126 + idx)) ;
+        Ep4_errorFun(idx + 1) = max(Ep4_error(125 - idx:126 + idx)) ;
+        Ep6_errorFun(idx + 1) = max(Ep6_error(125 - idx:126 + idx)) ;
+        Ep8_errorFun(idx + 1) = max(Ep8_error(125 - idx:126 + idx)) ;
     end
-
+    
     semilogy(intervalSize, Ep2_errorFun)
     hold on;
     semilogy(intervalSize, Ep4_errorFun)
@@ -169,10 +206,28 @@ for numGTermsModel = 2
     v2 = v{2}; v3 = v{3}; v4 = v{4}; v5 = v{5}; v6 = v{6}; v7 = v{7}; v8 = v{8};
     Ep2 = 0.5 * v2 * xd .^ 2; Ep3 = Ep2 + 0.5 * v3 * xd .^ 3; Ep4 = Ep3 + 0.5 * v4 * xd .^ 4; Ep5 = Ep4 + 0.5 * v5 * xd .^ 5; Ep6 = Ep5 + 0.5 * v6 * xd .^ 6; Ep7 = Ep6 + 0.5 * v7 * xd .^ 7; Ep8 = Ep7 + 0.5 * v8 * xd .^ 8;
 
-    Ep2_error = Ep2 - EMinusAnalytic; Ep2_error = Ep2_error .^ 2;
-    Ep4_error = Ep4 - EMinusAnalytic; Ep4_error = Ep4_error .^ 2;
-    Ep6_error = Ep6 - EMinusAnalytic; Ep6_error = Ep6_error .^ 2;
-    Ep8_error = Ep8 - EMinusAnalytic; Ep8_error = Ep8_error .^ 2;
+%     Ep2_error = Ep2 - EMinusAnalytic; Ep2_error = Ep2_error .^ 2;
+%     Ep4_error = Ep4 - EMinusAnalytic; Ep4_error = Ep4_error .^ 2;
+%     Ep6_error = Ep6 - EMinusAnalytic; Ep6_error = Ep6_error .^ 2;
+%     Ep8_error = Ep8 - EMinusAnalytic; Ep8_error = Ep8_error .^ 2;
+% 
+%     intervalSize = xd(126:end);
+%     Ep2_errorFun = zeros(length(intervalSize), 1);
+%     Ep4_errorFun = zeros(length(intervalSize), 1);
+%     Ep6_errorFun = zeros(length(intervalSize), 1);
+%     Ep8_errorFun = zeros(length(intervalSize), 1);
+%     for idx = 0:124
+%         Ep2_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep2_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
+%         Ep4_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep4_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
+%         Ep6_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep6_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
+%         Ep8_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep8_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
+%     end
+% Linfty error
+    
+    Ep2_error = abs(EMinusAnalytic - Ep2);
+    Ep4_error = abs(EMinusAnalytic - Ep4);
+    Ep6_error = abs(EMinusAnalytic - Ep6);
+    Ep8_error = abs(EMinusAnalytic - Ep8);
 
     intervalSize = xd(126:end);
     Ep2_errorFun = zeros(length(intervalSize), 1);
@@ -180,12 +235,12 @@ for numGTermsModel = 2
     Ep6_errorFun = zeros(length(intervalSize), 1);
     Ep8_errorFun = zeros(length(intervalSize), 1);
     for idx = 0:124
-        Ep2_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep2_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
-        Ep4_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep4_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
-        Ep6_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep6_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
-        Ep8_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep8_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
+        Ep2_errorFun(idx + 1) = max(Ep2_error(125 - idx:126 + idx)) ;
+        Ep4_errorFun(idx + 1) = max(Ep4_error(125 - idx:126 + idx)) ;
+        Ep6_errorFun(idx + 1) = max(Ep6_error(125 - idx:126 + idx)) ;
+        Ep8_errorFun(idx + 1) = max(Ep8_error(125 - idx:126 + idx)) ;
     end
-
+    
     semilogy(intervalSize, Ep2_errorFun)
     hold on;
     semilogy(intervalSize, Ep4_errorFun, '--')
@@ -221,10 +276,28 @@ for numGTermsModel = 1
     v2 = v{2}; v3 = v{3}; v4 = v{4}; v5 = v{5}; v6 = v{6}; v7 = v{7}; v8 = v{8};
     Ep2 = 0.5 * v2 * xd .^ 2; Ep3 = Ep2 + 0.5 * v3 * xd .^ 3; Ep4 = Ep3 + 0.5 * v4 * xd .^ 4; Ep5 = Ep4 + 0.5 * v5 * xd .^ 5; Ep6 = Ep5 + 0.5 * v6 * xd .^ 6; Ep7 = Ep6 + 0.5 * v7 * xd .^ 7; Ep8 = Ep7 + 0.5 * v8 * xd .^ 8;
 
-    Ep2_error = Ep2 - EMinusAnalytic; Ep2_error = Ep2_error .^ 2;
-    Ep4_error = Ep4 - EMinusAnalytic; Ep4_error = Ep4_error .^ 2;
-    Ep6_error = Ep6 - EMinusAnalytic; Ep6_error = Ep6_error .^ 2;
-    Ep8_error = Ep8 - EMinusAnalytic; Ep8_error = Ep8_error .^ 2;
+%     Ep2_error = Ep2 - EMinusAnalytic; Ep2_error = Ep2_error .^ 2;
+%     Ep4_error = Ep4 - EMinusAnalytic; Ep4_error = Ep4_error .^ 2;
+%     Ep6_error = Ep6 - EMinusAnalytic; Ep6_error = Ep6_error .^ 2;
+%     Ep8_error = Ep8 - EMinusAnalytic; Ep8_error = Ep8_error .^ 2;
+% 
+%     intervalSize = xd(126:end);
+%     Ep2_errorFun = zeros(length(intervalSize), 1);
+%     Ep4_errorFun = zeros(length(intervalSize), 1);
+%     Ep6_errorFun = zeros(length(intervalSize), 1);
+%     Ep8_errorFun = zeros(length(intervalSize), 1);
+%     for idx = 0:124
+%         Ep2_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep2_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
+%         Ep4_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep4_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
+%         Ep6_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep6_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
+%         Ep8_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep8_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
+%     end
+% Linfty error
+    
+    Ep2_error = abs(EMinusAnalytic - Ep2);
+    Ep4_error = abs(EMinusAnalytic - Ep4);
+    Ep6_error = abs(EMinusAnalytic - Ep6);
+    Ep8_error = abs(EMinusAnalytic - Ep8);
 
     intervalSize = xd(126:end);
     Ep2_errorFun = zeros(length(intervalSize), 1);
@@ -232,12 +305,11 @@ for numGTermsModel = 1
     Ep6_errorFun = zeros(length(intervalSize), 1);
     Ep8_errorFun = zeros(length(intervalSize), 1);
     for idx = 0:124
-        Ep2_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep2_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
-        Ep4_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep4_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
-        Ep6_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep6_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
-        Ep8_errorFun(idx + 1) = sqrt(trapz(xd(125 - idx:126 + idx), Ep8_error(125 - idx:126 + idx))) / (2 * xd(126 + idx));
+        Ep2_errorFun(idx + 1) = max(Ep2_error(125 - idx:126 + idx)) ;
+        Ep4_errorFun(idx + 1) = max(Ep4_error(125 - idx:126 + idx)) ;
+        Ep6_errorFun(idx + 1) = max(Ep6_error(125 - idx:126 + idx)) ;
+        Ep8_errorFun(idx + 1) = max(Ep8_error(125 - idx:126 + idx)) ;
     end
-
     semilogy(intervalSize, Ep2_errorFun)
     hold on;
     semilogy(intervalSize, Ep4_errorFun, ':')
