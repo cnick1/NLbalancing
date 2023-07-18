@@ -186,7 +186,7 @@ if (plotEnergy || plotBalancing)
             yticks([]);
         end
         set(gca, 'FontSize', 16)
-        load('utils\YlGnBu.mat')
+        load(fullfile('utils', 'YlGnBu.mat'))
         colormap(flip(YlGnBu))
         caxis([0 0.05])
         set(gca, 'Units', 'centimeters', 'Position', [3 3 6 6])
