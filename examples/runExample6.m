@@ -90,7 +90,7 @@ end
 
 % For run-time, only run the higher cases if exporting data, and only
 % run once since the run time is longer so error is less sensitive
-if exportData
+if false %exportData
     nTest = 1;
     for numEl = [32, 64, 128] %128 runs out of ram in kroneckerLeft.m
         numEls = [numEls, numEl];
@@ -123,7 +123,7 @@ if exportData
         energies = [energies, wzInit];
     end
 end
-if exportData
+if false%exportData
     logy = log10(times); % take the natural log of y data
     logx = log10(6*numEls); % take the natural log of x data
     X = [ones(length(logx),1) logx']; % create matrix of x data with a column of ones
