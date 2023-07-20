@@ -20,7 +20,7 @@ exportData = true;
 kawanoModel = true;
 %%  Example 1: 1D ODE with analytical energy functions
 % runExample1(1);
-runExample1(3,3,exportData);
+% runExample1(3,3,exportData); % run this
 % runExample1(3);
 
 % Compare all 4 cases
@@ -36,13 +36,13 @@ runExample1(3,3,exportData);
 % title('polynomial system, polynomial assumed ***')
 %
 
-runExample1_regionOfAccuracy(exportData);
+% runExample1_regionOfAccuracy(exportData); % run this
 % runExample1_regionOfAccuracy_res(exportData);
 
 %%  Example 2: 2D Energy Functions
 % For Table 1, please use energyFunctionValidation in the tests directory.
 % [v, w] = runExample2(6, true, false, 6, 1, 1, false, kawanoModel);
-[v, w] = runExample2(4, true, false, 4, 2, 2, exportData, kawanoModel);
+% [v, w] = runExample2(4, true, false, 4, 2, 2, exportData, kawanoModel); % run this
 % [v, w] = runExample2(6, true, false, 6, 3, 3, false, kawanoModel);
 
 
@@ -57,5 +57,5 @@ runExample1_regionOfAccuracy(exportData);
 %% Example 6: Finite Element Beam Convergence
 % [w1] = runExample6(2,2,false,0.1);
 % [w2] = runExample6(3,3,false,0.1);
-[w] = runExample6(4,4,exportData,0.1);
+% [w] = runExample6(4,4,exportData,0.1); % run this
 [w] = runExample6(4,4,exportData,0.01);
