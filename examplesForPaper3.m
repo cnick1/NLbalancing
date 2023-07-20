@@ -57,5 +57,5 @@ kawanoModel = true;
 %% Example 6: Finite Element Beam Convergence
 % [w1] = runExample6(2,2,false,0.1);
 % [w2] = runExample6(3,3,false,0.1);
-% [w] = runExample6(4,4,exportData,0.1); % run this
+[w] = runExample6(4,4,exportData,0.1); % run this
 [w] = runExample6(4,4,exportData,0.01);
