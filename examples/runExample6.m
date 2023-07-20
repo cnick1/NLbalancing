@@ -92,7 +92,7 @@ end
 % run once since the run time is longer so error is less sensitive
 if exportData
     nTest = 1;
-    for numEl = [32, 64] %, 128, 256] %128 runs out of ram in kroneckerLeft.m
+    for numEl = [32, 64, 128, 256] %128 runs out of ram in kroneckerLeft.m
         numEls = [numEls, numEl];
         fprintf(fileID, '%5d       &', numEl);
         fprintf(fileID, '%5d & ', 6 * numEl);
@@ -196,7 +196,7 @@ end
 % run once since the run time is longer so error is less sensitive
 if exportData
     nTest = 1;
-    for numEl = [8, 16] %, 32, 64, 128, 256]
+    for numEl = [8, 16, 32, 64, 128, 256]
         numEls = [numEls, numEl];
         fprintf(fileID, '%5d       &', numEl);
         fprintf(fileID, '%5d & ', 6 * numEl);

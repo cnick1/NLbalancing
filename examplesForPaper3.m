@@ -47,10 +47,10 @@ runExample1_regionOfAccuracy(exportData);
 
 
 % Example 2: Singular Value Functions
-runExample2_singularValueFunctions(4, true, true, 1, 2, 2, exportData, kawanoModel);
-runExample2_singularValueFunctions(4, true, true, 1, 2, 2, exportData, kawanoModel);
-runExample2_singularValueFunctions(4, true, true, 3, 2, 2, exportData, kawanoModel);
-close all
+% runExample2_singularValueFunctions(4, true, true, 1, 2, 2, exportData, kawanoModel);
+% runExample2_singularValueFunctions(4, true, true, 1, 2, 2, exportData, kawanoModel);
+% runExample2_singularValueFunctions(4, true, true, 3, 2, 2, exportData, kawanoModel);
+% close all
 
 % Example 2: residuals
 
