@@ -186,7 +186,7 @@ if (d > 2)
             b = b + 0.25 * eta * i * j * vec(tmp);
         end
         
-        % Now add the higher order polynomial terms by iterating through the sums
+        % Now add the higher order polynomial terms "G" by iterating through the sums
         [g{lg + 2:2 * lg + 1}] = deal(0); % Need extra space in g because of GaWb indexing
         
         for o = 1:2 * lg

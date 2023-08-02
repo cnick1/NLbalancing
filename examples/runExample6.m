@@ -56,7 +56,8 @@ fprintf(fileID, 'numElements &    n & n^%d           & CPU-sec   & E_%d^+(x_0)  
 % compute and print the results
 nTest = 10;
 nd = []; times = []; energies = [];
-numEls = [1, 2, 4, 8, 16];
+% numEls = [1, 2, 4, 8, 16];
+numEls = [1, 2, 4];% 8, 16];
 for numEl = numEls
     fprintf(fileID, '%5d       &', numEl);
     fprintf(fileID, '%5d & ', 6 * numEl);
@@ -90,9 +91,10 @@ end
 
 % For run-time, only run the higher cases if exporting data, and only
 % run once since the run time is longer so error is less sensitive
-if false %exportData
+if exportData
     nTest = 1;
-    for numEl = [32, 64, 128] %128 runs out of ram in kroneckerLeft.m
+%     for numEl = [32, 64, 128] %128 runs out of ram in kroneckerLeft.m
+    for numEl = [128] %128 runs out of ram in kroneckerLeft.m
         numEls = [numEls, numEl];
         fprintf(fileID, '%5d       &', numEl);
         fprintf(fileID, '%5d & ', 6 * numEl);

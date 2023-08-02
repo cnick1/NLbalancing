@@ -31,7 +31,6 @@ function [A, B, C, N, f, g, h] = getSystem6(numElements, actuatorConfig, rotaryI
 %                        for the drift, input, and output (generalizations
 %                        containing A,B,C, and N)
 %
-%   The value of eta is set below.
 %
 %   Background: after finite element discretization, the finite element
 %   equations for the beam can be written as
