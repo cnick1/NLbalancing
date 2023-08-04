@@ -45,11 +45,15 @@ function [A, B, C, N, f, g, h] = getSystem8(numElements, elementOrder, varargin)
 vec = @(X) X(:);
 
 if nargin < 1
-    numElements = 10;
+    numElements = 4;
 end
 
 if nargin < 2
-    elementOrder = 2;
+    elementOrder = 1;
+end
+
+if elementOrder == 2
+    error("Not fully implemented!")
 end
 
 rodLength = 30;
@@ -156,7 +160,7 @@ end
 
 %% RHS
 % TODO
-RB0 = sparse(TotalDOFs, 2);
+% RB0 = sparse(TotalDOFs, 2);
 %         RB1 = sparse(TotalDOFs, 2 * TotalDOFs);
 %         RB2 = sparse(TotalDOFs, 2 * TotalDOFs ^ 2);
 %         RB3 = sparse(TotalDOFs, 2 * TotalDOFs ^ 3);
@@ -164,6 +168,8 @@ RB0 = sparse(TotalDOFs, 2);
 %         RB0(TotalDOFs - 2, 2) = 1; % Force in x direction
 %         RB0(TotalDOFs - 1, 1) = 1; % Force in y direction
 %         RB0(TotalDOFs, :) = 0; % Moment in z direction
+
+RB0 = generate_B_matrix(4, (TotalDOFs-1)/4);
 
 %% Impose boundary conditions
 fixedDOFs = [1, TotalDOFs]; % First and last nodes fixed
@@ -199,7 +205,7 @@ F1 = -McholL.' \ (McholL \ K1G);
 
 G0 = McholL.' \ (McholL \ RB0);
 
-C = sparse(1, n); C(1, n - 1) = 1; % TODO
+C = RB0.';
 
 % Construct N₂
 F2 = -McholL.' \ (McholL \ K2G);
@@ -218,4 +224,17 @@ B = full(G0);
 C = full(C);
 N = full(F2);
 
+end
+
+function B = generate_B_matrix(m, i)
+    if rem(i,1) ~= 0 
+       error("Incorrect number of elements/inputs") 
+    end
+    n = i*m + 1;
+    B = sparse(n, m);
+    for j = 0:m-1
+        B(i*j+1:i*j+1+i, j+1) = 1;
+    end
+    
+    B = B./(i + 1);
 end
