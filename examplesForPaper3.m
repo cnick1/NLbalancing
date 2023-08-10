@@ -1,61 +1,43 @@
-%  A script to run the examples in QB NLBT
+%  A script to run the examples in Polynomial NLBT
 %  The examples are the following:
 %
-%       Example 1: a 1-DOF quadratic-bilinear model for which we can
+%       Example 1: a 1-DOF quadratic-polynomial model for which we can
 %       analytically plot the energy functions
 %       Example 2: a 2-DOF quadratic-bilinear model based on
 %       Scherpen/Kawano
 %       Example 6: a nonlinear (von Karman) Euler-Bernoulli beam with cable
-%       actuation that provides state dependent inputs. The dynamics and
-%       input are up-to cubic. The model can be made arbitrarily large.
-%       Example 5: a 3-DOF quadratic-bilinear unicycle model
+%       actuation that provides state dependent inputs. The drift and input
+%       dynamics are up-to cubic. The model can be made arbitrarily large.
 %
+%   Reference: Submitted to IEEE TAC. 
+%   "Scalable Computation of ℋ∞ Energy Functions for Polynomial 
+%    Control-Affine Systems", N. Corbin and B. Kramer
+%    arXiv:
+% 
+
 close all; clear; clc;
 setKroneckerToolsPath
 addpath('examples')
 addpath('utils')
 
-% exportData = false;
 exportData = true;
-kawanoModel = true;
 %%  Example 1: 1D ODE with analytical energy functions
-% runExample1(1);
-% runExample1(3,3,exportData); % run this
-% runExample1(3);
+% This generates Figure 1
+runExample1(3,3,exportData); 
 
-% Compare all 4 cases
-% a = 4; b = 5;
-% runExample1(1,1);
-% close; xlim([-a, a]); ylim([0, b]); grid on
-% title('quadratic, quadratic assumed')
-% runExample1(2,1); close; xlim([-a, a]); ylim([0, b]); grid on
-% title('QB system, quadratic assumed')
-% runExample1(2,2); close; xlim([-a, a]); ylim([0, b]); grid on
-% title('QB system, QB assumed')
-% runExample1(3,3); close; xlim([-a, a]); ylim([0, b]); grid on
-% title('polynomial system, polynomial assumed ***')
-%
-
-% runExample1_regionOfAccuracy(exportData); % run this
-% runExample1_regionOfAccuracy_res(exportData);
+% This generates Figures 2 and 3
+runExample1_regionOfAccuracy(exportData);
 
 %%  Example 2: 2D Energy Functions
-% For Table 1, please use energyFunctionValidation in the tests directory.
-% [v, w] = runExample2(6, true, false, 6, 1, 1, false, kawanoModel);
-% [v, w] = runExample2(4, true, false, 4, 2, 2, exportData, kawanoModel); % run this
-% [v, w] = runExample2(6, true, false, 6, 3, 3, false, kawanoModel);
+% This generates the data for Figure 4
+runExample2(4, true, false, 4, 2, 2, exportData, true); 
 
-
-% Example 2: Singular Value Functions
-% runExample2_singularValueFunctions(4, true, true, 1, 2, 2, exportData, kawanoModel);
-% runExample2_singularValueFunctions(4, true, true, 1, 2, 2, exportData, kawanoModel);
-% runExample2_singularValueFunctions(4, true, true, 3, 2, 2, exportData, kawanoModel);
-% close all
-
-% Example 2: residuals
+% This generates Figure 5
+runExample2_regionOfAccuracy_res(exportData);
 
 %% Example 6: Finite Element Beam Convergence
-% [w1] = runExample6(2,2,false,0.1);
-% [w2] = runExample6(3,3,false,0.1);
-[w] = runExample6(4,4,exportData,0.1); % run this
-[w] = runExample6(4,4,exportData,0.01);
+% This generates the data for Tables II and III, which are plotted in
+% Figures 7, 8, and 9. (Note: this takes a few hours on a good modern  
+% laptop with 16GB RAM)
+runExample6(4,4,exportData,0.1); % run this first to get the larger IC xb
+runExample6(4,4,exportData,0.01); % run this first to get the smaller IC xa

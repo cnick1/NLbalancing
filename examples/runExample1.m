@@ -16,6 +16,9 @@ function [v, w] = runExample1(numGTermsModel, numGTermsApprox, exportPlotData, v
 %   Reference: [1] Nonlinear Balanced Truncation Model Reduction:
 %        Part 1-Computing Energy Functions, by Kramer, Gugercin, and Borggaard.
 %        arXiv:2209.07645.
+%        [2] Scalable Computation of ℋ∞ Energy Functions for Polynomial  
+%        Control-Affine Systems, N. Corbin and B. Kramer,
+%        arXiv:
 %
 %   Part of the NLbalancing repository.
 %%
@@ -35,14 +38,13 @@ g(numGTermsModel + 1:end) = deal({0}); % Adjust FOM to be Quadratic, QB, etc.
 fprintf('Running Example 1\n')
 
 eta = 0.5; % values should be between -\infty and 1.
-% eta=0.5 corresponds to gamma= sqrt(2)
-% since eta = 1 - 1/gamma^2;
+% eta=0.5 corresponds to gamma= sqrt(2), since eta = 1 - 1/gamma^2;
 
 fprintf('Simulating for eta=%g (gamma=%g)\n', eta, 1 / sqrt(1 - eta))
 
 %  Compute the polynomial approximations to the future energy function
 d = 8;
-[w, RES] = approxFutureEnergy(f, N, g(1:numGTermsApprox), C, eta, d, true);
+[w] = approxFutureEnergy(f, N, g(1:numGTermsApprox), C, eta, d, true);
 
 w2 = w{2}; w3 = w{3}; w4 = w{4}; w5 = w{5}; w6 = w{6}; w7 = w{7}; w8 = w{8};
 
@@ -55,11 +57,6 @@ Ef5 = Ef4 + 0.5 * w5 * x .^ 5;
 Ef6 = Ef5 + 0.5 * w6 * x .^ 6;
 Ef7 = Ef6 + 0.5 * w7 * x .^ 7;
 Ef8 = Ef7 + 0.5 * w8 * x .^ 8;
-
-%   Efd = Ef2;
-%   for idx = 3:length(w)
-%     Efd = Efd + 0.5*w{idx}*x.^idx;
-%   end
 
 %  Compute the analytical solution for comparison
 
@@ -86,9 +83,8 @@ ylabel('$\mathcal{E}_\gamma^+$', ...
     'interpreter', 'latex', ...
     'FontSize', 20, ...
     'fontweight', 'bold')
-
-% xlim([-3, 3])
-% ylim([0, 3])
+xlim([-6 6])
+ylim([-1 10])
 
 if exportPlotData
     %  Save data to generate tikz plots for the paper
@@ -151,24 +147,10 @@ ylabel('$\mathcal{E}_\gamma^-$', ...
     'FontSize', 20, ...
     'fontweight', 'bold')
 
+xlim([-6 6])
+ylim([0 20])
+
 if exportPlotData
-    %   fid = fopen('plots/ex1_errorpe_2.txt','w');
-    %   fprintf(fid,'%g %g\n',[x;abs(Ep2-EMinusAnalytic)]);
-    %   fclose(fid);
-    %
-    %   fid = fopen('plots/ex1_errorpe_4.txt','w');
-    %   fprintf(fid,'%g %g\n',[x;abs(Ep4-EMinusAnalytic)]);
-    %   fclose(fid);
-    %
-    %   fid = fopen('plots/ex1_errorpe_6.txt','w');
-    %   fprintf(fid,'%g %g\n',[x;abs(Ep6-EMinusAnalytic)]);
-    %   fclose(fid);
-    %
-    %   fid = fopen('plots/ex1_errorpe_8.txt','w');
-    %   fprintf(fid,'%g %g\n',[x;abs(Ep8-EMinusAnalytic)]);
-    %   fclose(fid);
-    %
-    %   %
     fid = fopen('plots/ex1_past_a.txt', 'w');
     fprintf(fid, '%g %g\n', [x; EMinusAnalytic]);
     fclose(fid);
@@ -188,11 +170,6 @@ if exportPlotData
     fid = fopen('plots/ex1_past_8.txt', 'w');
     fprintf(fid, '%g %g\n', [x; Ep8]);
     fclose(fid);
-    %
-    %
-    %   save('Ex1_RawData.mat','x',...
-    %        'EPlusAnalytic', 'Ef2','Ef3','Ef4','Ef5','Ef6','Ef7','Ef8',...
-    %        'EMinusAnalytic','Ep2','Ep3','Ep4','Ep5','Ep6','Ep7','Ep8')
 end
 end
 
@@ -207,11 +184,6 @@ c = 1/2 * kronPolyEval(h,x) ^ 2;
 dEx2 = (-b - sqrt(b ^ 2 - 4 * a * c)) / (2 * a);
 dEx1 = (-b + sqrt(b ^ 2 - 4 * a * c)) / (2 * a);
 
-% Ex1 = int(dEx1, x);
-% Ex2 = int(dEx2, x);
-
-% y = piecewise(x < 0, Ex1, x >= 0, Ex2);
-
 i = 1; Ex = zeros(1, length(xd));
 for xi = xd
     if xi < 0
@@ -221,10 +193,6 @@ for xi = xd
     end
     i = i + 1;
 end
-
-% fplot(y, [-6, 6], '-.+', 'LineWidth', 2)
-% hold on
-% plot(xd(1:10:end),Ex(1:10:end),'+', 'LineWidth', 1)
 
 end
 
@@ -239,11 +207,6 @@ c = eta/2 * kronPolyEval(h,x) ^ 2;
 dEx2 = (-b - sqrt(b ^ 2 - 4 * a * c)) / (2 * a);
 dEx1 = (-b + sqrt(b ^ 2 - 4 * a * c)) / (2 * a);
 
-% Ex1 = int(dEx1, x);
-% Ex2 = int(dEx2, x);
-
-% y = piecewise(x < 0, Ex1, x >= 0, Ex2);
-
 i = 1; Ex = zeros(1, length(xd));
 for xi = xd
     if xi < 0
@@ -253,9 +216,6 @@ for xi = xd
     end
     i = i + 1;
 end
-
-% hold on
-% plot(xd(1:10:end),Ex(1:10:end),'+', 'LineWidth', 1)
 
 end
 

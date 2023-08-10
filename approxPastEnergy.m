@@ -1,4 +1,4 @@
-function [v, RES] = approxPastEnergy(f, N, g, h, eta, d, verbose)
+function [v] = approxPastEnergy(f, N, g, h, eta, d, verbose)
 %  Calculates a polynomial approximation to the past energy function
 %  for a quadratic drift, polynomial input system. The default usage is
 %
@@ -39,8 +39,9 @@ function [v, RES] = approxPastEnergy(f, N, g, h, eta, d, verbose)
 %
 %  Reference: [1] Nonlinear balanced truncation: Part 1--Computing energy
 %             functions, by Kramer, Gugercin, and Borggaard, arXiv:2209.07645.
-%             [2] Nonlinear balanced truncation for quadratic bilinear
-%             systems, by Nick Corbin ... (in progress).
+%             [2] Scalable Computation of ℋ∞ Energy Functions for  
+%             Polynomial Control-Affine Systems, N. Corbin and B. Kramer,
+%             arXiv:
 %
 %             See Algorithm 1 in [1].
 %
@@ -253,31 +254,31 @@ if (d > 2)
     
 end
 
-if verbose % Check HJB Residual
-    % Compute "residual":
-    %     inputs: f, g, h, eta, v
-    %     nX = 301; nY = nX;
-    %     xPlot = linspace(-1, 1, nX);
-    %     yPlot = linspace(-1, 1, nY);
-    %     [X, Y] = meshgrid(xPlot, yPlot);
-    %     RES = zeros(nY, nX);
-    %     degree = length(v);
-    %     for i = 1:nY
-    %         for j = 1:nX
-    %             x = [X(i, j); Y(i, j)];
-    %
-    %             RES(i, j) = (0.5 * kronPolyDerivEval(v, x, degree)) * (f{1} * x + f{2} * kron(x, x)) ...
-    %                 + 0.5 * 0.25 * kronPolyDerivEval(v, x, degree) * (g{1} + g{2} * x) * (g{1} + g{2} * x).' * kronPolyDerivEval(v, x, degree).' ...
-    %                 - eta / 2 * (C * x).' * (C * x);
-    %         end
-    %     end
-    %     % RES = sum(sum(abs(RES))) / (nX * nY);
-    RES = computeResidualPastHJB(f, g, h, eta, v);
-    
-    fprintf('The residual of the HJB equation on the unit square is %g\n', norm(RES, 'inf'));
-else
-    RES = [];
-end
+% if verbose % Check HJB Residual
+%     % Compute "residual":
+%     %     inputs: f, g, h, eta, v
+%     %     nX = 301; nY = nX;
+%     %     xPlot = linspace(-1, 1, nX);
+%     %     yPlot = linspace(-1, 1, nY);
+%     %     [X, Y] = meshgrid(xPlot, yPlot);
+%     %     RES = zeros(nY, nX);
+%     %     degree = length(v);
+%     %     for i = 1:nY
+%     %         for j = 1:nX
+%     %             x = [X(i, j); Y(i, j)];
+%     %
+%     %             RES(i, j) = (0.5 * kronPolyDerivEval(v, x, degree)) * (f{1} * x + f{2} * kron(x, x)) ...
+%     %                 + 0.5 * 0.25 * kronPolyDerivEval(v, x, degree) * (g{1} + g{2} * x) * (g{1} + g{2} * x).' * kronPolyDerivEval(v, x, degree).' ...
+%     %                 - eta / 2 * (C * x).' * (C * x);
+%     %         end
+%     %     end
+%     %     % RES = sum(sum(abs(RES))) / (nX * nY);
+%     RES = computeResidualPastHJB(f, g, h, eta, v);
+%     
+%     fprintf('The residual of the HJB equation on the unit square is %g\n', norm(RES, 'inf'));
+% else
+%     RES = [];
+% end
 
 end
 

@@ -18,6 +18,11 @@ function [w] = runExample6(numGTermsModel, numGTermsApprox, exportData, x0, vara
 %
 %   The value of eta is set below.
 %
+%   Reference: Submitted to IEEE TAC. 
+%   "Scalable Computation of ℋ∞ Energy Functions for Polynomial 
+%    Control-Affine Systems", N. Corbin and B. Kramer
+%    arXiv:
+%
 %   Part of the NLbalancing repository.
 %%
 
@@ -56,8 +61,7 @@ fprintf(fileID, 'numElements &    n & n^%d           & CPU-sec   & E_%d^+(x_0)  
 % compute and print the results
 nTest = 10;
 nd = []; times = []; energies = [];
-% numEls = [1, 2, 4, 8, 16];
-numEls = [1, 2, 4];% 8, 16];
+numEls = [1, 2, 4, 8, 16];
 for numEl = numEls
     fprintf(fileID, '%5d       &', numEl);
     fprintf(fileID, '%5d & ', 6 * numEl);
@@ -93,8 +97,7 @@ end
 % run once since the run time is longer so error is less sensitive
 if exportData
     nTest = 1;
-%     for numEl = [32, 64, 128] %128 runs out of ram in kroneckerLeft.m
-    for numEl = [128] %128 runs out of ram in kroneckerLeft.m
+    for numEl = [32, 64, 128] %128 runs out of ram in kroneckerLeft.m
         numEls = [numEls, numEl];
         fprintf(fileID, '%5d       &', numEl);
         fprintf(fileID, '%5d & ', 6 * numEl);
@@ -198,7 +201,7 @@ end
 % run once since the run time is longer so error is less sensitive
 if exportData
     nTest = 1;
-    for numEl = [8, 16, 32, 64, 128]
+    for numEl = [8, 16, 32, 64]
         numEls = [numEls, numEl];
         fprintf(fileID, '%5d       &', numEl);
         fprintf(fileID, '%5d & ', 6 * numEl);

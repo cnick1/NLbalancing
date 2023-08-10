@@ -32,10 +32,15 @@ function [v, w] = runExample2_singularValueFunctions(degree, plotEnergy, plotBal
 %   References: [1] Nonlinear Balanced Truncation Model Reduction:
 %        Part 1-Computing Energy Functions, by Kramer, Gugercin, and Borggaard.
 %        arXiv:2209.07645.
+%       
 %              [2] Y. Kawano and J. M. A. Scherpen, “Model reduction by
 %        differential balancing based on nonlinear hankel operators,”
 %        IEEE Transactions on Automatic Control, vol. 62, no. 7,
 %        pp. 3293–3308, Jul. 2017, doi: 10.1109/tac.2016.2628201.
+%
+%               [3]"Scalable Computation of ℋ∞ Energy Functions for  
+%        Polynomial Control-Affine Systems", N. Corbin and B. Kramer
+%        arXiv:
 %
 %   Part of the NLbalancing repository.
 %% Process inputs
