@@ -57,6 +57,7 @@ if elementOrder == 2
 end
 
 rodLength = 30;
+alpha = -1/8;
 
 %% Define geometry and properties
 
@@ -80,8 +81,10 @@ if elementOrder == 1
     % Define stiffness matrix for one element
     K1E = 1 / elementLength * [1, -1;
         -1, 1] ...
-        - elementLength / 48 * [2, 1;
-        1, 2];
+        + alpha * elementLength / 6 * [2, 1;
+        1, 2] ... 
+        + 1/2 * [-1 1;
+                 -1 1];
 elseif elementOrder == 2
     M1E = elementLength / 30 * ...
         [4, 2, -1;
@@ -174,6 +177,7 @@ RB0 = generate_B_matrix(4, (TotalDOFs-1)/4);
 %% Impose boundary conditions
 fixedDOFs = [1, TotalDOFs]; % First and last nodes fixed
 freeDOFs = setdiff(1:TotalDOFs, fixedDOFs);
+
 
 % Reduced system method
 K1G = K1G(freeDOFs, freeDOFs);
