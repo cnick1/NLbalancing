@@ -74,8 +74,8 @@ end
 % run once since the run time is longer so error is less sensitive
 if exportData
     nTest = 1;
-    numEls = [256, 512, 1024, 1024];
-    for numEl = numEls
+    for numEl = [256, 512, 1024]
+        numEls = [numEls, numEl];
         fprintf(fileID, '%5d       &', numEl); fprintf(fileID, '%5d & ', numEl - 1);
         
         [A, B, C, N, f, g, h] = getSystem8(numEl);
@@ -163,8 +163,9 @@ end
 % run once since the run time is longer so error is less sensitive
 if exportData
     nTest = 1;
-    numEls = [64, 128];
-    for numEl = numEls
+    for numEl = [64, 128]
+        numEls = [numEls, numEl];
+                
         fprintf(fileID, '%5d       &', numEl); fprintf(fileID, '%5d & ', numEl - 1);
         
         [A, B, C, N, f, g, h] = getSystem8(numEl);

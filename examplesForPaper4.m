@@ -12,5 +12,4 @@ addpath('utils')
 exportData = true;
 
 %% Example 8: Finite Element Heat Nonlinear Equation
-[w] = runExample8(exportData,1e-4); % run this
 [w] = runExample8(exportData,1e-5);
