@@ -151,7 +151,7 @@ if (d > 2)
     % TODO: use symmetry to cut in half
     for p = (3 - lh):lh
         q = 3 - p;
-        b = b - vec(h{p}.' * h{q}');
+        b = b - vec(h{p}.' * h{q});
     end
     
     [w{3}] = KroneckerSumSolver(Acell(1:3), b, 3); % Solve Ax=b for k=3
@@ -218,7 +218,7 @@ if (d > 2)
         % TODO: use symmetry to cut in half
         for p = (k - lh):lh % would be 1:(k-1) but need to truncate only to h{} terms which exist
             q = k - p;
-            b = b - vec(h{p}.' * h{q}');
+            b = b - vec(h{p}.' * h{q});
         end
         
         % Done with RHS! Now solve and symmetrize!
