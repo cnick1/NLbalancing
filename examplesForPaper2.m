@@ -2,12 +2,13 @@
 %  Part 2-Model Reduction on Manifolds, Kramer, Gugercin, and Borggaard.
 %
 %  testcase=1 produces Table 1.
+close all; clear; clc; 
 
 setKroneckerToolsPath
 addpath('examples')
 addpath('utils')
 
-testcase = 1;
+testcase = 2;
 
 %% Example 1
 switch testcase
@@ -22,7 +23,7 @@ switch testcase
 
     zmin =-0.2;%-0.1; 
     zmax = 0.2;%0.1; 
-    Npts = 51;
+    Npts = 101;
 
     rng(20,'twister')
     n = 2;
@@ -52,7 +53,7 @@ switch testcase
 
     zmin =-0.2; 
     zmax = 0.2; 
-    Npts = 51;
+    Npts = 101;
 
     % get the system
     [A,B,C,N] = getSystem2();
@@ -70,20 +71,20 @@ switch testcase
     validateInputNormalPastEnergy = false;
     makeEnergyPlots = false;
 
-    maxDegree = 5;
+    maxDegree = 3;
 
     eta =  0.99;     % these parameter values match part 1
 
-    zmin =-0.0002; 
-    zmax = 0.0002; 
-    Npts = 51;
+    zmin =-0.25; 
+    zmax = 0.25; 
+    Npts = 101;
 
     m = 4;
     p = 4;
 
     n = 16;
 
-    epsilon = 0.001;
+    epsilon = 0.05;
     alpha   = 0.0;
 
     % get the system
@@ -94,7 +95,7 @@ switch testcase
     [w] = approxFutureEnergy(A,N,B,C,eta,maxDegree+1);
     [v] = approxPastEnergy(A,N,B,C,eta,maxDegree+1);
     
-    nSingValFcns = 10;
+    nSingValFcns = 8;
 
   otherwise
 
@@ -221,7 +222,7 @@ end
 
   %
   %% Generate data for plots of singular value functions
-  zRange = linspace(-1e-5,1e-5,51);
+  zRange = linspace(-.25,.25,101);
   plotSingularValueFunctions(sigma,c,zRange,nSingValFcns)
 
 
