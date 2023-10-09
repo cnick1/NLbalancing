@@ -72,7 +72,7 @@ for k = 3:degree
 
     % Construct the RHS vector
     RHS = [];
-    temp = sparse(size(Nk, 2), 1); % TODO: May be wrong size
+    temp = sparse(size(Nk, 2), 1);
     for i = 2:k - 2
         j = k - i;
         temp = temp + vec(Tod{j}.' * Tod{i});
@@ -83,7 +83,7 @@ for k = 3:degree
     %% Form output-diagonal equations coefficient matrix
     CoeffMatrix = [CoeffMatrix; 2 * Nk(n + 1:end, :) * kron(speye(n ^ (k - 1)), Sigma .^ 2)];
 
-    temp = sparse(size(Nk(n + 1:end, :), 2), 1); % TODO: May be wrong size
+    temp = sparse(size(Nk(n + 1:end, :), 2), 1);
     for i = 2:k - 2
         j = k - i;
         temp = temp + vec(Tod{j}.' * Sigma .^ 2 * Tod{i});
@@ -100,6 +100,7 @@ for k = 3:degree
     idxs = vec((n * (linclassidx - 1) + (1:n)).');
 
     %% Set extra parameter equation
+    % TODO: find best parameters; for now just solve "a" solution with mldivide
     % parameterEqsRHS = 1;
     % parameterEqsCoeff = zeros(1,n^k);
     % parameterEqsCoeff(4) = 1;
