@@ -1,11 +1,11 @@
-function [v, w] = runExample2(degree, plotEnergy, plotBalancing, balancingDegree, numGTermsModel, numGTermsApprox, exportPlotData, kawanoModel, varargin)
+function [v, w] = runExample2(degree, plotEnergy, plotBalancing, balancingDegree, numGTermsModel, numGTermsApprox, exportPlotData, kawanoModel)
 %runExample2 Runs the 2D example to plot energy functions as contour plots
 %
 %   Usage:  [v,w] = runExample2(degree,plotEnergy,plotBalancing,balancingDegree,
 %                               numGTermsModel, numGTermsApprox, exportPlotData, kawanoModel)
 %
 %   runExample2() runs the default case of a quadratic model from [1] which
-%                 is based on a model from [2].
+%                 is based on a model from [2]. The kawanoModel version is used in [3].
 %
 %   Inputs:
 %       degree          is the degree of energy function approximations
@@ -27,15 +27,17 @@ function [v, w] = runExample2(degree, plotEnergy, plotBalancing, balancingDegree
 %
 %   The value of eta is set below.
 %
-%   References: [1] Nonlinear Balanced Truncation Model Reduction:
-%        Part 1-Computing Energy Functions, by Kramer, Gugercin, and Borggaard.
-%        arXiv:2209.07645.
+%   Reference: [1] B. Kramer, S. Gugercin, J. Borggaard, and L. Balicki, “Nonlinear
+%               balanced truncation: Part 1—computing energy functions,” arXiv,
+%               Dec. 2022. doi: 10.48550/ARXIV.2209.07645
 %              [2] Y. Kawano and J. M. A. Scherpen, “Model reduction by
-%        differential balancing based on nonlinear hankel operators,”
-%        IEEE Transactions on Automatic Control, vol. 62, no. 7,
-%        pp. 3293–3308, Jul. 2017, doi: 10.1109/tac.2016.2628201.
-%
-%   Part of the NLbalancing repository.
+%               differential balancing based on nonlinear hankel operators,”
+%               IEEE Transactions on Automatic Control, vol. 62, no. 7,
+%               pp. 3293–3308, Jul. 2017, doi: 10.1109/tac.2016.2628201.
+%              [3] N. A. Corbin and B. Kramer, “Scalable computation of 𝓗_∞
+%               energy functions for polynomial control-affine systems,” 2023.
+%%
+
 %% Process inputs
 if nargin < 8
     if nargin < 7
@@ -69,7 +71,7 @@ else
 end
 
 %% Get model and compute energy functions
-[A, ~, C, N, f, g, ~] = getSystem2(kawanoModel);
+[f, g, h] = getSystem2(kawanoModel);
 g(numGTermsModel + 1:end) = deal({0}); % Adjust FOM to be Quadratic, QB, etc.
 fprintf('Running Example 2\n')
 
@@ -84,8 +86,8 @@ end
 fprintf('Simulating for eta=%g (gamma=%g)\n', eta, 1 / sqrt(1 - eta))
 
 %  Compute the polynomial approximations to the past future energy function
-[v] = approxPastEnergy(f, N, g(1:numGTermsApprox), C, eta, degree, true);
-[w] = approxFutureEnergy(f, N, g(1:numGTermsApprox), C, eta, degree, true);
+[v] = approxPastEnergy(f, f{2}, g(1:numGTermsApprox), h, eta, degree, true);
+[w] = approxFutureEnergy(f, f{2}, g(1:numGTermsApprox), h, eta, degree, true);
 
 %% Plot the past and future energy functions
 if (plotEnergy || plotBalancing)

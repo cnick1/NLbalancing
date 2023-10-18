@@ -1,5 +1,5 @@
-function [A, B, C, N, f, g, h] = getSystem8(numElements, elementOrder, varargin)
-%getSystem6  Generates a cubic finite element model system for testing
+function [f, g, h] = getSystem8(numElements, elementOrder)
+%getSystem8  Generates a cubic finite element model system for testing
 %            energy functions. The system is a finite element model for a
 %            nonlinear heat equation, i.e. a reaction-diffusion equation.
 %            The function returns a finite element model with either linear
@@ -8,23 +8,19 @@ function [A, B, C, N, f, g, h] = getSystem8(numElements, elementOrder, varargin)
 %            n=2*numElements-1 for quadratic elements, due to the fixed end
 %            boundary conditions.
 %
-%   Usage:   [A,B,C,N] = getSystem8()
-%         or [~,~,~,~,f,g,h] = getSystem8()
-%            [A, B, C, N, f, g, h] = getSystem8(numElements,elementOrder)
+%   Usage:   [f,g,h] = getSystem8()
+%         or [f,g,h = getSystem8(numElements,elementOrder)
 %
 %   Inputs:
 %       numElements    - number of elements to discretize the domain with
+%                        (default = 4)
 %       elementOrder   - select either:
-%                          • 1 = linear elements
-%                          • 2 = quadratic elements
+%                          • 1 = linear elements (default)
+%                          • 2 = quadratic elements (not fully implemented)
 %
-%   Outputs:
-%       A, B, C        - Linear drift, input, and output matrices
-%       N              - Quadratic drift coefficient
-%       f,g,h          - Cell arrays containing the polynomial coefficients
+%   Outputs: f,g,h     - Cell arrays containing the polynomial coefficients
 %                        for the drift, input, and output (generalizations
 %                        containing A,B,C, and N)
-%
 %
 %   Background: after finite element discretization, the finite element
 %   equations for the reaction-diffusion problem can be written as
@@ -39,7 +35,21 @@ function [A, B, C, N, f, g, h] = getSystem8(numElements, elementOrder, varargin)
 %       = B₀ u + B₁ (x ⊗ u) + B₂ (x ⊗ x ⊗ u) + ...,
 %     y = C x.
 %
+%   Reference: [1] N. A. Corbin and B. Kramer, “Scalable computation of 𝓗_∞
+%               energy functions for polynomial drift nonlinear systems,” 2023.
+%              [2] M. Embree, “Unstable modes in projection-based
+%               reduced-order models: how many can there be, and what do they
+%               tell you?,” Systems & Control Letters, vol. 124, pp. 49–59,
+%               Feb. 2019, doi: 10.1016/j.sysconle.2018.11.010
+%              [3] J. Galkowski, “Nonlinear instability in a semiclassical
+%               problem,” Communications in Mathematical Physics, vol. 316,
+%               no. 3, pp. 705–722, Oct. 2012, doi: 10.1007/s00220-012-1598-5
+%              [4] B. Sandstede and A. Scheel, “Basin boundaries and
+%               bifurcations near convective instabilities: a case study,”
+%               Journal of Differential Equations, vol. 208, no. 1, pp.
+%               176–193, Jan. 2005, doi: 10.1016/j.jde.2004.02.016
 %
+%   Part of the NLbalancing repository.
 %%
 
 vec = @(X) X(:);
@@ -76,28 +86,28 @@ TotalDOFs = numNodes * DOFsPerNode;
 if elementOrder == 1
     M1E = elementLength / 6 * ...
         [2, 1;
-        1, 2];
-    
+     1, 2];
+
     % Define stiffness matrix for one element
     K1E = 1 / elementLength * [1, -1;
-        -1, 1] ...
+                               -1, 1] ...
         + alpha * elementLength / 6 * [2, 1;
-        1, 2] ... 
-        + 1/2 * [-1 1;
-                 -1 1];
+                                   1, 2] ...
+        +1/2 * [-1 1;
+            -1 1];
 elseif elementOrder == 2
     M1E = elementLength / 30 * ...
         [4, 2, -1;
-        2, 16, 2;
-        -1, 2, 4];
-    
+     2, 16, 2;
+     -1, 2, 4];
+
     % Define stiffness matrix for one element
     K1E = 1 / (3 * elementLength) * [7, -8, 1;
-        -8, 16, -8;
-        1, -8, 7] ...
+                                     -8, 16, -8;
+                                     1, -8, 7] ...
         - elementLength / 240 * [4, 2, -1;
-        2, 16, 2;
-        -1, 2, 4];
+                             2, 16, 2;
+                             -1, 2, 4];
 end
 % Initialize and stack/assemble global matrix
 M1G = sparse(TotalDOFs, TotalDOFs);
@@ -110,7 +120,7 @@ if elementOrder == 1
     end
 elseif elementOrder == 2
     for i = 1:numElements
-        ii = 2*i - 1;
+        ii = 2 * i - 1;
         M1G(ii:(ii + DOFsPerElement - 1), ii:(ii + DOFsPerElement - 1)) = M1G(ii:(ii + DOFsPerElement - 1), ii:(ii + DOFsPerElement - 1)) + M1E;
         K1G(ii:(ii + DOFsPerElement - 1), ii:(ii + DOFsPerElement - 1)) = K1G(ii:(ii + DOFsPerElement - 1), ii:(ii + DOFsPerElement - 1)) + K1E;
     end
@@ -124,12 +134,12 @@ K2G = sparse(TotalDOFs, TotalDOFs ^ 2);
 % Define stiffness matrix for one element
 if elementOrder == 1
     K3E = -elementLength / 20 * [4, 3, 0, 2, 0, 0, 0, 1;
-        1, 2, 0, 3, 0, 0, 0, 4];
+                                 1, 2, 0, 3, 0, 0, 0, 4];
 elseif elementOrder == 2
     K3E = -elementLength / 1260 * ...
         [92, 96, -21, 0, 96, -24, 0, 0, 6, 0, 0, 0, 0, 32, -48, 0, 0, -12, 0, 0, 0, 0, 0, 0, 0, 0, -7;
-        32, 96, -12, 0, 96, -96, 0, 0, -12, 0, 0, 0, 0, 512, 96, 0, 0, 96, 0, 0, 0, 0, 0, 0, 0, 0, 32;
-        -7, -12, 6, 0, -48, -24, 0, 0, -21, 0, 0, 0, 0, 32, 96, 0, 0, 96, 0, 0, 0, 0, 0, 0, 0, 0, 92];
+     32, 96, -12, 0, 96, -96, 0, 0, -12, 0, 0, 0, 0, 512, 96, 0, 0, 96, 0, 0, 0, 0, 0, 0, 0, 0, 32;
+     -7, -12, 6, 0, -48, -24, 0, 0, -21, 0, 0, 0, 0, 32, 96, 0, 0, 96, 0, 0, 0, 0, 0, 0, 0, 0, 92];
 end
 
 % Initialize and stack/assemble global matrix
@@ -142,20 +152,20 @@ if elementOrder == 1
             + vec(( ...
             vec(([1:DOFsPerElement] + [0:TotalDOFs:TotalDOFs * (DOFsPerElement - 1)]')')' ... % (basically the quadratic indices)
             + [0:TotalDOFs ^ 2:TotalDOFs ^ 2 * (DOFsPerElement - 1)]' ... % Add secondary skips into sequence (add row to column and then vec)
-            )')';
-        
+        )')';
+
         % "stack" element matrices into global matrix
         K3G(ii:(ii + DOFsPerElement - 1), idxs) = K3G(ii:(ii + DOFsPerElement - 1), idxs) + K3E;
     end
 elseif elementOrder == 2
     for i = 1:numElements
-        ii = 2*i - 1;
-        idxs = (TotalDOFs ^ 2 + TotalDOFs + 1) * (i-1) * DOFsPerNode * 2 ... % Starting index shift depending on element iteration
+        ii = 2 * i - 1;
+        idxs = (TotalDOFs ^ 2 + TotalDOFs + 1) * (i - 1) * DOFsPerNode * 2 ... % Starting index shift depending on element iteration
             + vec(( ...
             vec(([1:DOFsPerElement] + [0:TotalDOFs:TotalDOFs * (DOFsPerElement - 1)]')')' ... % (basically the quadratic indices)
             + [0:TotalDOFs ^ 2:TotalDOFs ^ 2 * (DOFsPerElement - 1)]' ... % Add secondary skips into sequence (add row to column and then vec)
-            )')';
-        
+        )')';
+
         % "stack" element matrices into global matrix
         K3G(ii:(ii + DOFsPerElement - 1), idxs) = K3G(ii:(ii + DOFsPerElement - 1), idxs) + K3E;
     end
@@ -172,12 +182,11 @@ end
 %         RB0(TotalDOFs - 1, 1) = 1; % Force in y direction
 %         RB0(TotalDOFs, :) = 0; % Moment in z direction
 
-RB0 = generate_B_matrix(4, (TotalDOFs-1)/4);
+RB0 = generate_B_matrix(4, (TotalDOFs - 1) / 4);
 
 %% Impose boundary conditions
 fixedDOFs = [1, TotalDOFs]; % First and last nodes fixed
 freeDOFs = setdiff(1:TotalDOFs, fixedDOFs);
-
 
 % Reduced system method
 K1G = K1G(freeDOFs, freeDOFs);
@@ -217,7 +226,6 @@ F2 = -McholL.' \ (McholL \ K2G);
 % Construct N₃
 F3 = -McholL.' \ (McholL \ K3G);
 
-
 %% Format outputs
 f = {full(F1), F2, F3};
 g = {full(G0)};
@@ -231,14 +239,14 @@ N = full(F2);
 end
 
 function B = generate_B_matrix(m, i)
-    if rem(i,1) ~= 0 
-       error("Incorrect number of elements/inputs") 
-    end
-    n = i*m + 1;
-    B = sparse(n, m);
-    for j = 0:m-1
-        B(i*j+1:i*j+1+i, j+1) = 1;
-    end
-    
-    B = B./(i + 1);
+if rem(i, 1) ~= 0
+    error("Incorrect number of elements/inputs")
+end
+n = i * m + 1;
+B = sparse(n, m);
+for j = 0:m - 1
+    B(i * j + 1:i * j + 1 + i, j + 1) = 1;
+end
+
+B = B ./ (i + 1);
 end

@@ -16,11 +16,11 @@ function runExample1_regionOfAccuracy_Lyapunov()
 xd = linspace(-6, 6, 250);
 eta = 0.5; % values should be between -\infty and 1.
 
-[A, B, C, N, f, g, h] = getSystem1();
+[f, g, h] = getSystem1();
 
 %  Compute the polynomial approximations to the future energy function
 d = 8;
-[w] = approxFutureEnergy(f, N, g, h, eta, d);
+[w] = approxFutureEnergy(f, f{2}, g, h, eta, d);
 
 w2 = w{2}; w3 = w{3}; w4 = w{4}; w5 = w{5}; w6 = w{6}; w7 = w{7}; w8 = w{8};
 
@@ -41,7 +41,7 @@ Ef8 = Ef7 + 0.5 * w8 * x .^ 8;
 
 %  Compute the analytical solution for comparison
 
-EPlusAnalytic = EgammaPlusNumerical(x,f,g,h, eta);
+EPlusAnalytic = EgammaPlusNumerical(x, f, g, h, eta);
 
 figure
 plot(x(1:10:end), EPlusAnalytic(1:10:end), '+', ...
@@ -67,29 +67,29 @@ ylabel('$\mathcal{E}_\gamma^+$', ...
 
 ylim([0 20])
 
-regn2 = computeRegion(f,g,h, eta, w, 2, xd, Ef2);
-regn4 = computeRegion(f,g,h, eta, w, 4, xd, Ef4);
-regn6 = computeRegion(f,g,h, eta, w, 6, xd, Ef6);
-regn8 = computeRegion(f,g,h, eta, w, 8, xd, Ef8);
+regn2 = computeRegion(f, g, h, eta, w, 2, xd, Ef2);
+regn4 = computeRegion(f, g, h, eta, w, 4, xd, Ef4);
+regn6 = computeRegion(f, g, h, eta, w, 6, xd, Ef6);
+regn8 = computeRegion(f, g, h, eta, w, 8, xd, Ef8);
 
-set(gca,'ColorOrderIndex',2)
+set(gca, 'ColorOrderIndex', 2)
 hold on
-plot(xd(regn2),regn2(regn2)*0,'*','LineWidth', 1)
-plot(xd(regn4),regn4(regn4)*.2,'*','LineWidth', 1)
-plot(xd(regn6),regn6(regn6)*.4,'*','LineWidth', 1)
-plot(xd(regn8),regn8(regn8)*.6,'*','LineWidth', 1)
+plot(xd(regn2), regn2(regn2) * 0, '*', 'LineWidth', 1)
+plot(xd(regn4), regn4(regn4) * .2, '*', 'LineWidth', 1)
+plot(xd(regn6), regn6(regn6) * .4, '*', 'LineWidth', 1)
+plot(xd(regn8), regn8(regn8) * .6, '*', 'LineWidth', 1)
 
-tspan  = [0, 2]; X0 = -5;
-[t2, X2] = ode23(@(t,x) kronPolyEval(f, x) - eta * (g{1} + kronPolyEval(g(2:end), x)) * (g{1} + kronPolyEval(g(2:end), x)).' * ( 0.5 * kronPolyDerivEval(w(1:2), x) ), tspan, X0);
-[t4, X4] = ode23(@(t,x) kronPolyEval(f, x) - eta * (g{1} + kronPolyEval(g(2:end), x)) * (g{1} + kronPolyEval(g(2:end), x)).' * ( 0.5 * kronPolyDerivEval(w(1:4), x) ), tspan, X0);
-[t6, X6] = ode23(@(t,x) kronPolyEval(f, x) - eta * (g{1} + kronPolyEval(g(2:end), x)) * (g{1} + kronPolyEval(g(2:end), x)).' * ( 0.5 * kronPolyDerivEval(w(1:6), x) ), tspan, X0);
-[t8, X8] = ode23(@(t,x) kronPolyEval(f, x) - eta * (g{1} + kronPolyEval(g(2:end), x)) * (g{1} + kronPolyEval(g(2:end), x)).' * ( 0.5 * kronPolyDerivEval(w(1:8), x) ), tspan, X0);
+tspan = [0, 2]; X0 = -5;
+[t2, X2] = ode23(@(t, x) kronPolyEval(f, x) - eta * (g{1} + kronPolyEval(g(2:end), x)) * (g{1} + kronPolyEval(g(2:end), x)).' * (0.5 * kronPolyDerivEval(w(1:2), x)), tspan, X0);
+[t4, X4] = ode23(@(t, x) kronPolyEval(f, x) - eta * (g{1} + kronPolyEval(g(2:end), x)) * (g{1} + kronPolyEval(g(2:end), x)).' * (0.5 * kronPolyDerivEval(w(1:4), x)), tspan, X0);
+[t6, X6] = ode23(@(t, x) kronPolyEval(f, x) - eta * (g{1} + kronPolyEval(g(2:end), x)) * (g{1} + kronPolyEval(g(2:end), x)).' * (0.5 * kronPolyDerivEval(w(1:6), x)), tspan, X0);
+[t8, X8] = ode23(@(t, x) kronPolyEval(f, x) - eta * (g{1} + kronPolyEval(g(2:end), x)) * (g{1} + kronPolyEval(g(2:end), x)).' * (0.5 * kronPolyDerivEval(w(1:8), x)), tspan, X0);
 
-figure; hold on;set(gca,'ColorOrderIndex',2)
-plot(t2,X2,...
-    t4,X4,...
-    t6,X6,...
-    t8,X8,...
+figure; hold on; set(gca, 'ColorOrderIndex', 2)
+plot(t2, X2, ...
+    t4, X4, ...
+    t6, X6, ...
+    t8, X8, ...
     'LineWidth', 2)
 
 % figure; hold on;
@@ -101,7 +101,7 @@ error("This is wrong! Need Lyapunov sublevelset contained in D! Omega_c ")
 
 end
 
-function regn = computeRegion(f,g,h, eta, w, degree, xd, E)
+function regn = computeRegion(f, g, h, eta, w, degree, xd, E)
 
 dataRange = max(xd); N = length(xd);
 
@@ -123,15 +123,15 @@ for i = 1:N ^ n
     % Calculate the indices for each dimension
     indices = mod(floor((i - 1) ./ N .^ (0:(n - 1))), N) + 1;
     x = flip(xn(indices).'); % This is the ith point x in the state-space
-    
+
     if length(g) > 1
         % Polynomial input
         Lie(i) = (0.5 * kronPolyDerivEval(w, x)) * kronPolyEval(f, x) ...
-            - eta * 0.25 * kronPolyDerivEval(w, x) * (g{1} + kronPolyEval(g(2:end), x)) * (g{1} + kronPolyEval(g(2:end), x)).' * kronPolyDerivEval(w, x).' ;
+            - eta * 0.25 * kronPolyDerivEval(w, x) * (g{1} + kronPolyEval(g(2:end), x)) * (g{1} + kronPolyEval(g(2:end), x)).' * kronPolyDerivEval(w, x).';
     else
         % Linear/constant input B
         Lie(i) = (0.5 * kronPolyDerivEval(w, x)) * kronPolyEval(f, x) ...
-            - eta * 0.25 * kronPolyDerivEval(w, x) * g{1} * g{1}.' * kronPolyDerivEval(w, x).' ;
+            - eta * 0.25 * kronPolyDerivEval(w, x) * g{1} * g{1}.' * kronPolyDerivEval(w, x).';
 
     end
 end
@@ -142,10 +142,7 @@ end
 
 %% compute region where Lie <=0 and E(x) >= 0
 
-regn = (E >= 0 & Lie.' <= 0); 
-
-
-
+regn = (E >= 0 & Lie.' <= 0);
 
 end
 
@@ -153,9 +150,9 @@ function [Ex] = EgammaPlusNumerical(xd, f, g, h, eta)
 
 syms x;
 
-a = -eta/2 * (g{1} + kronPolyEval(g(2:end),x)) ^ 2;
-b = kronPolyEval(f,x);
-c = 1/2 * kronPolyEval(h,x) ^ 2;
+a = -eta / 2 * (g{1} + kronPolyEval(g(2:end), x)) ^ 2;
+b = kronPolyEval(f, x);
+c = 1/2 * kronPolyEval(h, x) ^ 2;
 
 dEx2 = (-b - sqrt(b ^ 2 - 4 * a * c)) / (2 * a);
 dEx1 = (-b + sqrt(b ^ 2 - 4 * a * c)) / (2 * a);

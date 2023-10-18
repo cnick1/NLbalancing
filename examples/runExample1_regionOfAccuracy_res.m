@@ -1,4 +1,4 @@
-function runExample1_regionOfAccuracy_res(exportData, varargin)
+function runExample1_regionOfAccuracy_res(exportData)
 %runExample1_regionOfAccuracy Runs 1D ODE example to compare computed and
 %analytical energy functions. This function plots a) error vs region size
 %comparing degree of approximation for a polynomial function, and b) error
@@ -20,11 +20,11 @@ eta = 0.5; % values should be between -\infty and 1.
 % eta=0.5 corresponds to gamma= sqrt(2)
 % since eta = 1 - 1/gamma^2;
 
-[A, B, C, N, f, g, h] = getSystem1();
+[f, g, h] = getSystem1();
 
 %  Compute the polynomial approximations to the future energy function
 d = 8;
-[v] = approxPastEnergy(f, N, g, h, eta, d);
+[v] = approxPastEnergy(f, f{2}, g, h, eta, d);
 
 RES2 = computeResidualPastHJB(f, g, h, eta, v, 2, 6, 250);
 RES4 = computeResidualPastHJB(f, g, h, eta, v, 4, 6, 250);

@@ -1,22 +1,23 @@
-function [A, B, C, N, f, g, h] = getSystem1()
+function [f, g, h] = getSystem1()
 %getSystem1  Generates a simple 1D polynomial system for testing energy functions.
 %
-%   Usage:  [A,B,C,N] = getSystem1()
-%        or [A,B,C,N,f,g,h] = getSystem1()
+%   Usage:  [f, g, h] = getSystem1()
 %
-%   The "matrices" correspond to the input-output system
+%   The dynamics correspond to the input-output system
 %
-%       \dot(x) = -2x + x^2 + 2u - 0.2xu + x^2u
+%       \dot{x} = -2x + x^2 + 2u - 0.2xu + x^2u
 %             y = 2x
 %
-%   for which there is an analytic solution to the past and future energy functions.
+%   which has an analytic solution to the past and future energy functions.
 %
-%   Excluding the higher order g term gives the same system as in [1]. The
-%   cell arrays f, g, and h can also be used as outputs.
+%   Excluding the higher order g term gives the same system as in [1]. The polynomial
+%   version is used in [2].
 %
-%   Reference: [1] Nonlinear Balanced Truncation Model Reduction:
-%        Part 1-Computing Energy Functions, by Kromer, Gugercin, and Borggaard.
-%        arXiv.
+%   Reference: [1] B. Kramer, S. Gugercin, J. Borggaard, and L. Balicki, “Nonlinear
+%               balanced truncation: Part 1—computing energy functions,” arXiv,
+%               Dec. 2022. doi: 10.48550/ARXIV.2209.07645
+%              [2] N. A. Corbin and B. Kramer, “Scalable computation of 𝓗_∞
+%               energy functions for polynomial control-affine systems,” 2023.
 %
 %   Part of the NLbalancing repository.
 %%

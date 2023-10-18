@@ -1,4 +1,4 @@
-function [f1, f2] = plotDifferentialSingularValueFunctions(dataRange, varargin)
+function [f1, f2] = plotDifferentialSingularValueFunctions(dataRange)
 %  Plots polynomial approximations to singular value functions.
 %
 %   plotDifferentialSingularValueFunctions(sigma,c,zRange,n,l)
@@ -28,7 +28,7 @@ x2 = x1;
 [x1, x2] = meshgrid(x1, x2);
 
 xPx = ((5/4 + 3 * x2 + 2 * x2 .^ 2) .* x1 + (3/4 + x2) .* x2) .* x1 + ((3/4 + x2) .* x1 +1/2 * x2) .* x2;
-xPinvx = ((8) .* x1 + (16 * (-x2 - 3/4)) .* x2) .* x1 + ((16 * (-x2 - 3/4)) .* x1 + (16 * (2 * x2 .^ 2 + 3 * x2 + 5/4)) .* x2) .* x2;
+xPinvx = ((8) .* x1 + (16 * (-x2 -3/4)) .* x2) .* x1 + ((16 * (-x2 -3/4)) .* x1 + (16 * (2 * x2 .^ 2 + 3 * x2 +5/4)) .* x2) .* x2;
 xQx = ((1/2) .* x1 + (1/4 - x2 / 3) .* x2) .* x1 + ((1/4 - x2 / 3) .* x1 + (1/4 - 5 * x2 / 9 + x2 .^ 2/3) .* x2) .* x2;
 % [8 , 16*(-x2-3/4) ;
 %  16*(-x2-3/4) , 16*(2*x2.^2+3*x2+5/4)]

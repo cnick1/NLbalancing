@@ -33,7 +33,7 @@ runExample1_regionOfAccuracy(exportData);
 runExample2(4, true, false, 4, 2, 2, exportData, true); 
 
 % This generates Figure 5
-runExample2_regionOfAccuracy_res(exportData);
+runExample2_regionOfAccuracy_res();
 
 %% Example 6: Finite Element Beam Convergence
 % This generates the data for Tables II and III, which are plotted in

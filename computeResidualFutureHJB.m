@@ -1,4 +1,4 @@
-function RES = computeResidualFutureHJB(f, g, h, eta, w, degree, dataRange, nData, varargin)
+function RES = computeResidualFutureHJB(f, g, h, eta, w, degree, dataRange, nData)
 if nargin < 8
     nData = 301;
     if nargin < 7

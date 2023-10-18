@@ -32,13 +32,13 @@ function [v, w] = runExample2_singularValueFunctions(degree, plotEnergy, plotBal
 %   References: [1] Nonlinear Balanced Truncation Model Reduction:
 %        Part 1-Computing Energy Functions, by Kramer, Gugercin, and Borggaard.
 %        arXiv:2209.07645.
-%       
+%
 %              [2] Y. Kawano and J. M. A. Scherpen, “Model reduction by
 %        differential balancing based on nonlinear hankel operators,”
 %        IEEE Transactions on Automatic Control, vol. 62, no. 7,
 %        pp. 3293–3308, Jul. 2017, doi: 10.1109/tac.2016.2628201.
 %
-%               [3]"Scalable Computation of ℋ∞ Energy Functions for  
+%               [3]"Scalable Computation of ℋ∞ Energy Functions for
 %        Polynomial Control-Affine Systems", N. Corbin and B. Kramer
 %        arXiv:
 %
@@ -75,7 +75,7 @@ zmax = 0.2; zmin = -zmax;
 % Npts = 51;
 
 %% Get model and compute energy functions and input normal transformation
-[A, ~, C, N, f, g, ~] = getSystem2(kawanoModel);
+[f, g, h] = getSystem2(kawanoModel);
 g(numGTermsModel + 1:end) = deal({0}); % Adjust FOM to be Quadratic, QB, etc.
 % n = size(A, 1);
 

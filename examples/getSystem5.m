@@ -1,14 +1,13 @@
-function [A, B, C, N, f, g, h] = getSystem5()
+function [f, g, h] = getSystem5()
 %getSystem5  Generates a unicycle quadratic-bilinear system for testing energy functions.
 %
-%   Usage:  [A,B,C,N] = getSystem5()
-%        or [A,B,C,N,f,g,h] = getSystem5()
+%   Usage:  [f,g,h] = getSystem5()
 %
 %   The "matrices" correspond to the input-output system
 %
-%       \dot(x1) = u1 cos x3
-%       \dot(x2) = u1 sin x3  - x2
-%       \dot(x3) = u2
+%       \dot{x1} = u1 cos x3
+%       \dot{x2} = u1 sin x3  - x2
+%       \dot{x3} = u2
 %             y = x
 %
 %   upon polynomial approximation to f(x) and g(x). The cell arrays f, g, and h

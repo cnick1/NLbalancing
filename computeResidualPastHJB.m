@@ -1,4 +1,4 @@
-function RES = computeResidualPastHJB(f, g, h, eta, v, degree, dataRange, nData, varargin)
+function RES = computeResidualPastHJB(f, g, h, eta, v, degree, dataRange, nData)
 if nargin < 8
     nData = 301;
     if nargin < 7

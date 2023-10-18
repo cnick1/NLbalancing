@@ -38,11 +38,11 @@ The details of some of our functions and test examples are provided below.
 
 Let A be n-by-n, B be n-by-m, C be p-by-n, and N be n-by-n^2 , with [A,B] a controllable pair and [A,C] a detectable pair.  The parameter eta is used we can compute the coefficients of the solution to future and past energy functions in Matlab as
 ```
->>  [w] = approxFutureEnergy(A,N,B,C,eta,degree);
+>>  [w] = approxFutureEnergy(f,g,h,eta,degree);
 
 and
 
->>  [v] = approxPastEnergy(A,N,B,C,eta,degree);
+>>  [v] = approxPastEnergy(f,g,h,eta,degree);
 ```
 The variable _v_ is a cell array with _v{2}_ being n-by-n^2 , up to _v{degree+1}_ which is n-by-n^(degree+1) .  These are coefficients of the polynomial approximation to the value function.  From an initial _x0_, we can compute the approximation to the energy function as
 ```

@@ -1,8 +1,9 @@
-function [v, w] = runExample1(numGTermsModel, numGTermsApprox, exportPlotData, varargin)
+function [v, w] = runExample1(numGTermsModel, numGTermsApprox, exportPlotData)
 %runExample1 Runs 1D ODE example to compare computed and analytical energy functions
 %   Usage:  [v, w] = runExample1(numGTermsModel, numGTermsApprox, exportPlotData)
 %
-%   runExample1() runs the default case of a quadratic model from [1].
+%   runExample1() runs the default case of a quadratic model from [1]. The
+%   polynomial version corresponds to the example used in [2].
 %
 %   Inputs:
 %       numGTermsModel     - Number of terms in the full order model
@@ -13,12 +14,11 @@ function [v, w] = runExample1(numGTermsModel, numGTermsApprox, exportPlotData, v
 %       v,w             are coefficients of the past and future energy
 %                       function approximations, respectively.
 %
-%   Reference: [1] Nonlinear Balanced Truncation Model Reduction:
-%        Part 1-Computing Energy Functions, by Kramer, Gugercin, and Borggaard.
-%        arXiv:2209.07645.
-%        [2] Scalable Computation of ℋ∞ Energy Functions for Polynomial  
-%        Control-Affine Systems, N. Corbin and B. Kramer,
-%        arXiv:
+%   Reference: [1] B. Kramer, S. Gugercin, J. Borggaard, and L. Balicki, “Nonlinear
+%               balanced truncation: Part 1—computing energy functions,” arXiv,
+%               Dec. 2022. doi: 10.48550/ARXIV.2209.07645
+%              [2] N. A. Corbin and B. Kramer, “Scalable computation of 𝓗_∞
+%               energy functions for polynomial control-affine systems,” 2023.
 %
 %   Part of the NLbalancing repository.
 %%
@@ -33,7 +33,7 @@ if nargin < 3
     end
 end
 
-[A, B, C, N, f, g, h] = getSystem1();
+[f, g, h] = getSystem1();
 g(numGTermsModel + 1:end) = deal({0}); % Adjust FOM to be Quadratic, QB, etc.
 fprintf('Running Example 1\n')
 
@@ -44,7 +44,7 @@ fprintf('Simulating for eta=%g (gamma=%g)\n', eta, 1 / sqrt(1 - eta))
 
 %  Compute the polynomial approximations to the future energy function
 d = 8;
-[w] = approxFutureEnergy(f, N, g(1:numGTermsApprox), C, eta, d, true);
+[w] = approxFutureEnergy(f, f{2}, g(1:numGTermsApprox), h, eta, d, true);
 
 w2 = w{2}; w3 = w{3}; w4 = w{4}; w5 = w{5}; w6 = w{6}; w7 = w{7}; w8 = w{8};
 
@@ -60,7 +60,7 @@ Ef8 = Ef7 + 0.5 * w8 * x .^ 8;
 
 %  Compute the analytical solution for comparison
 
-EPlusAnalytic = EgammaPlusNumerical(x,f,g,h, eta);
+EPlusAnalytic = EgammaPlusNumerical(x, f, g, h, eta);
 
 figure
 plot(x(1:10:end), EPlusAnalytic(1:10:end), '+', ...
@@ -109,7 +109,7 @@ if exportPlotData
     fclose(fid);
 end
 %   %  Compute the polynomial approximations to the past energy function
-[v] = approxPastEnergy(f, N, g(1:numGTermsApprox), C, eta, d);
+[v] = approxPastEnergy(f, f{2}, g(1:numGTermsApprox), h, eta, d);
 v2 = v{2}; v3 = v{3}; v4 = v{4}; v5 = v{5}; v6 = v{6}; v7 = v{7}; v8 = v{8};
 
 % x = linspace(-6,6,121);
@@ -177,9 +177,9 @@ function [Ex] = EgammaPlusNumerical(xd, f, g, h, eta)
 
 syms x;
 
-a = -eta/2 * (g{1} + kronPolyEval(g(2:end),x)) ^ 2;
-b = kronPolyEval(f,x);
-c = 1/2 * kronPolyEval(h,x) ^ 2;
+a = -eta / 2 * (g{1} + kronPolyEval(g(2:end), x)) ^ 2;
+b = kronPolyEval(f, x);
+c = 1/2 * kronPolyEval(h, x) ^ 2;
 
 dEx2 = (-b - sqrt(b ^ 2 - 4 * a * c)) / (2 * a);
 dEx1 = (-b + sqrt(b ^ 2 - 4 * a * c)) / (2 * a);
@@ -200,9 +200,9 @@ function [Ex] = EgammaMinusNumerical(xd, f, g, h, eta)
 
 syms x;
 
-a = -1/2 * (g{1} + kronPolyEval(g(2:end),x)) ^ 2;
-b = -kronPolyEval(f,x);
-c = eta/2 * kronPolyEval(h,x) ^ 2;
+a = -1/2 * (g{1} + kronPolyEval(g(2:end), x)) ^ 2;
+b = -kronPolyEval(f, x);
+c = eta / 2 * kronPolyEval(h, x) ^ 2;
 
 dEx2 = (-b - sqrt(b ^ 2 - 4 * a * c)) / (2 * a);
 dEx1 = (-b + sqrt(b ^ 2 - 4 * a * c)) / (2 * a);
@@ -218,5 +218,3 @@ for xi = xd
 end
 
 end
-
-
