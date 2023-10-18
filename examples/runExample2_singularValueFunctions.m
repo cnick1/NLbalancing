@@ -85,8 +85,8 @@ eta = 0; % values should be between -\infty and 1.
 % since eta = 1 - 1/gamma^2;
 
 % approximate the energy functions
-[v] = approxPastEnergy(A, N, g(1:numGTermsApprox), C, eta, degree);
-[w] = approxFutureEnergy(A, N, g(1:numGTermsApprox), C, eta, degree);
+[v] = approxPastEnergy(f, g(1:numGTermsApprox), C, eta, degree);
+[w] = approxFutureEnergy(f, g(1:numGTermsApprox), C, eta, degree);
 
 % compute the input-normal transformation approximation
 [sigma, T] = inputNormalTransformation(v, w, degree - 1, true);

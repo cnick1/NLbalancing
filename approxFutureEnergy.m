@@ -1,41 +1,57 @@
-function [w] = approxFutureEnergy(f, g, h, eta, d, verbose)
-%  Calculates a polynomial approximation to the future energy function
-%  for a quadratic drift, polynomial input system. The default usage is
+function w = approxFutureEnergy(f, g, h, eta, d, verbose)
+%approxFutureEnergy  Compute a polynomial approximation to the future
+% energy function for a polynomial control-affine dynamical system.
 %
-%  w = approxFutureEnergy(f,g,h,eta,d,verbose)
+%   Usage: w = approxFutureEnergy(f,g,h,eta,d,verbose)
 %
-%  where 'verbose' is an optional argument. If the system has a constant
-%  input vector field Bu, the matrix B may be passes in place of a cell
-%  array 'g'. The cell array 'g' should be g{1} = B = G_0, g{2} = G1, g{3} = G2 ...
+%   Inputs:
+%       f,g,h   - cell arrays containing the polynomial coefficients
+%                 for the drift, input, and output.
+%                   • f must contain at least linear and quadratic coefficients
+%                   • g must contain at least a linear input (B matrix)
+%                   • h must contain at least a linear input (C matrix)
+%       eta     - η=1-1/γ^2, where γ is the H∞ gain parameter. For open-loop
+%                 balancing, use eta=0. For closed-loop (HJB) balancing, use
+%                 eta=1. Any other value between -1 and ∞ corresponds to
+%                 H∞ balancing.
+%       d       - desired degree of the computed energy function. A degree d
+%                 energy function uses information from f,g,h up-to degree d-1.
+%                 The default choice of d is lf+1, where lf is the degree of
+%                 the drift.
+%       verbose - optional argument to print runtime information
 %
-%  Computes a degree d polynomial approximation to the future energy function
+%   Output:
+%       w       - cell array containing the polynomial energy function coefficients
 %
-%          E^+(x) = 1/2 ( w{2}'*kron(x,x) + ... + w{d}'*kron(.. x) )
+%   Background: Computes a degree d polynomial approximation to the energy function
 %
-%  for the polynomial system
+%          E^+(x) = 1/2 ( w{2}'*(x⊗x) + ... + w{d}'*(...⊗x) )
 %
-%    \dot{x} = Ax + Bu + N*kron(x,x) + G1*kron(x,u) + G2*kron(x,x,u) + ...
-%          y = Cx
+%   for the polynomial control-affine system
 %
-%  where eta = 1-gamma^(-2), gamma is the parameter in the algebraic Riccati
-%  equation
+%    \dot{x} = Ax + F2*(x⊗x) + F3*(x⊗x⊗x) + ...
+%              + Bu + G1*(x⊗u) + G2*(x⊗x⊗u) + ...
+%          y = Cx + H2*(x⊗x) + H3*(x⊗x⊗x) + ...
+%
+%   where eta = η=1-1/γ^2, where γ is the H∞ gain parameter. w{2} = vec(W2) = W2(:)
+%   solves the H∞ Algebraic Riccati Equation
 %
 %    A'*W2 + W2*A - eta*W2*B*B'*W2 + C'*C = 0,
 %
-%  and in the subsequent linear systems arising from the Future H-infinity
-%  Hamilton-Jacobi-Bellman Partial Differential Equation.
+%   and the remaining w{i} solve linear systems arising from the Future H∞
+%   Hamilton-Jacobi-Bellman Partial Differential Equation.
 %
-%  Note that w{2} = vec(W2) = W2(:).  Details are in Section III.B of reference [1].
+%   Details are in Section III.B of reference [1] or III.A of reference [2].
 %
-%  Requires the following functions from the KroneckerTools repository:
+%   Requires the following functions from the KroneckerTools repository:
 %      KroneckerSumSolver
 %      kronMonomialSymmetrize
 %      LyapProduct
 %
-%  Authors: Jeff Borggaard, Virginia Tech
-%           Nick Corbin, UCSD
+%   Authors: Jeff Borggaard, Virginia Tech
+%            Nick Corbin, UCSD
 %
-%  License: MIT
+%   License: MIT
 %
 %   Reference: [1] B. Kramer, S. Gugercin, J. Borggaard, and L. Balicki, “Nonlinear
 %               balanced truncation: Part 1—computing energy functions,” arXiv,
@@ -59,7 +75,7 @@ if iscell(f)
     N = f{2}; % maybe don't do this here? Well if N is missing the code would break anyways
     lf = length(f);
 else
-    error("Must pass in atleast quadratic dynamics")
+    error("Must pass in at least quadratic dynamics")
 end
 
 if iscell(g)
