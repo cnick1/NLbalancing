@@ -20,7 +20,7 @@ eta = 0.5; % values should be between -\infty and 1.
 
 %  Compute the polynomial approximations to the future energy function
 d = 8;
-[w] = approxFutureEnergy(f, f{2}, g, h, eta, d);
+[w] = approxFutureEnergy(f, g, h, eta, d);
 
 w2 = w{2}; w3 = w{3}; w4 = w{4}; w5 = w{5}; w6 = w{6}; w7 = w{7}; w8 = w{8};
 

@@ -20,8 +20,8 @@ N = 301;
 xPlot = linspace(-1, 1, N);
 yPlot = linspace(-1, 1, N);
 [X, Y] = meshgrid(xPlot, yPlot);
-[v] = approxPastEnergy(f, f{2}, g, h, eta, 4, true);
-[w] = approxFutureEnergy(f, f{2}, g, h, eta, 4, true);
+[v] = approxPastEnergy(f, g, h, eta, 4, true);
+[w] = approxFutureEnergy(f, g, h, eta, 4, true);
 
 set(groot, 'defaultAxesTickLabelInterpreter', 'latex');
 set(groot, 'defaulttextinterpreter', 'latex');

@@ -44,7 +44,7 @@ fprintf('Simulating for eta=%g (gamma=%g)\n', eta, 1 / sqrt(1 - eta))
 
 %  Compute the polynomial approximations to the future energy function
 d = 8;
-[w] = approxFutureEnergy(f, f{2}, g(1:numGTermsApprox), h, eta, d, true);
+[w] = approxFutureEnergy(f, g(1:numGTermsApprox), h, eta, d, true);
 
 w2 = w{2}; w3 = w{3}; w4 = w{4}; w5 = w{5}; w6 = w{6}; w7 = w{7}; w8 = w{8};
 
@@ -109,7 +109,7 @@ if exportPlotData
     fclose(fid);
 end
 %   %  Compute the polynomial approximations to the past energy function
-[v] = approxPastEnergy(f, f{2}, g(1:numGTermsApprox), h, eta, d);
+[v] = approxPastEnergy(f, g(1:numGTermsApprox), h, eta, d);
 v2 = v{2}; v3 = v{3}; v4 = v{4}; v5 = v{5}; v6 = v{6}; v7 = v{7}; v8 = v{8};
 
 % x = linspace(-6,6,121);

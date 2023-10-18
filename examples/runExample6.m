@@ -67,7 +67,7 @@ for numEl = numEls
     f = f(1:numGTermsModel); % Adjust FOM to be Quadratic, QB, etc.
     g = g(1:numGTermsModel); % Adjust FOM to be Quadratic, QB, etc.
 
-    tic; for i = 1:nTest, [w] = approxFutureEnergy(f, f{2}, g(1:numGTermsApprox), h, eta, degree); end, tt = toc / nTest;
+    tic; for i = 1:nTest, [w] = approxFutureEnergy(f, g(1:numGTermsApprox), h, eta, degree); end, tt = toc / nTest;
 
     fprintf(fileID, '%10.4e    & ', length(w{degree}));
     nd = [nd, length(w{degree})];
@@ -102,7 +102,7 @@ if exportData
         %     f{4} = sparse(length(A),length(A)^4);
         %     f = f(1:numGTermsModel); % Adjust FOM to be Quadratic, QB, etc.
         g = g(1:numGTermsModel); % Adjust FOM to be Quadratic, QB, etc.
-        tic; for i = 1:nTest, [w] = approxFutureEnergy(f, f{2}, g(1:numGTermsApprox), h, eta, degree); end, tt = toc / nTest;
+        tic; for i = 1:nTest, [w] = approxFutureEnergy(f, g(1:numGTermsApprox), h, eta, degree); end, tt = toc / nTest;
 
         fprintf(fileID, '%10.4e    & ', length(w{degree}));
         nd = [nd, length(w{degree})];
@@ -170,7 +170,7 @@ for numEl = numEls
     %     f{4} = sparse(length(A),length(A)^4);
     %     f = f(1:numGTermsModel); % Adjust FOM to be Quadratic, QB, etc.
     g = g(1:numGTermsModel); % Adjust FOM to be Quadratic, QB, etc.
-    tic; for i = 1:nTest, [w] = approxFutureEnergy(f, f{2}, g(1:numGTermsApprox), h, eta, degree); end, tt = toc / nTest;
+    tic; for i = 1:nTest, [w] = approxFutureEnergy(f, g(1:numGTermsApprox), h, eta, degree); end, tt = toc / nTest;
 
     fprintf(fileID, '%10.4e    & ', length(w{degree}));
     nd = [nd, length(w{degree})];
@@ -205,7 +205,7 @@ if exportData
         f{4} = sparse(length(f{1}), length(f{1}) ^ 4);
         f = f(1:numGTermsModel); % Adjust FOM to be Quadratic, QB, etc.
         g = g(1:numGTermsModel); % Adjust FOM to be Quadratic, QB, etc.
-        tic; for i = 1:nTest, [w] = approxFutureEnergy(f, f{2}, g(1:numGTermsApprox), h, eta, degree); end, tt = toc / nTest;
+        tic; for i = 1:nTest, [w] = approxFutureEnergy(f, g(1:numGTermsApprox), h, eta, degree); end, tt = toc / nTest;
 
         fprintf(fileID, '%10.4e    & ', length(w{degree}));
         nd = [nd, length(w{degree})];
@@ -292,7 +292,7 @@ for degree = degrees
 
     %     % Past
     %     tic; for i = 1:nTest,
-    %         [v] = approxPastEnergy(A, N, g(1:numGTermsApprox), C, eta, degree);
+    %         [v] = approxPastEnergy(f, g(1:numGTermsApprox), C, eta, degree);
     %     end, tt = toc / nTest;
     %
     %     fprintf(fileID, '%8.2e  & ', tt);
@@ -305,7 +305,7 @@ for degree = degrees
 
     % Future
     tic; for i = 1:nTest,
-    [w] = approxFutureEnergy(f, f{2}, g(1:numGTermsApprox), h, eta, degree);
+    [w] = approxFutureEnergy(f, g(1:numGTermsApprox), h, eta, degree);
     end, tt = toc / nTest;
 
     fprintf(fileID, '%8.2e  & ', tt);
@@ -326,7 +326,7 @@ if exportData
 
         %     % Past
         %     tic; for i = 1:nTest,
-        %         [v] = approxPastEnergy(A, N, g(1:numGTermsApprox), C, eta, degree);
+        %         [v] = approxPastEnergy(f, g(1:numGTermsApprox), C, eta, degree);
         %     end, tt = toc / nTest;
         %
         %     fprintf(fileID, '%8.2e  & ', tt);
@@ -339,7 +339,7 @@ if exportData
 
         % Future
         tic; for i = 1:nTest,
-        [w] = approxFutureEnergy(f, f{2}, g(1:numGTermsApprox), h, eta, degree);
+        [w] = approxFutureEnergy(f, g(1:numGTermsApprox), h, eta, degree);
         end, tt = toc / nTest;
 
         fprintf(fileID, '%8.2e  & ', tt);

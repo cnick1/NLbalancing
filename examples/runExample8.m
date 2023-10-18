@@ -67,7 +67,7 @@ for numEl = numEls
 
     [f, g, h] = getSystem8(numEl);
 
-    tic; for i = 1:nTest, [w] = approxFutureEnergy(f, f{2}, g, h, eta, degree); end, tt = toc / nTest;
+    tic; for i = 1:nTest, [w] = approxFutureEnergy(f, g, h, eta, degree); end, tt = toc / nTest;
 
     fprintf(fileID, '%10.4e    & ', length(w{degree}));
     nd = [nd, length(w{degree})];
@@ -95,7 +95,7 @@ if exportData
 
         [f, g, h] = getSystem8(numEl);
 
-        tic; for i = 1:nTest, [w] = approxFutureEnergy(f, f{2}, g, h, eta, degree); end, tt = toc / nTest;
+        tic; for i = 1:nTest, [w] = approxFutureEnergy(f, g, h, eta, degree); end, tt = toc / nTest;
 
         fprintf(fileID, '%10.4e    & ', length(w{degree}));
         nd = [nd, length(w{degree})];
@@ -156,7 +156,7 @@ for numEl = numEls
 
     [f, g, h] = getSystem8(numEl);
 
-    tic; for i = 1:nTest, [w] = approxFutureEnergy(f, f{2}, g, h, eta, degree); end, tt = toc / nTest;
+    tic; for i = 1:nTest, [w] = approxFutureEnergy(f, g, h, eta, degree); end, tt = toc / nTest;
 
     fprintf(fileID, '%10.4e    & ', length(w{degree}));
     nd = [nd, length(w{degree})];
@@ -185,7 +185,7 @@ if exportData
 
         [f, g, h] = getSystem8(numEl);
 
-        tic; for i = 1:nTest, [w] = approxFutureEnergy(f, f{2}, g, h, eta, degree); end, tt = toc / nTest;
+        tic; for i = 1:nTest, [w] = approxFutureEnergy(f, g, h, eta, degree); end, tt = toc / nTest;
 
         fprintf(fileID, '%10.4e    & ', length(w{degree}));
         nd = [nd, length(w{degree})];
@@ -263,7 +263,7 @@ end
 %
 %     %     % Past
 %     %     tic; for i = 1:nTest,
-%     %         [v] = approxPastEnergy(A, N, g, C, eta, degree);
+%     %         [v] = approxPastEnergy(f, g, C, eta, degree);
 %     %     end, tt = toc / nTest;
 %     %
 %     %     fprintf(fileID, '%8.2e  & ', tt);
@@ -276,7 +276,7 @@ end
 %
 %     % Future
 %     tic; for i = 1:nTest,
-%         [w] = approxFutureEnergy(f, f{2}, g, h, eta, degree);
+%         [w] = approxFutureEnergy(f, g, h, eta, degree);
 %     end, tt = toc / nTest;
 %
 %     fprintf(fileID, '%8.2e  & ', tt);
@@ -297,7 +297,7 @@ end
 %
 %         %     % Past
 %         %     tic; for i = 1:nTest,
-%         %         [v] = approxPastEnergy(A, N, g, C, eta, degree);
+%         %         [v] = approxPastEnergy(f, g, C, eta, degree);
 %         %     end, tt = toc / nTest;
 %         %
 %         %     fprintf(fileID, '%8.2e  & ', tt);
@@ -310,7 +310,7 @@ end
 %
 %         % Future
 %         tic; for i = 1:nTest,
-%             [w] = approxFutureEnergy(f, f{2}, g, h, eta, degree);
+%             [w] = approxFutureEnergy(f, g, h, eta, degree);
 %         end, tt = toc / nTest;
 %
 %         fprintf(fileID, '%8.2e  & ', tt);

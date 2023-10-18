@@ -26,8 +26,8 @@ fprintf('Simulating for eta=%g (gamma=%g)\n', eta, 1 / sqrt(1 - eta))
 
 %  Compute the polynomial approximations to the future energy function
 d = 8;
-% [v] = approxPastEnergy(f, f{2}, g, h, eta, d);
-[w] = approxFutureEnergy(f, f{2}, g, h, eta, d);
+% [v] = approxPastEnergy(f, g, h, eta, d);
+[w] = approxFutureEnergy(f, g, h, eta, d);
 
 % syms x1 x2 x3
 % vpa(-eta*g{1}.'*(kronPolyDerivEval(w(1:2), [x1;x2;x3]).'/2),3)

@@ -23,7 +23,7 @@ EMinusAnalytic = EgammaMinusNumerical(xd, f, g, h, eta);
 
 %  Compute the polynomial approximations to the Past energy function
 d = 8;
-[v] = approxPastEnergy(f, f{2}, g, h, eta, d);
+[v] = approxPastEnergy(f, g, h, eta, d);
 v2 = v{2}; v3 = v{3}; v4 = v{4}; v5 = v{5}; v6 = v{6}; v7 = v{7}; v8 = v{8};
 Ep2 = 0.5 * v2 * xd .^ 2; Ep3 = Ep2 + 0.5 * v3 * xd .^ 3; Ep4 = Ep3 + 0.5 * v4 * xd .^ 4; Ep5 = Ep4 + 0.5 * v5 * xd .^ 5; Ep6 = Ep5 + 0.5 * v6 * xd .^ 6; Ep7 = Ep6 + 0.5 * v7 * xd .^ 7; Ep8 = Ep7 + 0.5 * v8 * xd .^ 8;
 
@@ -63,7 +63,7 @@ g(numGTermsModel + 1:end) = deal({0}); % Adjust FOM to be Quadratic, QB, etc.
 
 %  Compute the polynomial approximations to the Past energy function
 d = 8;
-[v] = approxPastEnergy(f, f{2}, g, h, eta, d);
+[v] = approxPastEnergy(f, g, h, eta, d);
 v2 = v{2}; v3 = v{3}; v4 = v{4}; v5 = v{5}; v6 = v{6}; v7 = v{7}; v8 = v{8};
 Ep2 = 0.5 * v2 * xd .^ 2; Ep3 = Ep2 + 0.5 * v3 * xd .^ 3; Ep4 = Ep3 + 0.5 * v4 * xd .^ 4; Ep5 = Ep4 + 0.5 * v5 * xd .^ 5; Ep6 = Ep5 + 0.5 * v6 * xd .^ 6; Ep7 = Ep6 + 0.5 * v7 * xd .^ 7; Ep8 = Ep7 + 0.5 * v8 * xd .^ 8;
 
@@ -103,7 +103,7 @@ g(numGTermsModel + 1:end) = deal({0}); % Adjust FOM to be Quadratic, QB, etc.
 
 %  Compute the polynomial approximations to the Past energy function
 d = 8;
-[v] = approxPastEnergy(f, f{2}, g, h, eta, d);
+[v] = approxPastEnergy(f, g, h, eta, d);
 v2 = v{2}; v3 = v{3}; v4 = v{4}; v5 = v{5}; v6 = v{6}; v7 = v{7}; v8 = v{8};
 Ep2 = 0.5 * v2 * xd .^ 2; Ep3 = Ep2 + 0.5 * v3 * xd .^ 3; Ep4 = Ep3 + 0.5 * v4 * xd .^ 4; Ep5 = Ep4 + 0.5 * v5 * xd .^ 5; Ep6 = Ep5 + 0.5 * v6 * xd .^ 6; Ep7 = Ep6 + 0.5 * v7 * xd .^ 7; Ep8 = Ep7 + 0.5 * v8 * xd .^ 8;
 

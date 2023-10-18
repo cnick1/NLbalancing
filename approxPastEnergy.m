@@ -1,8 +1,8 @@
-function [v] = approxPastEnergy(f, N, g, h, eta, d, verbose)
+function [v] = approxPastEnergy(f, g, h, eta, d, verbose)
 %  Calculates a polynomial approximation to the past energy function
 %  for a quadratic drift, polynomial input system. The default usage is
 %
-%  v = approxPastEnergy(A,N,g,h,eta,d,verbose)
+%  v = approxPastEnergy(f,g,h,eta,d,verbose)
 %
 %  where 'verbose' is an optional argument. If the system has a constant
 %  input vector field Bu, the matrix B may be passes in place of the cell
@@ -48,7 +48,7 @@ function [v] = approxPastEnergy(f, N, g, h, eta, d, verbose)
 %  Part of the NLbalancing repository.
 %%
 
-if (nargin < 7)
+if (nargin < 6)
     verbose = false;
 end
 
@@ -59,10 +59,7 @@ if iscell(f)
     N = f{2}; % maybe don't do this here? Well if N is missing the code would break anyways
     lf = length(f);
 else
-    % Will reduce to Jeff's original code
-    A = f;
-    lf = 1;
-    f = {A};
+    error("Must pass in atleast quadratic dynamics")
 end
 
 if iscell(g)

@@ -24,7 +24,7 @@ eta = 0.5; % values should be between -\infty and 1.
 
 %  Compute the polynomial approximations to the future energy function
 d = 8;
-[v] = approxPastEnergy(f, f{2}, g, h, eta, d);
+[v] = approxPastEnergy(f, g, h, eta, d);
 
 RES2 = computeResidualPastHJB(f, g, h, eta, v, 2, 6, 250);
 RES4 = computeResidualPastHJB(f, g, h, eta, v, 4, 6, 250);

@@ -54,7 +54,7 @@ for n = [64, 128, 256, 512]
     [f, g, h, zInit] = getSystem4(n, m, p, 1 / L ^ 2);
     zInit = z_factor * zInit;
 
-    tic; for i = 1:nTest, [w] = approxFutureEnergy(f, f{2}, g, h, eta, degree); end, tt = toc / nTest;
+    tic; for i = 1:nTest, [w] = approxFutureEnergy(f, g, h, eta, degree); end, tt = toc / nTest;
     fprintf('%10.4e & ', length(w{degree}))
     fprintf('%8.2e & ', tt)
 
@@ -80,7 +80,7 @@ for degree = [2, 3, 4, 5, 6] % only the last one is needed, but use this for tim
 
     tic;
     for kount = 1:2 ^ (8 - degree)
-        [v] = approxPastEnergy(f, f{2}, g, h, eta, degree, false);
+        [v] = approxPastEnergy(f, g, h, eta, degree, false);
     end
     tt = toc / 2 ^ (8 - degree);
     for d = 2:degree, v{d} = v{d}.'; end
@@ -90,7 +90,7 @@ for degree = [2, 3, 4, 5, 6] % only the last one is needed, but use this for tim
 
     tic;
     for kount = 1:2 ^ (8 - degree)
-        [w] = approxFutureEnergy(f, f{2}, g, h, eta, degree, false);
+        [w] = approxFutureEnergy(f, g, h, eta, degree, false);
     end
     tt = toc / 2 ^ (8 - degree);
     for d = 2:degree, w{d} = w{d}.'; end
