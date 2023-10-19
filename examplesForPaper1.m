@@ -10,7 +10,7 @@ addpath('utils')
 runExample1
 
 %%  runExample2 produces the plots for Fig. 2.  
-%  For Table 1, please use energyFunctionValidation in the tests directory.
+%  For Table 1, please use runExample2_energyFunctionValidation
 [v,w] = runExample2(6,true,false,6);
 
 %%  runExample3 produces Tables II, III, and IV.
