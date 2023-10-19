@@ -1,23 +1,25 @@
 # NLbalancing
-Software that uses polynomials to approximately solve the nonlinear (NL) balancing problem for systems with quadratic nonlinearities.  The description of the NL balancing algorithms are provided in the papers
+Software that uses polynomials to approximately solve the nonlinear (NL) balancing problem for systems with polynomial nonlinearities.  The description of the NL balancing algorithms are provided in papers [1-5].
 
-- *Nonlinear Balanced Truncation: Part 1-computing energy functions*
+[1] J. Borggaard and L. Zietsman, “The quadratic-quadratic regulator problem: approximating feedback controls for quadratic-in-state nonlinear systems,” in 2020 American Control Conference (ACC), Jul. 2020, pp. 818–823. doi: 10.23919/ACC45564.2020.9147286
 
-- *Nonlinear Balanced Truncation: Part 2-nonlinear manifold model reduction*
+[2] J. Borggaard and L. Zietsman, “On approximating polynomial-quadratic regulator problems,” IFAC-PapersOnLine, vol. 54, no. 9, pp. 329–334, 2021, doi: 10.1016/j.ifacol.2021.06.090
 
-by Boris Kramer, Serkan Gugercin, and Jeff Borggaard.  The Kronecker product
-solvers are based on those in the KroneckerTools repository and also used for
-the QQR software described in
+[3] B. Kramer, S. Gugercin, and J. Borggaard, “Nonlinear balanced truncation: Part 2—model reduction on manifolds,” arXiv, Feb. 2023. doi: 10.48550/ARXIV.2302.02036
 
-- *Approximating Polynomial-Quadratic Regulator Problems, Arxiv*
+[4] B. Kramer, S. Gugercin, J. Borggaard, and L. Balicki, “Nonlinear balanced truncation: Part 1—computing energy functions,” arXiv, Dec. 2022. doi: 10.48550/ARXIV.2209.07645
 
-by Jeff Borggaard and Lizette Zietsman (full references included below).
+[5] N. A. Corbin and B. Kramer, “Scalable computation of 𝓗_∞ energy functions for polynomial drift nonlinear systems,” 2023.
+
+[6] N. A. Corbin and B. Kramer, “Scalable computation of 𝓗_∞ energy functions for polynomial control-affine systems,” 2023.
+
 
 ## Installation Notes
-Clone this repository: 
+Clone these repository: 
 ```
-  git clone https://www.github.com/jborggaard/KroneckerTools.git
-  git clone https://www.github.com/jborggaard/NLbalancing.git
+  git clone https://www.github.com/cnick1/KroneckerTools.git
+  git clone https://www.github.com/cnick1/NLbalancing.git
+  git clone https://gitlab.com/tensors/tensor_toolbox.git
 ```
 then modify the path in **setKroneckerToolsPath.m**
 
@@ -35,16 +37,53 @@ The details of some of our functions and test examples are provided below.
 
 
 ## How to use this software
+We consider polynomial control-affine dynamical systems of the form 
+$$
+                \dot{\mathbf{x}}  = \mathbf{A} \mathbf{x} + \sum_{i=2}^\ell \mathbf{F}_i {\mathbf{x}}^{ⓘ} + \mathbf{B} \mathbf{u} + \sum_{i=1}^\ell \mathbf{G}_i ({\mathbf{x}}^{ⓘ} \otimes \mathbf{u}),  \\
+                \mathbf{y}        = \mathbf{C} \mathbf{x} + \sum_{i=2}^\ell \mathbf{H}_i {\mathbf{x}}^{ⓘ},
+$$
+where $\mathbf{A} \in \mathbb{R}^{n\times n}$, $\mathbf{F}_i \in \mathbb{R}^{n\times n^i}$, $\mathbf{B} \in \mathbb{R}^{n\times m}$, $\mathbf{G}_i \in \mathbb{R}^{n \times mn^i}$, $\mathbf{C} \in \mathbb{R}^{p\times n}$, and $\mathbf{H}_i \in \mathbb{R}^{p\times n^i}$.
+We also assume $[\mathbf{A},\mathbf{B}]$ a controllable pair and $[\mathbf{A},\mathbf{C}]$ a detectable pair.
+Letting $\eta = 1-\gamma^{-2}$, where $\gamma$ is the $\mathcal{H}_\infty$ parameter, the past and future energy functions are defined as 
+$$
+        \mathcal{E}_\gamma^{-}(\mathbf{x}_0)  \coloneqq  \min_{\substack{\mathbf{u} \in L_{2}(-\infty, 0] \\ \mathbf{x}(-\infty) = 0,\,  \mathbf{x}(0) = \mathbf{x}_0}} \! \frac{1}{2} \int_{-\infty}^{0} \eta \Vert \mathbf{y}(t) \Vert^2  +  \Vert \mathbf{u}(t) \Vert^2 {\rm{d}}t,\\
+        \mathcal{E}_\gamma^{+}(\mathbf{x}_0)  \coloneqq \max_{\substack{\mathbf{u} \in L_{2}[0,\infty) \\ \mathbf{x}(0) = \mathbf{x}_0, \,  \mathbf{x}(\infty) = 0}} \! \frac{1}{2} \int_{0}^{\infty} \Vert \mathbf{y}(t) \Vert^2  +  \frac{\Vert \mathbf{u}(t) \Vert^2}{\eta} {\rm{d}}t.\,\,\,\,\,\,
+$$
+and they solve the Hamilton-Jacobi-Bellman Partial Differential Equations (HJB PDEs)
+$$
+  0 =  \frac{\partial \mathcal{E}_\gamma^{-}(\mathbf{x})}{\partial \mathbf{x}} \mathbf{f}(\mathbf{x}) + \frac{1}{2}  \frac{\partial \mathcal{E}_\gamma^{-}(\mathbf{x})}{\partial \mathbf{x}} \mathbf{g}(\mathbf{x}) \mathbf{g}(\mathbf{x})^\top \frac{\partial^\top \mathcal{E}_\gamma^{-}(\mathbf{x})}{\partial \mathbf{x}} - \frac{\eta}{2}  \mathbf{h}(\mathbf{x})^\top  \mathbf{h}(\mathbf{x})\\
+            0 =  \frac{\partial \mathcal{E}_\gamma^{+}(\mathbf{x})}{\partial \mathbf{x}} \mathbf{f}(\mathbf{x})   - \frac{\eta}{2} \frac{\partial \mathcal{E}_\gamma^{+}(\mathbf{x})}{\partial \mathbf{x}} \mathbf{g}(\mathbf{x}) \mathbf{g}(\mathbf{x})^\top \frac{\partial^\top \mathcal{E}_\gamma^{+}(\mathbf{x})}{\partial \mathbf{x}} + \frac{1}{2}\mathbf{h}(\mathbf{x})^\top \mathbf{h}(\mathbf{x})
+$$
+As $\eta$ goes to one, the closed-loop HJB past and future energy functions are recovered, whereas as $\eta$ goes to zero, the open-loop nonlinear controllability and observability energy functions are recovered.
+We use Al'brekht's method to solve the HJB PDEs for polynomial expansions of the energy functions 
+$$
+      \mathcal{E}_\gamma^-(\mathbf{x})
+    = \frac{1}{2} \sum_{i=2}^d \mathbf{v}_i^\top {\mathbf{x}}^{ⓘ}
+                        \qquad \text{and} \qquad
+      \mathcal{E}_\gamma^+(\mathbf{x})
+    = \frac{1}{2} \sum_{i=2}^d \mathbf{w}_i^\top {\mathbf{x}}^{ⓘ}, 
+$$
+though a scalable implementation has not been provided until this work.
 
-Let A be n-by-n, B be n-by-m, C be p-by-n, and N be n-by-n^2 , with [A,B] a controllable pair and [A,C] a detectable pair.  The parameter eta is used we can compute the coefficients of the solution to future and past energy functions in Matlab as
+For a given set of polynomial dynamics defined by the cell arrays `f,g,h` and a permissible value of `eta`, the functions `approxFutureEnergy()` and `approxPastEnergy()` will return the energy function polynomial coefficients $\mathbf{v}_i$ and $\mathbf{w}_i$ up to degree $d=$`degree`:
 ```
 >>  [w] = approxFutureEnergy(f,g,h,eta,degree);
-
-and
-
 >>  [v] = approxPastEnergy(f,g,h,eta,degree);
 ```
-The variable _v_ is a cell array with _v{2}_ being n-by-n^2 , up to _v{degree+1}_ which is n-by-n^(degree+1) .  These are coefficients of the polynomial approximation to the value function.  From an initial _x0_, we can compute the approximation to the energy function as
+`approxFutureEnergy()` and `approxPastEnergy()` correspond to Algorithm 1 in reference [1].
+The variables `f,g,h` are cell arrays containing the polynomial coefficients for the dynamics, i.e. 
+``` 
+>>   f = {A, F2,...};
+>>   g = {B, G1, G2,...};
+>>   h = {C,H2,...};
+```
+To aid in computing these polynomial coefficients, we provide the function `utils/approxPolynomialDynamics.m`; given symbolic expressions for $\mathbf{f}(\mathbf{x}),\mathbf{g}(\mathbf{x}),\mathbf{h}(\mathbf{x})$, the function will return the polynomial coefficients to degree $d$ in Kronecker product form using multivariate Taylor series expansions.
+
+The returned variables `v` and `w` are cell arrays with `v{2}` being a vector of dimension $n^2 \times 1$, up to `v{degree+1}` which is a vector of dimension $n^{d+1} \times 1$. 
+These can be though of as vectorized tensors; for example `v{2}=V2(:)`. 
+Alternatively, `v{k}` are often reshaped as $n \times n^{k}$ matrices for efficient computations. 
+
+From an initial `x0`, we can compute the approximation to the energy function as
 ```
 >>  E = (1/2)*( v{2}*kron(x0,x0) + ... + v{degree+1}*kron(kron(... ,x0),x0) );
 ```
@@ -52,66 +91,57 @@ or, using the utility function,
 ```
 >>  E = (1/2)*kronPolyEval(v(1:degree),x0,degree);
 ```
-
-For details on how to compute input-normal balancing with **inBalance**, type
-```
->>  help inBalance
-```
-Examples of input-normal balancing are found in the examples folder (inExample1 and inExample2).
-
-The **inBalance** function uses **inputNormalTransformation** and **approximateSingularValueFunctions** with a provided tolerance to build a balanced reduced-order model.
-
-For details on how to run **HJBbalance**, type
-```
->>  help HJBbalance
-```
-
-for examples how to run **HJBbalance** see those in
-```
->> examplesForPaper3
-```
-and the files in the examples directory.
+TODO: Document input-normal and output-diagonal transformations.
 
 
 ## Description of Files
 #### setKroneckerToolsPath
 
-Defines the path to the KroneckerTools directory containing functions for working with Kronecker product expressions.  KroneckerTools can be downloaded from github.com/jborggaard/KroneckerTools  The default assumes that NLbalancing and KroneckerTools lie in the same directory and uses relative pathnames.  This should be changed if you use different locations.  (setKroneckerToolsPath also lies in the examples and tests directories, so should be changed there as well if you plan to run functions from those directories.
-
-#### CT2Kron and Kron2CT
-
-These compute mappings between coefficients of a multidimensional polynomial in compact Taylor series format and those in a Kronecker product format.  As a simple example, if p(x) = c1 x1^2 + c2 x1 x2 + c3 x2^2 , then n=2, degree=2.  We have
-
-p(x) = [c1 c2 c3] * [x1^2 x1x2 x2^2 ].' written as
-
-p(x) = ( CT2Kron(n,degree)*[c1 c2 c3].' ).' * kron([x1;x2],[x1;x2])
-
-or
-
-p(x) = [c1 c2/2 c2/2 c3] * kron([x1;x2],[x1;x2]) written as
-
-p(x) = ( Kron2CT(n,degree) * [c1 c2/2 c2/2 c3].' ).' * [x1^2 x1x2 x2^2 ].'
-
-There mappings are used to balance coefficients of the feedback and value functions.  (e.g., in the Kronecker form, we seek the same coefficient for x1 x2 and x2 x1).  This is done automatically using the provided function, kronPolySymmetrize.
+Defines the path to the KroneckerTools directory containing functions for working with Kronecker product expressions.
+KroneckerTools can be downloaded from github.com/cnick1/KroneckerTools.
+The default assumes that NLbalancing and KroneckerTools lie in the same directory and uses relative pathnames.
+This should be changed if you use different locations.  (setKroneckerToolsPath also lies in the tests directory, so should be changed there as well if you plan to run functions from those directories.)
 
 #### LyapProduct
 
-Efficiently computes the product of a special Kronecker sum matrix (aka an N-Way Lyapunov matrix) with a vector.  This is done by reshaping the vector, performing matrix-matrix products, then reshaping the answer.  We could also utilize the matrization of the associated tensor.
+Efficiently computes the product of a special Kronecker sum matrix (aka an N-Way Lyapunov matrix) with a vector.  
+This is done by reshaping the vector, performing matrix-matrix products, then reshaping the answer.  
+We could also utilize the matrization of the associated tensor.
 
 ## Examples
 
-### Example01.m
+### runExample1.m
+Approximates the future and past energy functions for a one-dimensional model problem motivated by the literature.  
+A quadratic approximation to this problem appears as Example 1 in [1], and the full polynomial problem appears as Example 1 in [6].
 
-Approximates the future and past energy functions for a one-dimensional model problem motivated by the literature.  This appears as example 1 in Kramer, Borggaard, and Gugercin.
+### runExample2.m
+The example is based on a two-dimensional problem found in Kawano and Scherpen, IEEE Transactions on Automatic Control, 2016.
+This example approximates the future and past energy functions, then computes an approximation to the input-normal transformation.  
+An quadratic approximation to the original model is considered as Example 2 in [1], and the full quadratic-bilinear model is considered as Example 2 in [6].
 
-### Example02.m
+### runExample3
+This example demonstrates the scalability and convergence of the proposed approach on a finite-element discretization of Burgers' equation.
+This is Example 3 in [1].
 
-Approximates the future and past energy functions, then computes an approximation to the (input-normal) balancing transformation and computes a reduced model.  The example is based on a two-dimensional problem found in Kawano and Scherpen, IEEE Transactions on Automatic Control, 2016 (we ignore their bilinear term in this example).
+### runExample4
+This example demonstrates the scalability and convergence of the proposed approach on a finite-element discretization of the Kuramoto-Sivashinsky equation.
+This is Example 4 in [1].
 
+### runExample6
+This example demonstrates the scalability and convergence of the proposed approach on a finite-element discretization of a nonlinear beam.
+This is Example 3 in [6].
 
-## Algorithms from Kramer, Gugercin, and Borggaard, Part 1:
+### runExample7
+This example demonstrates controllers based on the energy functions on a 3D aircraft stall stabilization model from Garrard 1977.
 
-### Algorithm 1 is implemented in _approxFutureEnergy.m_ and _approxPastEnergy.m_
+### runExample8
+This example demonstrates the scalability and convergence of the proposed approach on a finite-element discretization of a nonlinear heat equation (reaction-diffusion problem).
+This is Example 1 in [5].
+
+<!-- ### runExample12
+This example is for testing the output-diagonalization transformation.
+The system is a polynomial approximation of the 2D model from Fujimoto and Scherpen 2001, 2005, 2010. -->
+
 
 ## Algorithms from Kramer, Gugercin, and Borggaard, Part 2:
 
@@ -121,50 +151,70 @@ Approximates the future and past energy functions, then computes an approximatio
 
 ## References
 ```
-  @misc{kramer2022balancedtruncation1,
-    title={Nonlinear Balanced Truncation: Part 1-computing energy functions},
-    author={Boris Kramer, Jeff Borggaard, and Serkan Gugercin},
-    year={2022},
-    eprint={2209.07645},
-    archivePrefix={arXiv},
-    primaryClass={math.OC}
-  }
+@inproceedings{Borggaard2020,
+  author           = {Borggaard, Jeff and Zietsman, Lizette},
+  booktitle        = {2020 American Control Conference (ACC)},
+  doi              = {10.23919/ACC45564.2020.9147286},
+  month            = jul,
+  pages            = {818--823},
+  title            = {The quadratic-quadratic regulator problem: approximating feedback controls for quadratic-in-state nonlinear systems},
+  year             = {2020}
+}
 ```
-
 ```
-  @misc{kramer2022balancedtruncation2,
-    title={Nonlinear Balanced Truncation: Part 2-nonlinear manifold model reduction},
-    author={Boris Kramer, Jeff Borggaard, and Serkan Gugercin},
-    year={2022},
-    eprint={pending},
-    archivePrefix={arXiv},
-    primaryClass={math.OC}
-  }
+@article{Borggaard2021,
+  author           = {Borggaard, Jeff and Zietsman, Lizette},
+  doi              = {10.1016/j.ifacol.2021.06.090},
+  journal          = {{IFAC}-{PapersOnLine}},
+  number           = {9},
+  pages            = {329--334},
+  publisher        = {Elsevier {BV}},
+  title            = {On approximating polynomial-quadratic regulator problems},
+  volume           = {54},
+  year             = {2021}
+}
 ```
-
 ```
-  @inproceedings{borggaard2019quadraticquadratic,
-    title={The Quadratic-Quadratic Regulator Problem: 
-     Approximating feedback controls for quadratic-in-state nonlinear systems},
-    author={Jeff Borggaard and Lizette Zietsman}, 
-    booktitle={Proceedings of the 2020 American Conference on Control},
-    year={2020},
-    eprint={1910.03396},
-    archivePrefix={arXiv},
-    primaryClass={math.OC}
-  }
+@unpublished{Kramer2023,
+  archiveprefix    = {arXiv},
+  author           = {Kramer, Boris and Gugercin, Serkan and Borggaard, Jeff},
+  doi              = {10.48550/ARXIV.2302.02036},
+  eprint           = {2302.02036},
+  month            = feb,
+  note             = {{\em arXiv:2302.02036}},
+  primaryclass     = {math.OC},
+  publisher        = {arXiv},
+  title            = {Nonlinear balanced truncation: {P}art 2---model reduction on manifolds},
+  year             = {2023}
+}
 ```
-
 ```
-  @article{borggaard2021polynomialquadratic,
-    title={On Approximating Polynomial-Quadratic Regulator Problems},
-    author={Jeff Borggaard and Lizette Zietsman},
-    journal={IFAC-PaersOnLine},
-    volume=54,
-    number=9,
-    pages={329--334},
-    year={2021}
-  }
+@unpublished{Kramer2022,
+  archiveprefix    = {arXiv},
+  author           = {Kramer, Boris and Gugercin, Serkan and Borggaard, Jeff and Balicki, Linus},
+  doi              = {10.48550/ARXIV.2209.07645},
+  eprint           = {arXiv:2209.07645v2},
+  month            = dec,
+  note             = {{\em arXiv:2209.07645v2}},
+  primaryclass     = {math.OC},
+  publisher        = {arXiv},
+  title            = {Nonlinear balanced truncation: {P}art 1---computing energy functions},
+  year             = {2022}
+}
 ```
-
-
+```
+@Unpublished{Corbin2023,
+  author           = {Corbin, Nicholas A. and Kramer, Boris},
+  note             = {Submitted to ACC 2024},
+  title            = {Scalable computation of {$\mathcal{H}_\infty$} energy functions for polynomial drift nonlinear systems},
+  year             = {2023},
+}
+```
+```
+@Unpublished{Corbin2023a,
+  author           = {Corbin, Nicholas A. and Kramer, Boris},
+  note             = {Submitted to IEEE Transactions on Automatic Control},
+  title            = {Scalable computation of {$\mathcal{H}_\infty$} energy functions for polynomial control-affine systems},
+  year             = {2023},
+}
+```

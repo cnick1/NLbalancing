@@ -1,5 +1,7 @@
 function runExample12()
-%runExample12 Runs the example to test diagonalization.
+%runExample12 Runs the example to test diagonalization. The system is a
+%   polynomial approximation of the 2D model from Fujimoto and Scherpen
+%   2001, 2005, 2010 [1-3].
 %
 %   Usage:  [v,w] = runExample12()
 %
