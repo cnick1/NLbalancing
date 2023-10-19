@@ -39,8 +39,8 @@ The details of some of our functions and test examples are provided below.
 ## How to use this software
 We consider polynomial control-affine dynamical systems of the form 
 $$
-                \dot{\mathbf{x}}  = \mathbf{A} \mathbf{x} + \sum_{i=2}^l \mathbf{F}_i {\mathbf{x}}^{ⓘ} + \mathbf{B} \mathbf{u} + \sum_{i=1}^l \mathbf{G}_i ({\mathbf{x}}^{ⓘ} \otimes \mathbf{u}),  \\
-                \mathbf{y}        = \mathbf{C} \mathbf{x} + \sum_{i=2}^l \mathbf{H}_i {\mathbf{x}}^{ⓘ},
+                \dot{\mathbf{x}}  = \mathbf{A} \mathbf{x} + \sum_{i=2}^l \mathbf{F}_i {\mathbf{x}}^{i} + \mathbf{B} \mathbf{u} + \sum_{i=1}^l \mathbf{G}_i ({\mathbf{x}}^{i} \otimes \mathbf{u}),  \\
+                \mathbf{y}        = \mathbf{C} \mathbf{x} + \sum_{i=2}^l \mathbf{H}_i {\mathbf{x}}^{i},
 $$
 where $\mathbf{A} \in \mathbb{R}^{n\times n}$, $\mathbf{F}_i \in \mathbb{R}^{n\times n^i}$, $\mathbf{B} \in \mathbb{R}^{n\times m}$, $\mathbf{G}_i \in \mathbb{R}^{n \times mn^i}$, $\mathbf{C} \in \mathbb{R}^{p\times n}$, and $\mathbf{H}_i \in \mathbb{R}^{p\times n^i}$.
 We also assume $[\mathbf{A},\mathbf{B}]$ a controllable pair and $[\mathbf{A},\mathbf{C}]$ a detectable pair.
@@ -58,10 +58,10 @@ As $\eta$ goes to one, the closed-loop HJB past and future energy functions are 
 We use Al'brekht's method to solve the HJB PDEs for polynomial expansions of the energy functions 
 $$
       \mathcal{E}_\gamma^-(\mathbf{x})
-    = \frac{1}{2} \sum_{i=2}^d \mathbf{v}_i^\top {\mathbf{x}}^{ⓘ}
+    = \frac{1}{2} \sum_{i=2}^d \mathbf{v}_i^\top {\mathbf{x}}^{i}
                         \qquad \text{and} \qquad
       \mathcal{E}_\gamma^+(\mathbf{x})
-    = \frac{1}{2} \sum_{i=2}^d \mathbf{w}_i^\top {\mathbf{x}}^{ⓘ}, 
+    = \frac{1}{2} \sum_{i=2}^d \mathbf{w}_i^\top {\mathbf{x}}^{i}, 
 $$
 though a scalable implementation has not been provided until this work.
 
