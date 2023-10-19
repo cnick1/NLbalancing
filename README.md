@@ -38,31 +38,23 @@ The details of some of our functions and test examples are provided below.
 
 ## How to use this software
 We consider polynomial control-affine dynamical systems of the form 
-$$
-                \dot{\mathbf{x}}  = \mathbf{A} \mathbf{x} + \sum_{i=2}^l \mathbf{F}_i {\mathbf{x}}^{i} + \mathbf{B} \mathbf{u} + \sum_{i=1}^l \mathbf{G}_i ({\mathbf{x}}^{i} \otimes \mathbf{u}),  \\
-                \mathbf{y}        = \mathbf{C} \mathbf{x} + \sum_{i=2}^l \mathbf{H}_i {\mathbf{x}}^{i},
-$$
-where $\mathbf{A} \in \mathbb{R}^{n\times n}$, $\mathbf{F}_i \in \mathbb{R}^{n\times n^i}$, $\mathbf{B} \in \mathbb{R}^{n\times m}$, $\mathbf{G}_i \in \mathbb{R}^{n \times mn^i}$, $\mathbf{C} \in \mathbb{R}^{p\times n}$, and $\mathbf{H}_i \in \mathbb{R}^{p\times n^i}$.
+$$\dot{\mathbf{x}}  = \mathbf{A} \mathbf{x} + \sum^\ell_{i=2}\mathbf{F}_ i {\mathbf{x}}^{ⓘ} + \mathbf{B} \mathbf{u}  + \sum^\ell_{i=1} \mathbf{G} _ i({\mathbf{x}}^{ⓘ} \otimes \mathbf{u}),$$
+$$\mathbf{y}        = \mathbf{C} \mathbf{x} + \sum^\ell_{i=2} \mathbf{H} _ i {\mathbf{x}}^{ⓘ},$$
+
+where $\mathbf{A} \in \mathbb{R}^{n\times n}$, $\mathbf{F}_ i \in \mathbb{R}^{n\times n^i}$, $\mathbf{B} \in \mathbb{R}^{n\times m}$, $\mathbf{G}_ i \in \mathbb{R}^{n \times mn^i}$, $\mathbf{C} \in \mathbb{R}^{p\times n}$, and $\mathbf{H}_ i \in \mathbb{R}^{p\times n^i}$.
 We also assume $[\mathbf{A},\mathbf{B}]$ a controllable pair and $[\mathbf{A},\mathbf{C}]$ a detectable pair.
-Letting $\eta = 1-\gamma^{-2}$, where $\gamma$ is the $\mathcal{H}_\infty$ parameter, the past and future energy functions are defined as 
-$$
-        \mathcal{E}_\gamma^{-}(\mathbf{x}_0)  \coloneqq  \min_{\substack{\mathbf{u} \in L_{2}(-\infty, 0] \\ \mathbf{x}(-\infty) = 0,\,  \mathbf{x}(0) = \mathbf{x}_0}} \! \frac{1}{2} \int_{-\infty}^{0} \eta \Vert \mathbf{y}(t) \Vert^2  +  \Vert \mathbf{u}(t) \Vert^2 {\rm{d}}t,\\
-        \mathcal{E}_\gamma^{+}(\mathbf{x}_0)  \coloneqq \max_{\substack{\mathbf{u} \in L_{2}[0,\infty) \\ \mathbf{x}(0) = \mathbf{x}_0, \,  \mathbf{x}(\infty) = 0}} \! \frac{1}{2} \int_{0}^{\infty} \Vert \mathbf{y}(t) \Vert^2  +  \frac{\Vert \mathbf{u}(t) \Vert^2}{\eta} {\rm{d}}t.\,\,\,\,\,\,
-$$
+Letting $\eta = 1-\gamma^{-2}$, where $\gamma$ is the $\mathcal{H}_ \infty$ parameter, the past and future energy functions are defined as 
+$$\mathcal{E}_ \gamma^{-}(\mathbf{x}_ 0)  \coloneqq  \min_{\substack{\mathbf{u} \in L_{2}(-\infty, 0] \\ \mathbf{x}(-\infty) = 0,  \mathbf{x}(0) = \mathbf{x}_ 0}}  \frac{1}{2} \int_{-\infty}^{0} \eta \Vert \mathbf{y}(t) \Vert^2  +  \Vert \mathbf{u}(t) \Vert^2 {\rm{d}}t,$$
+
+$$\mathcal{E}_ \gamma^{+}(\mathbf{x}_ 0)  \coloneqq \max_{\substack{\mathbf{u} \in L_{2}[0,\infty) \\ \mathbf{x}(0) = \mathbf{x}_ 0,   \mathbf{x}(\infty) = 0}}  \frac{1}{2} \int_{0}^{\infty} \Vert \mathbf{y}(t) \Vert^2  +  \frac{\Vert \mathbf{u}(t) \Vert^2}{\eta} {\rm{d}}t.$$
+
 and they solve the Hamilton-Jacobi-Bellman Partial Differential Equations (HJB PDEs)
-$$
-  0 =  \frac{\partial \mathcal{E}_\gamma^{-}(\mathbf{x})}{\partial \mathbf{x}} \mathbf{f}(\mathbf{x}) + \frac{1}{2}  \frac{\partial \mathcal{E}_\gamma^{-}(\mathbf{x})}{\partial \mathbf{x}} \mathbf{g}(\mathbf{x}) \mathbf{g}(\mathbf{x})^\top \frac{\partial^\top \mathcal{E}_\gamma^{-}(\mathbf{x})}{\partial \mathbf{x}} - \frac{\eta}{2}  \mathbf{h}(\mathbf{x})^\top  \mathbf{h}(\mathbf{x})\\
-            0 =  \frac{\partial \mathcal{E}_\gamma^{+}(\mathbf{x})}{\partial \mathbf{x}} \mathbf{f}(\mathbf{x})   - \frac{\eta}{2} \frac{\partial \mathcal{E}_\gamma^{+}(\mathbf{x})}{\partial \mathbf{x}} \mathbf{g}(\mathbf{x}) \mathbf{g}(\mathbf{x})^\top \frac{\partial^\top \mathcal{E}_\gamma^{+}(\mathbf{x})}{\partial \mathbf{x}} + \frac{1}{2}\mathbf{h}(\mathbf{x})^\top \mathbf{h}(\mathbf{x})
-$$
+$$0 =  \frac{\partial \mathcal{E}_ \gamma^{-}(\mathbf{x})}{\partial \mathbf{x}} \mathbf{f}(\mathbf{x}) + \frac{1}{2}  \frac{\partial \mathcal{E}_ \gamma^{-}(\mathbf{x})}{\partial \mathbf{x}} \mathbf{g}(\mathbf{x}) \mathbf{g}(\mathbf{x})^\top \frac{\partial^\top \mathcal{E}_ \gamma^{-}(\mathbf{x})}{\partial \mathbf{x}} - \frac{\eta}{2}  \mathbf{h}(\mathbf{x})^\top  \mathbf{h}(\mathbf{x})$$
+$$0 =  \frac{\partial \mathcal{E}_ \gamma^{+}(\mathbf{x})}{\partial \mathbf{x}} \mathbf{f}(\mathbf{x})   - \frac{\eta}{2} \frac{\partial \mathcal{E}_ \gamma^{+}(\mathbf{x})}{\partial \mathbf{x}} \mathbf{g}(\mathbf{x}) \mathbf{g}(\mathbf{x})^\top \frac{\partial^\top \mathcal{E}_\gamma^{+}(\mathbf{x})}{\partial \mathbf{x}} + \frac{1}{2}\mathbf{h}(\mathbf{x})^\top \mathbf{h}(\mathbf{x})$$
+
 As $\eta$ goes to one, the closed-loop HJB past and future energy functions are recovered, whereas as $\eta$ goes to zero, the open-loop nonlinear controllability and observability energy functions are recovered.
 We use Al'brekht's method to solve the HJB PDEs for polynomial expansions of the energy functions 
-$$
-      \mathcal{E}_\gamma^-(\mathbf{x})
-    = \frac{1}{2} \sum_{i=2}^d \mathbf{v}_i^\top {\mathbf{x}}^{i}
-                        \qquad \text{and} \qquad
-      \mathcal{E}_\gamma^+(\mathbf{x})
-    = \frac{1}{2} \sum_{i=2}^d \mathbf{w}_i^\top {\mathbf{x}}^{i}, 
-$$
+$$\mathcal{E}_ \gamma^-(\mathbf{x}) = \frac{1}{2} \sum_{i=2}^d \mathbf{v}_ i^\top {\mathbf{x}}^{i} \qquad \text{and} \qquad \mathcal{E}_ \gamma^+(\mathbf{x}) = \frac{1}{2} \sum_{i=2}^d \mathbf{w}_i^\top {\mathbf{x}}^{i}, $$
 though a scalable implementation has not been provided until this work.
 
 For a given set of polynomial dynamics defined by the cell arrays `f,g,h` and a permissible value of `eta`, the functions `approxFutureEnergy()` and `approxPastEnergy()` will return the energy function polynomial coefficients $\mathbf{v}_i$ and $\mathbf{w}_i$ up to degree $d=$`degree`:
