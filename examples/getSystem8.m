@@ -9,7 +9,7 @@ function [f, g, h] = getSystem8(numElements, elementOrder)
 %            boundary conditions.
 %
 %   Usage:   [f,g,h] = getSystem8()
-%         or [f,g,h = getSystem8(numElements,elementOrder)
+%         or [f,g,h] = getSystem8(numElements,elementOrder)
 %
 %   Inputs:
 %       numElements    - number of elements to discretize the domain with

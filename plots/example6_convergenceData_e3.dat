@@ -1,9 +1,0 @@
-# Table III Data
-# finite element beam model, convergence and scalability results 
-# numEls = 3   -->   n = 18 
-d      & CPU-sec-2    & E_d^+(x_0)      
-2      & 2.03e-02     & 1.012561e-07    
-3      & 8.70e-03     & 1.034814e-07    
-4      & 2.65e-01     & 1.035239e-07    
-5      & 4.49e+01     & 1.035240e-07    
-6      & 1.38e+03     & 1.035240e-07    

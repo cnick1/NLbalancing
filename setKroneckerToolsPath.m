@@ -9,7 +9,7 @@ try
     addpath('../KroneckerTools/src')
     addpath('../KroneckerTools/util')
 catch
-    disp("Run 'git clone https://github.com/jborggaard/KroneckerTools' in the parent directory")
+    disp("Run 'git clone https://github.com/cnick1/KroneckerTools' in the parent directory")
     error("KroneckerTools repo not found, please clone it.")
 end
 
@@ -17,5 +17,12 @@ try
     addpath('../tensor_toolbox')
 catch
     disp("Run 'git clone https://gitlab.com/tensors/tensor_toolbox.git' in the parent directory")
+    error("tensor_toolbox repo not found, please clone it.")
+end
+
+try
+    addpath('../PQR')
+catch
+    disp("Run 'git clone https://github.com/cnick1/PQR' in the parent directory")
     error("tensor_toolbox repo not found, please clone it.")
 end

@@ -8,7 +8,10 @@ function [f, g, h] = getSystem11(degree, m, L)
 %              \dot{x}_2 & = \frac{3T}{m\L^2} + \frac{3g}{2\L} (x_1-\frac{x_1^3}{6}+\frac{x_1^5}{120}-\frac{x_1^7}{5040} + \frac{x_1^9}{362880})
 %                   y    & = x_1
 %
-%       References:
+%   Reference: [1] N. A. Corbin and B. Kramer, “The polynomial-polynomial regulator:
+%              computing feedback for polynomially nonlinear systems with polynomial
+%              performance indexes,” 2023.
+%
 %%
 
 if nargin < 3

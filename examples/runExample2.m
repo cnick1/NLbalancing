@@ -101,8 +101,6 @@ if (plotEnergy || plotBalancing)
     for i = 1:nY
         for j = 1:nX
             x = [X(i, j); Y(i, j)];
-            %         WBar = vbar(wT,x);
-            %         eFuture(i,j) = x.'*WBar*x;
             ePast(i, j) = 0.5 * kronPolyEval(v, x, degree);
             eFuture(i, j) = 0.5 * kronPolyEval(w, x, degree);
         end
