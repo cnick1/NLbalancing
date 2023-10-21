@@ -83,8 +83,6 @@ end
 % eta=0.1 corresponds to gamma= 1.0541...
 % since eta = 1 - 1/gamma^2;
 
-fprintf('Simulating for eta=%g (gamma=%g)\n', eta, 1 / sqrt(1 - eta))
-
 %  Compute the polynomial approximations to the past future energy function
 [v] = approxPastEnergy(f, g(1:numGTermsApprox), h, eta, degree, true);
 [w] = approxFutureEnergy(f, g(1:numGTermsApprox), h, eta, degree, true);

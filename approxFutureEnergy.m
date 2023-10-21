@@ -72,6 +72,17 @@ if (nargin < 6)
     end
 end
 
+% Print what type of energy function is being computed
+if eta == 0
+    message = sprintf('Computing open-loop balancing observability energy function (η=%g ↔ γ=%g)', eta, 1 / sqrt(1 - eta));
+elseif eta == 1
+    message = sprintf('Computing closed-loop balancing future energy function (η=%g ↔ γ=%g)', eta, 1 / sqrt(1 - eta));
+else
+    message = sprintf('Computing 𝓗∞ balancing future energy function (η=%g ↔ γ=%g)', eta, 1 / sqrt(1 - eta));
+end
+if verbose
+    disp(message)
+end
 
 % Rewritten by N Corbin to use pqr()
 [w] = pqr(f, g, h2q(h), eta, degree, verbose);

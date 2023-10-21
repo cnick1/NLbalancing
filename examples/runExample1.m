@@ -40,8 +40,6 @@ fprintf('Running Example 1\n')
 eta = 0.5; % values should be between -\infty and 1.
 % eta=0.5 corresponds to gamma= sqrt(2), since eta = 1 - 1/gamma^2;
 
-fprintf('Simulating for eta=%g (gamma=%g)\n', eta, 1 / sqrt(1 - eta))
-
 %  Compute the polynomial approximations to the future energy function
 d = 8;
 [w] = approxFutureEnergy(f, g(1:numGTermsApprox), h, eta, d, true);

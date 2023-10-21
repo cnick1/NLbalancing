@@ -32,7 +32,7 @@ for d = 4
     vRES = computeResidualPastHJB(f, g, h, eta, v, d, 1, 301);
     wRES = computeResidualFutureHJB(f, g, h, eta, w, d, 1, 301);
 
-    fig1 = figure
+    fig1 = figure;
     contourf(X, Y, abs(vRES), 16, 'w'); colorbar;
     xlabel('$x_1$', 'interpreter', 'latex');
     ylabel('$x_2$', 'interpreter', 'latex');
@@ -45,7 +45,7 @@ for d = 4
     colormap(flip(YlGnBuRescaled))
     fprintf('The residual of the HJB equation on the unit square is %g\n', norm(vRES, 'inf'));
 
-    fig2 = figure
+    fig2 = figure;
     pcolor(X, Y, abs(wRES)); shading interp; colorbar;
     xlabel('$x_1$', 'interpreter', 'latex');
     ylabel('$x_2$', 'interpreter', 'latex');
@@ -53,7 +53,7 @@ for d = 4
     set(gca, 'FontSize', 16)
     xticks([-1:1])
     yticks([-1:1])
-    h = get(gca, 'DataAspectRatio')
+    h = get(gca, 'DataAspectRatio');
     if h(3) == 1
         set(gca, 'DataAspectRatio', [1 1 1 / max(h(1:2))])
     else

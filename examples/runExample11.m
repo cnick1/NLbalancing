@@ -205,8 +205,6 @@ end
 % x0 = [-2, -1.7, -1.5, -1.3, -1.1, - .9, - .8, - .6, - .4, - .2, - .05, - .01, 0., 0.01, 0.05, 0.2, 0.4, 0.6, 0.8, .95, 1.1, 1.3, 1.5, 1.7, 2] * scaling;
 % y0 = [zeros(1, 11), zeros(1, 3), zeros(1, 11)];
 
-fprintf('Simulating for eta=%g (gamma=%g)\n', eta, 1 / sqrt(1 - eta))
-
 %  Compute the polynomial approximations to the past future energy function
 % [v] = approxPastEnergy(f, N, g, h, eta, degree, true);
 % [w] = pqr(f, g, h2q(h), eta, degree, true);

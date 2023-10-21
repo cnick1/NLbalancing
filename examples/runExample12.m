@@ -36,7 +36,6 @@ function runExample12()
 fprintf('Running Example 12\n')
 
 eta = 0;
-fprintf('Simulating for eta=%g (gamma=%g)\n', eta, 1 / sqrt(1 - eta))
 
 %  Compute the polynomial approximations to the future energy function
 degree = 8;
