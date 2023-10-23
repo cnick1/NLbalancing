@@ -1,22 +1,33 @@
-function [singularValueFunSquared, Tod] = outputDiagonalTransformation(v, w, Tin, Sigma, degree, verbose)
-%  Computes a polynomial approximation to the output-diagonal transformation
-%  for a system with polynomial nonlinearities as
+function [sigmaSquared, Tod] = outputDiagonalTransformation(v, w, Tin, Sigma, degree, verbose)
+%outputDiagonalTransformation  Compute the output-diagonal transformation for a polynomial control-affine dynamical system.
 %
-%     [singularValueFun,Tbar] = outputDiagonalTransformation(v,w,degree)
+%   Usage: [sigmaSquared,Tbar] = outputDiagonalTransformation(v, w, Tin, Sigma, degree)
 %
-%  using polynomial approximations to the past and future energy functions.
-%  The variables v and w contain the coefficients to the past and future energy
-%  functions, respectively, already in input-normal form. Hence v2 should
-%  be identity and v3 and on should be zero. Terms out to v{degree+1} and
-%  w{degree+1} must be defined in the input.  Thus,
+%   Inputs:
+%       v,w     - cell arrays containing the polynomial energy function
+%       coefficients; these should already be in input-normal form.
+%       Tin     - cell array containing the input-normal transformation
+%                 coefficients.
+%       Sigma   - diagonal matrix of the Hankel singular values of the 
+%                 linear system.
+%       degree  - desired degree of the computed transformation (default =
+%                 degree of energy functions - 1).
+%       verbose - optional argument to print runtime information.
+%
+%   Output:
+%       sigmaSquared - coefficients of the square of the singular value
+%                      functions.
+%       Tod          - cell array containing the input-normal
+%                      transformation coefficients.
+%
+%   Background: Since the inputs should be in input normal form, v2 should
+%   be identity and v3 and on should be zero. Terms out to v{degree+1} and
+%   w{degree+1} must be defined in the input.  Thus,
 %
 %      E_past(x) = 1/2 (kron(x,x))
 %                = 0.5*kronPolyEval(v,x,degree+1)
-%
-%  and
-%
-%      E_future(x) = 1/2 ( w{2}kron(x,x) + ... + w{degree+1}kron(kron...,x),x) )
-%                  = 0.5*kronPolyEval(w,x,degree+1)
+%      and E_future(x) = 1/2 ( w{2}kron(x,x) + ... + w{degree+1}kron(kron...,x),x) )
+%                      = 0.5*kronPolyEval(w,x,degree+1)
 %
 %  The balancing transformation then has the form
 %
@@ -32,9 +43,13 @@ function [singularValueFunSquared, Tod] = outputDiagonalTransformation(v, w, Tin
 %
 %  Part of the NLbalancing repository.
 %%
-if (nargin < 4)
+if (nargin < 6)
     verbose = false;
+    if (nargin < 5)
+        degree = length(v) - 1;
+    end
 end
+
 
 if (verbose)
     fprintf('Computing the degree %d output-diagonal balancing transformation\n', degree)
@@ -65,11 +80,11 @@ Tod = cell(1, degree); Tod{1} = speye(n);
 
 for k = 3:degree
     [Nk] = equivalenceClassIndices(n, k);
-
+    
     % \section{}
     %$ Form input-normal equations coefficient matrix
     CoeffMatrix = 2 * Nk;
-
+    
     % Construct the RHS vector
     RHS = [];
     temp = sparse(size(Nk, 2), 1);
@@ -78,11 +93,11 @@ for k = 3:degree
         temp = temp + vec(Tod{j}.' * Tod{i});
     end
     RHS = [RHS; -Nk * temp];
-
+    
     % \section
     %% Form output-diagonal equations coefficient matrix
     CoeffMatrix = [CoeffMatrix; 2 * Nk(n + 1:end, :) * kron(speye(n ^ (k - 1)), Sigma .^ 2)];
-
+    
     temp = sparse(size(Nk(n + 1:end, :), 2), 1);
     for i = 2:k - 2
         j = k - i;
@@ -92,88 +107,52 @@ for k = 3:degree
         temp = temp + calTTv(Tod, i, k, wtilde{i}); % TODO: Accelerate this
     end
     RHS = [RHS; -Nk(n + 1:end, :) * temp];
-
+    
     %% Form `flexibility' equations (Kronecker product repeated entries
     [linclassidx] = referenceElementMap(n, k - 1);
-
+    
     linclassidx(linclassidx) = []; % Basically remove the reference element so one is nonzero and the rest we eliminate
     idxs = vec((n * (linclassidx - 1) + (1:n)).');
-
+    
     %% Set extra parameter equation
     % TODO: find best parameters; for now just solve "a" solution with mldivide
     % parameterEqsRHS = 1;
     % parameterEqsCoeff = zeros(1,n^k);
     % parameterEqsCoeff(4) = 1;
-
+    
     % CoeffMatrix(:,4) = [];
     % indices(4) = [];
-
+    
     % idxs = [idxs; 16]; % alternatively could solve minimum norm solution
-
+    
     %% Assemble equations
     CoeffMatrix(:, idxs) = []; % Kronecker flexibility
-
+    
     % Form index set for the nonzero transformation components
     indices = 1:n ^ k; indices(idxs) = [];
-
+    
     Tod{k - 1} = sparse(n, n ^ (k - 1));
     Tod{k - 1}(indices) = CoeffMatrix \ RHS;
-
+    
 end
+
+%% Pluck out the singular value function coefficients
 
 [vbar, wbar] = transformEnergyFunctions(vtilde, wtilde, Tod);
 
-singularValueFunSquared = cell(1, degree);
+sigmaSquared = cell(1, degree);
 
 for k = 2:degree
     if verbose
         [N] = equivalenceClassIndices(n, k);
-
+        
         fprintf("The largest entry in v%i is %.1e; ", k, max(abs(N * vbar{k}))) % Should be zero, other than the first time which is one
         fprintf("the largest off-diagonal entry in w%i is %.1e\n", k, max(abs(N(n + 1:end, :) * wbar{k}))) % Should be diagonal
-
-        singularValueFunSquared{k - 1} = N(1:n, :) * wbar{k}; % Since the index set is already computed
+        
+        sigmaSquared{k - 1} = N(1:n, :) * wbar{k}; % Since the index set is already computed
     else
         indexSet = linspace(1, n ^ k, n);
-        singularValueFunSquared{k - 1} = wbar{k}(indexSet);
-    end
-end
-
-end
-
-function [vtilde, wtilde] = transformEnergyFunctions(v, w, T)
-%transformEnergyFunctions - Given a transformation T, compute the transformed energy functions given by the coefficients vtilde, wtilde.
-%
-% Syntax: [vtilde,wtilde] = transformEnergyFunctions(v,w,T)
-%
-% TODO: option to skip input if input normal transformation
-
-vec = @(X) X(:);
-
-degree = length(w);
-n = sqrt(length(v{2}));
-V2 = reshape(v{2}, n, n);
-W2 = reshape(w{2}, n, n);
-
-vtilde = cell(1, degree);
-wtilde = cell(1, degree);
-
-vtilde{2} = vec(T{1}.' * V2 * T{1});
-wtilde{2} = vec(T{1}.' * W2 * T{1});
-
-for k = 3:degree
-    vtilde{k} = vec(T{k - 1}.' * V2 * T{1}) + vec(T{1}.' * V2 * T{k - 1});
-    wtilde{k} = vec(T{k - 1}.' * W2 * T{1}) + vec(T{1}.' * W2 * T{k - 1});
-
-    for i = 2:k - 2
-        j = k - i;
-        vtilde{k} = vtilde{k} + vec(T{j}.' * V2 * T{i});
-        wtilde{k} = wtilde{k} + vec(T{j}.' * W2 * T{i});
-    end
-
-    for i = 3:k
-        vtilde{k} = vtilde{k} + calTTv(T, i, k, v{i});
-        wtilde{k} = wtilde{k} + calTTv(T, i, k, w{i});
+        sigmaSquared{k - 1} = wbar{k}(indexSet);
     end
 end
 
@@ -182,7 +161,7 @@ end
 function [N] = equivalenceClassIndices(n, k)
 %equivalenceClassIndices - For a k-way tensor of dimension n (n^k entries), compute the matrix N which combines the equivalence class entries. This matrix essentially goes from Kronecker product form to the unique monomial form.
 %
-% Syntax: [N] = equivalenceClassIndices(n,k)
+% Usage: [N] = equivalenceClassIndices(n,k)
 %
 
 %% Compute equivalence class index sets
@@ -216,7 +195,7 @@ function [linclassidx] = referenceElementMap(n, k)
 %referenceElementMap - For a k-way tensor of dimension n (n^k entries),
 %compute the vector that maps each element to its reference element.
 %
-% Syntax: [linclassidx] = referenceElementMap(n, k)
+% Usage: [linclassidx] = referenceElementMap(n, k)
 %
 
 %% Compute equivalence class index sets

@@ -1,15 +1,16 @@
-% Examples for Paper 4 (by N. Corbin, submitted to ACC 2024 Toronto)
+% Examples for Paper 6 (by N. Corbin and A. Sarkar, in progress)
 %
 %  Description: This script runs the example and produces the data for 
-%  reference [1], submitted to ACC 2024 Toronto. The examples are:
+%  reference [1]. The examples are:
 %
 %    - Example 8: a nonlinear heat equation from [2-4]. The dynamics are 
 %      cubic. The model can be made arbitrarily large with finite elements.
 %
 %  Authors:   Nick Corbin, UCSD
 %
-%  Reference: [1] N. A. Corbin and B. Kramer, “Scalable computation of 𝓗_∞
-%             energy functions for polynomial drift nonlinear systems,” 2023.
+%  Reference: [1] N. A. Corbin, A. Sarkar, and B. Kramer, “Computation of 
+%             Output Diagonal Transformations for Nonlinear Balancing,” 
+%             in progress, 2023.
 %             [2] M. Embree, “Unstable modes in projection-based
 %             reduced-order models: how many can there be, and what do they
 %             tell you?,” Systems & Control Letters, vol. 124, pp. 49–59,
@@ -21,13 +22,17 @@
 %             bifurcations near convective instabilities: a case study,”
 %             Journal of Differential Equations, vol. 208, no. 1, pp.
 %             176–193, Jan. 2005, doi: 10.1016/j.jde.2004.02.016
-%
+% 
+
 close all; clear; clc;
 setKroneckerToolsPath
 addpath('examples')
+addpath('ArijitExamples')
 addpath('utils')
 
-exportData = true;
+% exportData = true;
 
-%% Example 8: Finite Element Heat Nonlinear Equation
-[w] = runExample8(exportData, 1e-5);
+%% Checking input-normal/output-diagonal transformation
+[v, w] = runExample7_outputDiagonalization();
+
+

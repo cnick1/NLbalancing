@@ -1,6 +1,5 @@
 function v = approxPastEnergy(f, g, h, eta, degree, verbose)
-%approxPastEnergy  Compute a polynomial approximation to the past
-% energy function for a polynomial control-affine dynamical system.
+%approxPastEnergy  Compute the past energy function for a polynomial control-affine dynamical system.
 %
 %   Usage: v = approxPastEnergy(f,g,h,eta,d,verbose)
 %
@@ -77,7 +76,7 @@ if eta == 0
     q = 0;
 elseif eta == 1
     message = sprintf('Computing closed-loop balancing past energy function (η=%g ↔ γ=%g)', eta, 1 / sqrt(1 - eta));
-    q = h2q(h);
+    q = cellfun(@(x) x * (-1), h2q(h), 'un', 0);
 else
     message = sprintf('Computing 𝓗∞ balancing past energy function (η=%g ↔ γ=%g)', eta, 1 / sqrt(1 - eta));
     q = cellfun(@(x) x * (-eta), h2q(h), 'un', 0);

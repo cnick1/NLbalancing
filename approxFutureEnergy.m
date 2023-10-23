@@ -1,6 +1,5 @@
 function w = approxFutureEnergy(f, g, h, eta, degree, verbose)
-%approxFutureEnergy  Compute a polynomial approximation to the future
-% energy function for a polynomial control-affine dynamical system.
+%approxFutureEnergy  Compute the future energy function for a polynomial control-affine dynamical system.
 %
 %   Usage: w = approxFutureEnergy(f,g,h,eta,d,verbose)
 %
