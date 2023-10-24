@@ -1,17 +1,14 @@
-function runExample12()
+function runExample12(degree)
 %runExample12 Runs the example to test diagonalization. The system is a
 %   polynomial approximation of the 2D model from Fujimoto and Scherpen
 %   2001, 2005, 2010 [1-3].
 %
-%   Usage:  [v,w] = runExample12()
+%   Usage:  [v,w] = runExample12(degree)
 %
 %   Inputs:
-%       exportData      - Boolean variable to determine if
-%                         plots/data are exported
+%       degree - desired degree of the energy function approximation
 %
 %   Outputs:
-%       v,w             - Coefficients of the past and future energy
-%                         function approximations, respectively
 %
 %   The value of eta is set below.
 %
@@ -34,15 +31,30 @@ function runExample12()
 %   Part of the NLbalancing repository.
 %%
 fprintf('Running Example 12\n')
-
 eta = 0;
 
-%  Compute the polynomial approximations to the future energy function
-degree = 8;
+if nargin < 1
+    degree = 8;
+end
 
-[f, g, h] = getSystem12(degree)
+[f, g, h] = getSystem12(degree - 1);
 
-[v] = approxPastEnergy(f, g, h, eta, degree + 1);
-[w] = approxFutureEnergy(f, g, h, eta, degree + 1);
+%  Compute the energy functions
+[v] = approxPastEnergy(f, g, h, eta, degree, true);
+[w] = approxFutureEnergy(f, g, h, eta, degree, true);
+
+%% Compute the input-normal transformation approximation
+[sigma, Tin] = inputNormalTransformation(v, w, degree - 1, false);
+
+%% Compute the output-diagonal transformation approximation, also giving the squared singular value functions
+[sigmaSquared, Tod] = outputDiagonalTransformation(v, w, Tin, diag(sigma), degree, true);
+
+%% Plot the singular value functions
+n = length(f{1});
+z = linspace(- .5, .5, 51);
+figure; hold on;
+for i = 1:n
+    plot(z, sqrt(polyval(flip(sigmaSquared(i, :)), z)))
+end
 
 end

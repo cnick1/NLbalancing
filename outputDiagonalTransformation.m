@@ -14,14 +14,24 @@ function [sigmaSquared, Tod] = outputDiagonalTransformation(v, w, Tin, Sigma, de
 %                 degree of energy functions - 1).
 %       verbose - optional argument to print runtime information.
 %
-%   Output:
-%       sigmaSquared - coefficients of the square of the singular value
-%                      functions.
-%       Tod          - cell array containing the input-normal
+%   Outputs:
+%       sigmaSquared - an n×degree-1 matrix containing the coefficients of
+%                      the square of the singular value functions. The 
+%                      first column corresponds to the square of the Hankel 
+%                      singular values, the next column corresponds to the 
+%                      degree 1 coefficients, etc. These can be plotted
+%                      using polyval() (and flip()). 
+
+%                      Warning: Note that the singular value functions are 
+%                      NOT given by sigmaSquared.^(1/2). Use the function
+%                      utils/polySqrt() to get the coefficients of the
+%                      singular value functions.
+
+%       Tod          - cell array containing the output-diagonal
 %                      transformation coefficients.
 %
-%   Background: Since the inputs should be in input normal form, v2 should
-%   be identity and v3 and on should be zero. Terms out to v{degree+1} and
+%   Background: Since the inputs should be in input normal form, v{2} should
+%   be identity and v{3} and on should be zero. Terms out to v{degree+1} and
 %   w{degree+1} must be defined in the input.  Thus,
 %
 %      E_past(x) = 1/2 (kron(x,x))
@@ -140,7 +150,8 @@ end
 
 [vbar, wbar] = transformEnergyFunctions(vtilde, wtilde, Tod);
 
-sigmaSquared = cell(1, degree);
+% sigmaSquared = cell(1, degree-1);
+sigmaSquared = zeros(n, degree-1);
 
 for k = 2:degree
     if verbose
@@ -149,10 +160,12 @@ for k = 2:degree
         fprintf("The largest entry in v%i is %.1e; ", k, max(abs(N * vbar{k}))) % Should be zero, other than the first time which is one
         fprintf("the largest off-diagonal entry in w%i is %.1e\n", k, max(abs(N(n + 1:end, :) * wbar{k}))) % Should be diagonal
         
-        sigmaSquared{k - 1} = N(1:n, :) * wbar{k}; % Since the index set is already computed
+%         sigmaSquared{k - 1} = N(1:n, :) * wbar{k}; % Since the index set is already computed
+        sigmaSquared(:,k - 1) = N(1:n, :) * wbar{k}; % Since the index set is already computed
     else
         indexSet = linspace(1, n ^ k, n);
-        sigmaSquared{k - 1} = wbar{k}(indexSet);
+%         sigmaSquared{k - 1} = wbar{k}(indexSet);
+        sigmaSquared(:,k - 1) = wbar{k}(indexSet);
     end
 end
 
