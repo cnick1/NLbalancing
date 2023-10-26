@@ -86,7 +86,7 @@ end
 % preallocate storage for the output T.
 Tod = cell(1, degree); Tod{1} = speye(n);
 
-[vtilde, wtilde] = transformEnergyFunctions(v, w, Tin); % Input-normal
+[vtilde, wtilde] = transformEnergyFunctions(v, w, Tin, true); % Input-normal
 
 for k = 3:degree
     [Nk] = equivalenceClassIndices(n, k);
@@ -148,7 +148,7 @@ end
 
 %% Pluck out the singular value function coefficients
 
-[vbar, wbar] = transformEnergyFunctions(vtilde, wtilde, Tod);
+[vbar, wbar] = transformEnergyFunctions(vtilde, wtilde, Tod, true);
 
 % sigmaSquared = cell(1, degree-1);
 sigmaSquared = zeros(n, degree-1);

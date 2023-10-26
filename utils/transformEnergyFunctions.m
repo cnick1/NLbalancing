@@ -1,11 +1,16 @@
-function [vtilde, wtilde] = transformEnergyFunctions(v, w, T)
+function [vtilde, wtilde] = transformEnergyFunctions(v, w, T, inputNormal)
 %transformEnergyFunctions Transforms the energy coefficients v and w by T.
 %
 %   Usage: [vtilde, wtilde] = transformEnergyFunctions(v, w, T)
 %
 %   Inputs:
-%       v,w   - cell arrays containing the polynomial energy function coefficients
-%       T     - cell array containing the polynomial transformation coefficients
+%       v,w         - cell arrays containing the polynomial energy function
+%                     coefficients
+%       T           - cell array containing the polynomial transformation
+%                     coefficients
+%       inputNormal - boolean indicating the transformation is input
+%                     normal, used to speed up the computation by skipping
+%                     that transformation (default = false)
 %       TODO: option to skip input if input normal transformation
 %
 %   Output:
@@ -17,6 +22,9 @@ function [vtilde, wtilde] = transformEnergyFunctions(v, w, T)
 %
 %   Authors: Nick Corbin, UCSD
 %
+if nargin < 4
+    inputNormal = false;
+end
 
 vec = @(X) X(:);
 
@@ -31,20 +39,36 @@ wtilde = cell(1, degree);
 vtilde{2} = vec(T{1}.' * V2 * T{1});
 wtilde{2} = vec(T{1}.' * W2 * T{1});
 
-for k = 3:degree
-    vtilde{k} = vec(T{k - 1}.' * V2 * T{1}) + vec(T{1}.' * V2 * T{k - 1});
-    wtilde{k} = vec(T{k - 1}.' * W2 * T{1}) + vec(T{1}.' * W2 * T{k - 1});
-
-    for i = 2:k - 2
-        j = k - i;
-        vtilde{k} = vtilde{k} + vec(T{j}.' * V2 * T{i});
-        wtilde{k} = wtilde{k} + vec(T{j}.' * W2 * T{i});
+if inputNormal
+    % TODO: consider adding a check to verify that the transformation is input normal, throw error if not
+    for k = 3:degree
+        vtilde{k} = sparse(n^k,1);
+        wtilde{k} = vec(T{k - 1}.' * W2 * T{1}) + vec(T{1}.' * W2 * T{k - 1});
+        
+        for i = 2:k - 2
+            j = k - i;
+            wtilde{k} = wtilde{k} + vec(T{j}.' * W2 * T{i});
+        end
+        
+        for i = 3:k
+            wtilde{k} = wtilde{k} + calTTv(T, i, k, w{i});
+        end
     end
-
-    for i = 3:k
-        vtilde{k} = vtilde{k} + calTTv(T, i, k, v{i});
-        wtilde{k} = wtilde{k} + calTTv(T, i, k, w{i});
+else
+    for k = 3:degree
+        vtilde{k} = vec(T{k - 1}.' * V2 * T{1}) + vec(T{1}.' * V2 * T{k - 1});
+        wtilde{k} = vec(T{k - 1}.' * W2 * T{1}) + vec(T{1}.' * W2 * T{k - 1});
+        
+        for i = 2:k - 2
+            j = k - i;
+            vtilde{k} = vtilde{k} + vec(T{j}.' * V2 * T{i});
+            wtilde{k} = wtilde{k} + vec(T{j}.' * W2 * T{i});
+        end
+        
+        for i = 3:k
+            vtilde{k} = vtilde{k} + calTTv(T, i, k, v{i});
+            wtilde{k} = wtilde{k} + calTTv(T, i, k, w{i});
+        end
     end
 end
-
 end
