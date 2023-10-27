@@ -39,7 +39,7 @@ wtilde = cell(1, degree);
 vtilde{2} = vec(T{1}.' * V2 * T{1});
 wtilde{2} = vec(T{1}.' * W2 * T{1});
 
-if inputNormal
+if false%inputNormal
     % TODO: consider adding a check to verify that the transformation is input normal, throw error if not
     for k = 3:degree
         vtilde{k} = sparse(n^k,1);
@@ -53,6 +53,8 @@ if inputNormal
         for i = 3:k
             wtilde{k} = wtilde{k} + calTTv(T, i, k, w{i});
         end
+        
+        wtilde{k} = kronMonomialSymmetrize(wtilde{k},n,k);
     end
 else
     for k = 3:degree
@@ -69,6 +71,9 @@ else
             vtilde{k} = vtilde{k} + calTTv(T, i, k, v{i});
             wtilde{k} = wtilde{k} + calTTv(T, i, k, w{i});
         end
+        
+        vtilde{k} = kronMonomialSymmetrize(vtilde{k},n,k);
+        wtilde{k} = kronMonomialSymmetrize(wtilde{k},n,k);
     end
 end
 end
