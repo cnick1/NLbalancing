@@ -74,9 +74,9 @@ dv = length(v);
 dw = length(w);
 n = sqrt(length(v{2}));
 
-if (degree < 1)
-    error('outputDiagonalTransformation: degree must be at least 1')
-end
+% if (degree < 1)
+%     error('outputDiagonalTransformation: degree must be at least 1')
+% end
 
 % if (dv < degree + 1 || dw < degree + 1)
 %     error('outputDiagonalTransformation: we need degree %d terms in the energy function', ...
@@ -157,7 +157,7 @@ for k = 2:degree
     if verbose
         [N] = equivalenceClassIndices(n, k);
         
-        fprintf("The largest entry in v%i is %.1e; ", k, max(abs(N * vbar{k}))) % Should be zero, other than the first time which is one
+        fprintf("  - The largest entry in v%i is %.1e; ", k, max(abs(N * vbar{k}))) % Should be zero, other than the first time which is one
         fprintf("the largest off-diagonal entry in w%i is %.1e\n", k, max(abs(N(n + 1:end, :) * wbar{k}))) % Should be diagonal
         
 %         sigmaSquared{k - 1} = N(1:n, :) * wbar{k}; % Since the index set is already computed

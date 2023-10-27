@@ -108,9 +108,11 @@ function [sigma,T] = inputNormalTransformation(v,w,degree,verbose)
       term = TVT + Tv;
       
       T{k} = -0.5*T{1}*reshape(term,n^k,n).';
-      for i=1:n
-        T{k}(i,:) = kronMonomialSymmetrize(T{k}(i,:),n,k);
-      end
+      
+      % Symmetrize (optional)
+%       for i=1:n
+%         T{k}(i,:) = kronMonomialSymmetrize(T{k}(i,:),n,k);
+%       end
 
       if (verbose)
         fprintf('The residual error for T{%d} is %g\n',k,...
