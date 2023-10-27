@@ -1,117 +1,65 @@
 function [Tv] = calTTv(T, m, k, v)
-%calTTv Calculates the term \cal{T}_{m,k}.'v
-%
-%  Note the additional T in calTTv ensures the transpose of T is taken.
-%
-%         Tv = \|i\|=k kron(T_i1.',kron(T_i2.',kron(T_i3.',...,T_im.'))*v
+%calTTv Calculates the term \cT_{m,k}^\top v
 %
 %  Usage:  Tv = calTTv(T,m,k,v)
 %
-%  Variables:   T  a cell array of matrices.  The pth entry has size n times n^p
-%               v  a vector of dimension (n^m)
+%   Inputs:
+%       T  - a cell array of matrices (transformation coefficients).
+%       v  - a vector of dimension n^m
+%       m  - related to dimension of v
+%       k  - related to dimension of the output vector Tv
 %
-%  This is multiplication performed recursively using Kronecker product rules.
+%   Output:
+%       Tv - the vector that results from product "caligraphic T transpose times v".
 %
-%  This function assumes the functions mkIndices and kroneckerRight have
-%  been imported from the KroneckerTools repository (and in the Matlab path).
+%   Background: When applying a polynomial transformation to a polynomial
+%   energy function, repeated products appear such as 
+% 
+%                   (T{1} ⊗ T{2} ⊗ ... ⊗T{m}).' * v)
+% 
+%   We introduce the notation \cT = (T{1} ⊗ T{2} ⊗ ... ⊗T{m}); more
+%   specifically, \cT is defined with two subscript indices: m and k. 
+%       - m denotes the number of terms in the Kronecker products; it is
+%         also related to the dimension of the input vector v
+%       - k is related to the dimension of the resultant vector vT
+% 
+%   Examples include 
+%       - \cT_{k,k} = T{1} ⊗ T{1} ⊗ ... ⊗T{1}    (k times)
+%       - \cT_{3,4} = T{1} ⊗ T{1} ⊗ T{2} + T{1} ⊗ T{2} ⊗ T{1} + T{2} ⊗ T{1} ⊗ T{1}
+% 
+%   Hence "\cT_{m,k} denotes all unique tensor products with m terms and 
+%   n^k columns" [1]. In this function, we evaluate the product \cT_{m,k}^\top v
+%   efficiently using the kronecker-vec identity recursively with the 
+%   function kroneckerRight.
+% 
+%   Author: Rewritten by Nick Corbin, UCSD, based on code by Jeff Borggaard, VT
 %
-%  Author: Jeff Borggaard, VT
-%          Nick Corbin, UCSD
-%
-%  License: MIT
+%   License: MIT
+
+%   Reference: [1] B. Kramer, S. Gugercin, and J. Borggaard, “Nonlinear 
+%              balanced truncation: Part 2—model reduction on manifolds,” 
+%              arXiv, Feb. 2023. doi: 10.48550/ARXIV.2302.02036
 %
 %  Part of the NLbalancing repository.
 %%
-method = 3;
 
-switch method
-    case 1 %% Old way
-        % Get a list of indices
-        indexSet = mkIndices(m, k);
-        nTerms = size(indexSet, 1);
-        
-        n = size(T{1}, 2);
-        
-        Tv = zeros(1, n ^ k);
-        
-        for i = 1:nTerms
-             Tv = Tv + kroneckerRight(v.', T(indexSet(i, :)));
-        end
-        
-        Tv = Tv.';
-        
-    case 2 %% basically old way but using new function and perms (just a test)
-        % Get a list of indices
-        [indexSet, mult] = findCombinations(m, k);
-        nTerms = size(indexSet, 1);
-        %
-        n = size(T{1}, 2);
-        
-        Tv = zeros(1, n ^ k);
-        for i = 1:nTerms
-                ps = unique(perms(indexSet(i, :)),'rows');
-                for j = 1:mult(i) % add other permutations; mult(i) should be length(ps)
-%                     Tv = Tv + kroneckerRight(v.', T(ps(j,:))); % Identity
-                    Tv = Tv + kronMonomialSymmetrize(kroneckerRight(v.', T(ps(j,:))), n, k).'; % Can also symmetrize each thing
-                end
-        end
-        
-        Tv = Tv.';
-        
-    case 3 %% Now symmetrize and multiply by multiplicity rather than using perms
-        % Get a list of indices
-        [indexSet, mult] = findCombinations(m, k);
-        nTerms = size(indexSet, 1);
-        %
-        n = size(T{1}, 2);
-        
-        Tv = zeros(1, n ^ k);
-        for i = 1:nTerms
-            Tv = Tv + mult(i) * kronMonomialSymmetrize(kroneckerRight(v.', T(indexSet(i, :))), n, k).'; % Can also symmetrize each thing
-        end
-        
-        Tv = Tv.';
-    
-end
-end
+% Get a list of indices
+[indexSet, mult] = findCombinations(m, k);
 
-function indexSet = mkIndices(m, k)
-%  Returns all combinations of m natural numbers that sum to k.
-%
-%  indexSet = mkIndices(m,k);
-%
-%  Used to compute calT_{m,k} in the function calTtimesv
-%
-%  Author: Jeff Borggaard, Virginia Tech
-%
-%  Licence: MIT
-%
-%  Reference:  Nonlinear balanced truncation model reduction for large-scale
-%              polynomial systems, arXiv
-%
-%              See Algorithm 3.
-%
-%  Part of the NLbalancing repository.
-%%
-indexSet = [];
+nTerms = size(indexSet, 1);
 
-if m == 1
-    indexSet = k;
-    
-else % fill the remaining indices through recursion
-    
-    for i = 1:k - m + 1
-        J = mkIndices(m - 1, k - i);
-        rJ = size(J, 1);
-        
-        indexSet = [indexSet; i * ones(rJ, 1) J];
-    end
-    
+n = size(T{1}, 2);
+
+Tv = zeros(n ^ k, 1);
+for i = 1:nTerms
+    Tv = Tv + mult(i) * kronMonomialSymmetrize(kroneckerRight(v.', T(indexSet(i, :))), n, k); % Can also symmetrize each thing
 end
 
 end
 
 function [combinations, multiplicities] = findCombinations(m, k)
+%findCombinations  Returns all combinations of m natural numbers that sum to k.
+
 combinations = [];
 multiplicities = [];
 findCombinationsHelper(m, k, zeros(1, m), 1, 1);
@@ -131,7 +79,6 @@ findCombinationsHelper(m, k, zeros(1, m), 1, 1);
     end
 end
 
-% Calculate multiplicity correctly
 function multiplicity = computeMultiplicity(comb)
 n = length(comb);
 multiplicity = factorial(n);
