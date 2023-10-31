@@ -1,6 +1,27 @@
 function [F,G,H] = approxPolynomialDynamics(f,g,h,x,degree)
-%approxPolynomialDynamics Summary of this function goes here
-%   Detailed explanation goes here
+%approxPolynomialDynamics Returns polynomial approximations to symbolic dynamics
+%   
+%   Usage: [F,G,H] = approxPolynomialDynamics(f,g,h,x,degree)
+%
+%   Inputs:
+%       f,g,h   - symbolic expressions for the drift, input, and output of
+%                 a dynamical system.
+%       x       - vector of symbolic variables used in f,g,h; if not included,
+%                 the default is "x = sym('x',[1,n])" where n is the length of f.
+%       degree  - desired degree of the polynomial approximation to the
+%                 dynamics.
+%
+%   Outputs:
+%       F,G,H   - cell arrays containing the polynomial coefficients for
+%                 the drift, input, and output. Computed using Yaylor
+%                 approximations.
+% 
+%  Author: Nick Corbin, UCSD
+%
+%  License: MIT
+%
+%  Part of the NLbalancing repository.
+%%
 
 n = size(f,1);
 m = size(g,2);
