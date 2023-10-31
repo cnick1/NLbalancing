@@ -66,7 +66,7 @@ fprintf("\n                             ->  Example 1 results match.\n\n")
 [sigma, Tin] = inputNormalTransformation(v, w, degree -1, true);
 
 %% Compute the output-diagonal transformation approximation, also giving the squared singular value functions
-[sigmaSquared, Tod] = outputDiagonalTransformation(v, w, Tin, diag(sigma), degree, true);
+[sigmaSquared, Tod] = outputDiagonalTransformation(v, w, Tin, diag(sigma), degree - 1, true);
 
 fprintf("\n  - Comparing our energy function with Fujimoto/Scherpen 2010 Example 5:\n") 
 

@@ -11,7 +11,6 @@ function [vtilde, wtilde] = transformEnergyFunctions(v, w, T, inputNormal)
 %       inputNormal - boolean indicating the transformation is input
 %                     normal, used to speed up the computation by skipping
 %                     that transformation (default = false)
-%       TODO: option to skip input if input normal transformation
 %
 %   Output:
 %       v,w   - cell arrays containing the transformed polynomial energy function

@@ -1,15 +1,15 @@
 function [sigmaSquared, Tod] = outputDiagonalTransformation(v, w, Tin, Sigma, degree, verbose)
-%outputDiagonalTransformation  Compute the output-diagonal transformation for a polynomial control-affine dynamical system.
+%outputDiagonalTransformation Compute the output-diagonal transformation for a polynomial control-affine dynamical system.
 %
 %   Usage: [sigmaSquared,Tbar] = outputDiagonalTransformation(v, w, Tin, Sigma, degree)
 %
 %   Inputs:
 %       v,w     - cell arrays containing the polynomial energy function
-%       coefficients; these should already be in input-normal form.
+%                 coefficients; these should already be in input-normal form.
 %       Tin     - cell array containing the input-normal transformation
 %                 coefficients.
 %       Sigma   - diagonal matrix of the Hankel singular values of the 
-%                 linear system.
+%                 linearized system.
 %       degree  - desired degree of the computed transformation (default =
 %                 degree of energy functions - 1).
 %       verbose - optional argument to print runtime information.
@@ -21,12 +21,12 @@ function [sigmaSquared, Tod] = outputDiagonalTransformation(v, w, Tin, Sigma, de
 %                      singular values, the next column corresponds to the 
 %                      degree 1 coefficients, etc. These can be plotted
 %                      using polyval() (and flip()). 
-
+% 
 %                      Warning: Note that the singular value functions are 
 %                      NOT given by sigmaSquared.^(1/2). Use the function
 %                      utils/polySqrt() to get the coefficients of the
 %                      singular value functions.
-
+% 
 %       Tod          - cell array containing the output-diagonal
 %                      transformation coefficients.
 %
@@ -39,13 +39,12 @@ function [sigmaSquared, Tod] = outputDiagonalTransformation(v, w, Tin, Sigma, de
 %      and E_future(x) = 1/2 ( w{2}kron(x,x) + ... + w{degree+1}kron(kron...,x),x) )
 %                      = 0.5*kronPolyEval(w,x,degree+1)
 %
-%  The balancing transformation then has the form
+%  The output-diagonal transformation then has the form
 %
 %      x = T{1}z + T{2}kron(z,z) + ... + T{degree}kron(kron...,z),z)
 %
 %  where E_past(x) = 1/2 ( z.'z ) and E_future(x) = 1/2 ( z.'diag(sigma^2)z )
 %  in the z coordinates.  The singular value functions are sigma.
-%
 %
 %  Author: Nick Corbin, UCSD
 %
@@ -88,7 +87,7 @@ Tod = cell(1, degree); Tod{1} = speye(n);
 
 [vtilde, wtilde] = transformEnergyFunctions(v, w, Tin, true); % Input-normal
 
-for k = 3:degree
+for k = 3:degree+1
     [Nk] = equivalenceClassIndices(n, k);
     
     % \section{}
@@ -97,7 +96,7 @@ for k = 3:degree
     
     % Construct the RHS vector
     RHS = [];
-    temp = sparse(size(Nk, 2), 1);
+    temp = zeros(size(Nk, 2), 1);
     for i = 2:k - 2
         j = k - i;
         temp = temp + vec(Tod{j}.' * Tod{i});
@@ -108,7 +107,7 @@ for k = 3:degree
     %% Form output-diagonal equations coefficient matrix
     CoeffMatrix = [CoeffMatrix; 2 * Nk(n + 1:end, :) * kron(speye(n ^ (k - 1)), Sigma .^ 2)];
     
-    temp = sparse(size(Nk(n + 1:end, :), 2), 1);
+    temp = zeros(size(Nk(n + 1:end, :), 2), 1);
     for i = 2:k - 2
         j = k - i;
         temp = temp + vec(Tod{j}.' * Sigma .^ 2 * Tod{i});
@@ -141,17 +140,20 @@ for k = 3:degree
     % Form index set for the nonzero transformation components
     indices = 1:n ^ k; indices(idxs) = [];
     
-    Tod{k - 1} = sparse(n, n ^ (k - 1));
+    Tod{k - 1} = zeros(n, n ^ (k - 1));
     Tod{k - 1}(indices) = CoeffMatrix \ RHS;
     
+    % Symmetrize
+    for i=1:n
+        Tod{k - 1}(i,:) = kronMonomialSymmetrize(Tod{k - 1}(i,:), n, k-1);
+    end
 end
 
 %% Pluck out the singular value function coefficients
 
 [vbar, wbar] = transformEnergyFunctions(vtilde, wtilde, Tod, true);
 
-% sigmaSquared = cell(1, degree-1);
-sigmaSquared = zeros(n, degree-1);
+sigmaSquared = zeros(n, degree);
 
 for k = 2:degree
     if verbose
