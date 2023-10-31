@@ -1,41 +1,45 @@
 function [sigma,T] = inputNormalTransformation(v,w,degree,verbose)
-%  Computes a polynomial approximation to the input-normal balancing 
-%  transformation for a system with polynomial nonlinearities as
+%inputNormalTransformation Computes the input-normal balancing for a polynomial control-affine dynamical system.
 %
-%     [sigma,T] = inputNormalTransformation(v,w,degree)
+%   Usage: [sigma,T] = inputNormalTransformation(v, w, degree)
 %
-%  using polynomial approximations to the past and future energy functions.
-%  The variables v and w contain the coefficients to the past and future energy
-%  functions, respectively.  Terms out to v{degree+1} and w{degree+1} must be 
-%  defined in the input.  Thus,
+%   Inputs:
+%       v,w     - cell arrays containing the polynomial energy function
+%                 coefficients; these should already be in input-normal form.
+%       degree  - desired degree of the computed transformation (default =
+%                 degree of energy functions - 1).
+%       verbose - optional argument to print runtime information.
+%
+%   Outputs:
+%       sigma - a vector containing the Hankel singular values of the
+%               linearized system.
+%       T     - cell array containing the input-normal transformation
+%               coefficients.
+% 
+%   Background: The past and future energy functions are
 % 
 %      E_past(x) = 1/2 ( v{2}kron(x,x) + ... + v{degree+1}kron(kron...,x),x) )
 %                = 0.5*kronPolyEval(v,x,degree+1)
 % 
-%  and
-% 
-%      E_future(x) = 1/2 ( w{2}kron(x,x) + ... + w{degree+1}kron(kron...,x),x) )
+%      and E_future(x) = 1/2 ( w{2}kron(x,x) + ... + w{degree+1}kron(kron...,x),x) )
 %                  = 0.5*kronPolyEval(w,x,degree+1)
 % 
-%  The balancing transformation then has the form
+%   The input-normal transformation then has the form
 %
 %      x = T{1}z + T{2}kron(z,z) + ... + T{degree}kron(kron...,z),z)
 %
-%  where E_past(x) = 1/2 ( z.'z ) and E_future(x) = 1/2 ( z.'diag(sigma)z )
-%  in the z coordinates.  The singular value functions (sigma) are
-%  approximated separately using approximateSingularValueFunction.
+%   where E_past(x) = 1/2 ( z.'z ) in the z coordinates.
+% 
+%   The input-normal transformation is described in Section III.A of the reference.
 %
-%  The input-normal/output-diagonal balancing transformation is described in
-%  Section III.A of the reference.
+%   Author: Jeff Borggaard, Virginia Tech
 %
-%  Author: Jeff Borggaard, Virginia Tech
+%   License: MIT
 %
-%  License: MIT
+%   Reference:  Nonlinear balanced truncation: Part 2--Model reduction on
+%               manifolds, by Kramer, Gugercin, and Borggaard, arXiv.
 %
-%  Reference:  Nonlinear balanced truncation: Part 2--Model reduction on
-%              manifolds, by Kramer, Gugercin, and Borggaard, arXiv.
-%
-%              See Algorithm 1.
+%               See Algorithm 1.
 %
 %  Part of the NLbalancing repository.
 %%
@@ -109,21 +113,21 @@ function [sigma,T] = inputNormalTransformation(v,w,degree,verbose)
       
       T{k} = -0.5*T{1}*reshape(term,n^k,n).';
       
-      % Symmetrize (optional)
-%       for i=1:n
-%         T{k}(i,:) = kronMonomialSymmetrize(T{k}(i,:),n,k);
-%       end
-
-      if (verbose)
-        fprintf('The residual error for T{%d} is %g\n',k,...
-                norm( (kron(T{1}.',T{k}.')+kron(T{k}.',T{1}.'))*v{2} + term ) )
-        GG = (kron(T{1}.',T{k}.')+kron(T{k}.',T{1}.'))*v{2} + term;
-        zz = rand(n,1);
-        MM = GG.'*KroneckerPower(zz,k+1);
-
-        fprintf('... however, the residual error randomly multiplied\n')
-        fprintf('    by a Kronecker product term is %g\n',MM)
+%       Symmetrize 
+      for i=1:n
+        T{k}(i,:) = kronMonomialSymmetrize(T{k}(i,:),n,k);
       end
+
+%       if (verbose)
+%         fprintf('The residual error for T{%d} is %g\n',k,...
+%                 norm( (kron(T{1}.',T{k}.')+kron(T{k}.',T{1}.'))*v{2} + term ) )
+%         GG = (kron(T{1}.',T{k}.')+kron(T{k}.',T{1}.'))*v{2} + term;
+%         zz = rand(n,1);
+%         MM = GG.'*KroneckerPower(zz,k+1);
+% 
+%         fprintf('... however, the residual error randomly multiplied\n')
+%         fprintf('    by a Kronecker product term is %g\n',MM)
+%       end
     end
   end
 
