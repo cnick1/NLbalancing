@@ -43,6 +43,11 @@ function [Tv] = calTTv(T, m, k, v)
 %  Part of the NLbalancing repository.
 %%
 
+if m == 1 
+    Tv = T{k}.'*v;
+    return
+end
+
 % Get a list of indices
 [indexSet, mult] = findCombinations(m, k);
 
@@ -50,9 +55,9 @@ nTerms = size(indexSet, 1);
 
 n = size(T{1}, 2);
 
-Tv = zeros(n ^ k, 1);
+Tv = zeros(n ^ k, size(v,2));
 for i = 1:nTerms
-    Tv = Tv + mult(i) * kronMonomialSymmetrize(kroneckerRight(v.', T(indexSet(i, :))), n, k); % Can also symmetrize each thing
+    Tv = Tv + mult(i) * kronMonomialSymmetrize(kroneckerRight(v.', T(indexSet(i, :))).', n, k); % Can also symmetrize each thing
 end
 
 end
