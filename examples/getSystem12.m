@@ -1,4 +1,4 @@
-function [f, g, h] = getSystem12(degree)
+function [f, g, h] = getSystem12(degree, transformedModel)
 %getSystem12  Generates a polynomial approximation to the 2D model from
 %   Fujimoto and Scherpen 2001, 2005, 2010 [1-3]
 %
@@ -35,22 +35,33 @@ function [f, g, h] = getSystem12(degree)
 %
 %%
 
-if nargin < 1
-    degree = 9;
+if nargin < 2
+    transformedModel = true;
+    if nargin < 1
+        degree = 9;
+    end
 end
 
 n = 2;
 x = sym('x', [1, n]).';
 syms(x);
 
-fsym = [-9 * x1 + 6 * x1 ^ 2 * x2 + 6 * x2 ^ 3 - x1 ^ 5 - 2 * x1 ^ 3 * x2 ^ 2 - x1 * x2 ^ 4;
-        -9 * x2 - 6 * x1 ^ 3 - 6 * x1 * x2 ^ 2 - x1 ^ 4 * x2 - 2 * x1 ^ 2 * x2 ^ 3 - x2 ^ 5];
-gsym = [3 * sqrt(2) * (9 - 6 * x1 * x2 + x1 ^ 4 - x2 ^ 4) / (9 + x1 ^ 4 + 2 * x1 ^ 2 * x2 ^ 2 + x2 ^ 4), sqrt(2) * (-9 * x1 ^ 2 - 27 * x2 ^ 2 + 6 * x1 ^ 3 * x2 + 6 * x1 * x2 ^ 3 - (x1 ^ 2 + x2 ^ 2) ^ 3) / (9 + x1 ^ 4 + 2 * x1 ^ 2 * x2 ^ 2 + x2 ^ 4);
-        sqrt(2) * (27 * x1 ^ 2 + 9 * x2 ^ 2 + 6 * x1 ^ 3 * x2 + 6 * x1 * x2 ^ 3 + (x1 ^ 2 + x2 ^ 2) ^ 3) / (9 + x1 ^ 4 + 2 * x1 ^ 2 * x2 ^ 2 + x2 ^ 4), 3 * sqrt(2) * (9 + 6 * x1 * x2 - x1 ^ 4 + x2 ^ 4) / (9 + x1 ^ 4 + 2 * x1 ^ 2 * x2 ^ 2 + x2 ^ 4)];
-% hsym = [2 * sqrt(2) * (3 * x1 + x1 * x2 ^ 2 + x2 ^ 3) * (3 - x1 ^ 4 - 2 * x1 ^ 2 * x2 ^ 2 - x2 ^ 4) / (1 + x1 ^ 4 + 2 * x1 ^ 2 * x2 ^ 2 + x2 ^ 4);
-hsym = [2 * sqrt(2) * (3 * x1 + x1 ^ 2 * x2 + x2 ^ 3) * (3 - x1 ^ 4 - 2 * x1 ^ 2 * x2 ^ 2 - x2 ^ 4) / (1 + x1 ^ 4 + 2 * x1 ^ 2 * x2 ^ 2 + x2 ^ 4);
-        sqrt(2) * (3 * x2 - x1 ^ 3 - x1 * x2 ^ 2) * (3 - x1 ^ 4 - 2 * x1 ^ 2 * x2 ^ 2 - x2 ^ 4) / (1 + x1 ^ 4 + 2 * x1 ^ 2 * x2 ^ 2 + x2 ^ 4)];
-
+if transformedModel % Use the model in the transformed coordinates (21) in Example 3 Fujimoto 2001
+    fsym = [-9 * x1 - x1 ^ 5 - 2 * x1 ^ 3 * x2 ^ 2 - x1 * x2 ^ 4;
+            -9 * x2 - x1 ^ 4 * x2 - 2 * x1 ^ 2 * x2 ^ 3 - x2 ^ 5];
+    gsym = [sqrt(18 + 2 * x1 ^ 4 + 4 * x1 ^ 2 * x2 ^ 2 + 2 * x2 ^ 4), 0;
+            0, sqrt(18 + 2 * x1 ^ 4 + 4 * x1 ^ 2 * x2 ^ 2 + 2 * x2 ^ 4)];
+    hsym = [(6 * x1 - 2 * x1 ^ 5 - 4 * x1 ^ 3 * x2 ^ 2 - 2 * x1 * x2 ^ 4) * sqrt(18 + 2 * x1 ^ 4 + 4 * x1 ^ 2 * x2 ^ 2 + 2 * x2 ^ 4) / (1 + x1 ^ 4 + 2 * x1 ^ 2 * x2 ^ 2 + x2 ^ 4);
+            (3 * x2 - x1 ^ 4 * x2 - 2 * x1 ^ 2 * x2 ^ 3 -  x2 ^ 5) * sqrt(18 + 2 * x1 ^ 4 + 4 * x1 ^ 2 * x2 ^ 2 + 2 * x2 ^ 4) / (1 + x1 ^ 4 + 2 * x1 ^ 2 * x2 ^ 2 + x2 ^ 4)];
+else % Use the model in the transformed coordinates (Example 1) in Fujimoto 2001
+    fsym = [-9 * x1 + 6 * x1 ^ 2 * x2 + 6 * x2 ^ 3 - x1 ^ 5 - 2 * x1 ^ 3 * x2 ^ 2 - x1 * x2 ^ 4;
+            -9 * x2 - 6 * x1 ^ 3 - 6 * x1 * x2 ^ 2 - x1 ^ 4 * x2 - 2 * x1 ^ 2 * x2 ^ 3 - x2 ^ 5];
+    gsym = [3 * sqrt(2) * (9 - 6 * x1 * x2 + x1 ^ 4 - x2 ^ 4) / (9 + x1 ^ 4 + 2 * x1 ^ 2 * x2 ^ 2 + x2 ^ 4), sqrt(2) * (-9 * x1 ^ 2 - 27 * x2 ^ 2 + 6 * x1 ^ 3 * x2 + 6 * x1 * x2 ^ 3 - (x1 ^ 2 + x2 ^ 2) ^ 3) / (9 + x1 ^ 4 + 2 * x1 ^ 2 * x2 ^ 2 + x2 ^ 4);
+            sqrt(2) * (27 * x1 ^ 2 + 9 * x2 ^ 2 + 6 * x1 ^ 3 * x2 + 6 * x1 * x2 ^ 3 + (x1 ^ 2 + x2 ^ 2) ^ 3) / (9 + x1 ^ 4 + 2 * x1 ^ 2 * x2 ^ 2 + x2 ^ 4), 3 * sqrt(2) * (9 + 6 * x1 * x2 - x1 ^ 4 + x2 ^ 4) / (9 + x1 ^ 4 + 2 * x1 ^ 2 * x2 ^ 2 + x2 ^ 4)];
+    % hsym = [2 * sqrt(2) * (3 * x1 + x1 * x2 ^ 2 + x2 ^ 3) * (3 - x1 ^ 4 - 2 * x1 ^ 2 * x2 ^ 2 - x2 ^ 4) / (1 + x1 ^ 4 + 2 * x1 ^ 2 * x2 ^ 2 + x2 ^ 4); % This is what's in 2001 paper, but it has a typo and so doesn't match the results they present
+    hsym = [2 * sqrt(2) * (3 * x1 + x1 ^ 2 * x2 + x2 ^ 3) * (3 - x1 ^ 4 - 2 * x1 ^ 2 * x2 ^ 2 - x2 ^ 4) / (1 + x1 ^ 4 + 2 * x1 ^ 2 * x2 ^ 2 + x2 ^ 4);
+            sqrt(2) * (3 * x2 - x1 ^ 3 - x1 * x2 ^ 2) * (3 - x1 ^ 4 - 2 * x1 ^ 2 * x2 ^ 2 - x2 ^ 4) / (1 + x1 ^ 4 + 2 * x1 ^ 2 * x2 ^ 2 + x2 ^ 4)];
+end
 [f, g, h] = approxPolynomialDynamics(fsym, gsym, hsym, x, degree);
 
 end

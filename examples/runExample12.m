@@ -37,13 +37,15 @@ if nargin < 1
     degree = 8;
 end
 
-[f, g, h] = getSystem12(degree - 1);
+[f, g, h] = getSystem12(degree - 1, false);
 
 %  Compute the energy functions
-[v] = approxPastEnergy(f, g, h, eta, degree, true);
-[w] = approxFutureEnergy(f, g, h, eta, degree, true);
+[v] = approxPastEnergy(f, g, h, eta, degree, false);
+[w] = approxFutureEnergy(f, g, h, eta, degree, false);
 
-fprintf("Beginning comparisons with Fujimoto/Scherpen 2001/2005/2010:\n") 
+
+fprintf("\n ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n") 
+fprintf(" ~~~~~~~~~~~ Beginning comparisons with Fujimoto/Scherpen 2001/2005:  ~~~~~~~~~~~ \n") 
 
 %% Comparison with Fujimoto 2001/2005 Example 1
 x = sym('x', [1, 2]).'; syms(x);
@@ -51,16 +53,69 @@ x = sym('x', [1, 2]).'; syms(x);
 LoSym =(36*x1^2 + 9*x2^2 + 18*x1^3*x2 + 18*x1*x2^3 + x1^6 + 6*x1^4*x2^2 + 9*x1^2*x2^4 + 4*x2^6)/ (1 + x1 ^ 4 + 2 * x1 ^ 2 * x2 ^ 2 + x2 ^ 4);
 [~,~,Lo] = approxPolynomialDynamics([1;1],[1;1],LoSym,x,degree);
 
-fprintf("\n  - Comparing our energy function with Fujimoto/Scherpen 2001/2005 Example 1:\n") 
+fprintf("\n  - Comparing our energy functions with Fujimoto/Scherpen 2001/2005 Example 1:\n") 
 for i = 2:2:length(Lo)
-    fprintf("    > Degree %i: the largest difference in w%i is %.1e;", ...
-        i, i, norm(w{i} - kronMonomialSymmetrize(full(Lo{i}),2,i),'inf')) % Should be zero
-    fprintf(" the largest entry in v%i is %.1e;\n", ...
-        i, norm(v{i},'inf')) % Should be one for v2, zero else
+        fprintf("    > Degree %i: the largest difference in v%i is %.1e;", ...
+        i, i, norm(v{i},'inf')) % Should be one for v2, zero else
+        fprintf(" the largest entry in w%i is %.1e;\n", ...
+        i, norm(w{i} - kronMonomialSymmetrize(full(Lo{i}),2,i),'inf')) % Should be zero
 end
-fprintf("\n                             ->  Example 1 results match.\n\n")
 
+thresh = 1e-16;
+v{3}(abs(v{3}) < thresh) = 0;v{4}(abs(v{4}) < thresh) = 0;v{5}(abs(v{5}) < thresh) = 0;v{6}(abs(v{6}) < thresh) = 0;v{7}(abs(v{7}) < thresh) = 0;v{8}(abs(v{8}) < thresh) = 0;
+w{3}(abs(w{3}) < thresh) = 0;w{4}(abs(w{4}) < thresh) = 0;w{5}(abs(w{5}) < thresh) = 0;w{6}(abs(w{6}) < thresh) = 0;w{7}(abs(w{7}) < thresh) = 0;w{8}(abs(w{8}) < thresh) = 0;
 
+fprintf("\n    Controllability energy: \n        Lc = 1/2 *(")
+disp(vpa(kronPolyEval(v,sym('x', [1, 2]).'),2))
+fprintf("    Observability energy: \n        Lo = 1/2 *(")
+disp(vpa(kronPolyEval(w,sym('x', [1, 2]).'),8))
+
+fprintf("                             ->  Example 1 results match.\n\n")
+
+%% Compute the input-normal transformation approximation
+[sigma, Tin] = inputNormalTransformation(v, w, degree -1, false);
+
+%% Compute the output-diagonal transformation approximation, also giving the squared singular value functions
+[sigmaSquared, Tod] = outputDiagonalTransformation(v, w, Tin, diag(sigma), degree - 1, false);
+
+fprintf("\n  - Comparing our singular value functions with Fujimoto/Scherpen 2001/2005 Example 3:\n") 
+
+rho1Sym = 2*sqrt((9+x1^4)/(1+x1^4))*x1;
+[~,~,s1] = approxPolynomialDynamics(1,1,rho1Sym,x1,degree);
+[~,~,s2] = approxPolynomialDynamics(1,1,rho1Sym/2,x1,degree);
+g1 = full(cell2mat(s1)); g1sq = conv(g1,g1);
+g2 = full(cell2mat(s2)); g2sq = conv(g2,g2);
+
+fprintf("    > Maximum distance between singular value functions squared:          %e \n",...
+    norm([g1sq(1:degree-1); g2sq(1:degree-1)] - sigmaSquared,'inf'))
+%% Plot the singular value functions
+
+syms z
+fprintf("\n         𝜎_1^2(z) = tau_1(z,0) = ")
+disp(vpa(poly2sym(flip(sigmaSquared(1,:)),z),2))
+fprintf("         𝜎_2^2(z) = tau_2(0,z) = ")
+disp(vpa(poly2sym(flip(sigmaSquared(2,:)),z),2))
+
+fprintf("                             ->  Example 3 results match.\n\n")
+
+%% Compare transformation
+fprintf("    > The full input-normal/output-diagonal transformation is: \n\n         𝚽(z) = ")
+
+Tod{3}(abs(Tod{3}) < 1e-14) = 0;Tod{5}(abs(Tod{5}) < 1e-14) = 0;
+disp(vpa(kronPolyEval(Tod(1:5),sym('z', [1, 2]).'),4))
+
+%% Compare with Fujimoto 2010
+fprintf("\n ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n") 
+fprintf(" ~~~~~~~~~~~~~~ Beginning comparisons with Fujimoto/Scherpen 2010: ~~~~~~~~~~~~~~ \n") 
+fprintf("     Note: in this paper, they start from an intermediate transformed system.       \n\n") 
+
+[f, g, h] = getSystem12(degree - 1, true);
+
+%  Compute the energy functions
+[v] = approxPastEnergy(f, g, h, eta, degree, false);
+[w] = approxFutureEnergy(f, g, h, eta, degree, false);
+
+%% Comparison with Fujimoto 2001/2005 Example 1
 
 %% Compute the input-normal transformation approximation
 [sigma, Tin] = inputNormalTransformation(v, w, degree -1, true);
@@ -68,31 +123,32 @@ fprintf("\n                             ->  Example 1 results match.\n\n")
 %% Compute the output-diagonal transformation approximation, also giving the squared singular value functions
 [sigmaSquared, Tod] = outputDiagonalTransformation(v, w, Tin, diag(sigma), degree - 1, true);
 
-fprintf("\n  - Comparing our energy function with Fujimoto/Scherpen 2010 Example 5:\n") 
+fprintf("\n  - Comparing our singular value functions with Fujimoto/Scherpen 2010 Example 5:\n") 
 
-sigmaSquared;
+syms z
+fprintf("\n         𝜎_1^2(z) = tau_1(z,0) = ")
+disp(vpa(poly2sym(flip(sigmaSquared(1,:)),z),2))
+fprintf("         𝜎_2^2(z) = tau_2(0,z) = ")
+disp(vpa(poly2sym(flip(sigmaSquared(2,:)),z),2))
 
-s1Sym = 2*sqrt((9+x1^4)/(1+x1^4))*x1;
-[~,~,s1] = approxPolynomialDynamics(1,1,s1Sym,x1,degree);
-[~,~,s2] = approxPolynomialDynamics(1,1,s1Sym/2,x1,degree);
-g1 = full(cell2mat(s1)); g1sq = conv(g1,g1);
-g2 = full(cell2mat(s2)); g2sq = conv(g2,g2);
+fprintf("                     ->  Singular value functions match.\n\n")
 
-fprintf("    > Maximum distance between singular value functions squared:           %e \n",...
-    norm([g1sq(1:degree-1); g2sq(1:degree-1)] - sigmaSquared,'inf'))
-%% Plot the singular value functions
+%% Compare transformation
+fprintf("\n  - Comparing our transformation with Fujimoto/Scherpen 2010 Example 5:\n") 
 
-z = linspace(-1, 1, 51);
-figure; hold on;
+Tod{3}(abs(Tod{3}) < 1e-14) = 0;Tod{5}(abs(Tod{5}) < 1e-14) = 0;
 
-plot(z, sqrt(polyval(flip(sigmaSquared(1, :)), z)), 'LineWidth', 1.5); hold on
-plot(z, polyval(flip(g1),z),'--', 'LineWidth', 1.5); hold on
-plot(z, 2*sqrt((9+z.^4)./(1+z.^4)),'k--', 'LineWidth', 1.5)
+fprintf("    > The input-normal/output-diagonal transformation is: \n\n         𝚽(y) = ")
+disp(vpa(kronPolyEval(Tod(1:5),sym('y', [1, 2]).'),4))
 
-plot(z, sqrt(polyval(flip(sigmaSquared(2, :)), z)), 'LineWidth', 1.5); hold on
-plot(z, polyval(flip(g2),z),'--', 'LineWidth', 1.5); hold on
-plot(z, sqrt((9+z.^4)./(1+z.^4)),'k--', 'LineWidth', 1.5)
+fprintf("                     ->  Transformation matches.\n\n")
 
-fprintf("\n                             ->  Example 5 results match.\n\n")
+fprintf("                             ->  Example 5 results match.\n\n")
+
+return
+
+%% Compute transformed dynamics
+[fin, gin, hin] = transformDynamics(f, g, h, Tin);
+[fod, god, hod] = transformDynamics(fin, gin, hin, Tod);
 
 end

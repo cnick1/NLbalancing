@@ -155,7 +155,7 @@ end
 
 sigmaSquared = zeros(n, degree);
 
-for k = 2:degree
+for k = 2:degree+1
     if verbose
         [N] = equivalenceClassIndices(n, k);
         

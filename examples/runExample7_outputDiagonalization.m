@@ -34,7 +34,7 @@ degree = 8;
 [sigma, Tin] = inputNormalTransformation(v, w, degree - 1, false);
 
 %% Compute the output-diagonal transformation approximation, also giving the squared singular value functions
-[sigmaSquared, Tod] = outputDiagonalTransformation(v, w, Tin, diag(sigma), degree, true);
+[sigmaSquared, Tod] = outputDiagonalTransformation(v, w, Tin, diag(sigma), degree - 1, true);
 
 %% Plot the singular value functions 
 n = length(f{1});
@@ -44,6 +44,36 @@ for i=1:n
     plot(z,sqrt(polyval(flip(sigmaSquared(i,:)),z)))
 end
 
+%% Test combined transformation 
+
+[vtilde, wtilde] = transformEnergyFunctions(v, w, Tin, true); % Input-normal
+[vbar, wbar] = transformEnergyFunctions(vtilde, wtilde, Tod, true);
+
+sigmaSquared
+
+for i=2:length(vbar)
+    vbar{i}(abs(vbar{i}) < 1e-14) = 0; wbar{i}(abs(wbar{i}) < 1e-14) = 0;
+end
+
+fprintf("\n    Controllability energy: \n        Lc = 1/2 *(")
+disp(vpa(kronPolyEval(vbar,sym('x', [1, 3]).'),2))
+fprintf("    Observability energy: \n        Lo = 1/2 *(")
+disp(vpa(kronPolyEval(wbar,sym('x', [1, 3]).'),8))
+
+% Now combine transformations
+Tcomb = composeTransformations(Tin,Tod);
+[vhat, what] = transformEnergyFunctions(v, w, Tcomb, true); % combined
+
+for i=2:length(vhat)
+    vhat{i}(abs(vhat{i}) < 1e-14) = 0; what{i}(abs(what{i}) < 1e-14) = 0;
+end
+
+fprintf("\n    Controllability energy: \n        Lc = 1/2 *(")
+disp(vpa(kronPolyEval(vhat,sym('x', [1, 3]).'),2))
+fprintf("    Observability energy: \n        Lo = 1/2 *(")
+disp(vpa(kronPolyEval(what,sym('x', [1, 3]).'),8))
+
+return
 %% Compare with Boris' approximation
 % [c] = approximateSingularValueFunctions(Tin, w, sigma, degree - 2);
 %
