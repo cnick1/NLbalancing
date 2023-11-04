@@ -57,30 +57,41 @@ fprintf("\n                             ->  Singular value functions match up to
 %% Compare transformation
 fprintf("\n  - Comparing our transformation with Gray/Scherpen 2001 Example 2.1:\n")
 
-fprintf("    > The full input-normal/output-diagonal transformation is: \n\n         𝚽(z) = ")
-disp(vpa(kronPolyEval(Tod, sym('z', [1, 2]).'), 2))
+ourFullTransformation = composeTransformations(Tin,Tod);
+
+for i=2:length(ourFullTransformation)
+    ourFullTransformation{i}(abs(ourFullTransformation{i}) < 1e-14) = 0; 
+end
+
+fprintf("    > Our full input-normal/output-diagonal transformation is: \n\n         𝚽(z) = ")
+disp(vpa(kronPolyEval(ourFullTransformation, sym('z', [1, 2]).'), 2))
 
 %% Gray transformation
 z = sym('z', [1, 2]).'; syms(z);
 % Tsym = [(-1 + sqrt(1+4*z1))/2; z2];
 % [Tod2,~,~] = approxPolynomialDynamics(Tsym,[1;1],z1,z,3);
-Tod2 = {[1 0; 0 1], [0 0 0 -1; 0 0 0 0], zeros(2, 2 ^ 3)};
+Tin2 = {[1 0; 0 1], [0 0 0 -1; 0 0 0 0], zeros(2, 2 ^ 3)};
+Tod2 = {[1,-1; 1,1]./sqrt(2), zeros(2, 2 ^ 2), zeros(2, 2 ^ 3)};
 
-fprintf("    > The transformation given in Gray/Scherpen 2001 is:     𝚽(z) = ")
+TGray = composeTransformations(Tin2,Tod2);
+
+fprintf("    > The transformation supposed to be in Gray/Scherpen 2001 is: \n\n         𝚽(z) = ")
 % fprintf('%s \n', char(Tsym))
 % fprintf("     which can be approximated via Taylor series as: \n\n         𝚽(z) = ")
-fprintf('%s \n', char(vpa(kronPolyEval(Tod2, sym('z', [1, 2]).'), 2)))
+% fprintf('%s \n', char(vpa(kronPolyEval(TGray, sym('z', [1, 2]).'), 2)))
+disp(vpa(kronPolyEval(TGray, sym('z', [1, 2]).'), 8))
 
 
-[vtilde, wtilde] = transformEnergyFunctions(v, w, Tod2);
-[vtilde, wtilde] = transformEnergyFunctions(vtilde, wtilde, {[1,-1; 1,1]./sqrt(2), zeros(2, 2 ^ 2), zeros(2, 2 ^ 3)});
+[vtilde, wtilde] = transformEnergyFunctions(v, w, TGray);
 
 thresh = 2e-14;
-vtilde{3}(abs(vtilde{3}) < thresh) = 0; vtilde{4}(abs(vtilde{4}) < thresh) = 0; wtilde{3}(abs(wtilde{3}) < thresh) = 0; wtilde{4}(abs(wtilde{4}) < thresh) = 0;
+vtilde{3}(abs(vtilde{3}) < thresh) = 0; vtilde{4}(abs(vtilde{4}) < thresh) = 0; wtilde{2}(abs(wtilde{2}) < thresh) = 0;wtilde{3}(abs(wtilde{3}) < thresh) = 0; wtilde{4}(abs(wtilde{4}) < thresh) = 0;
 
 fprintf("\n    > Controllability energy: \n        Lc = 1/2 *(")
 disp(vpa(kronPolyEval(vtilde, sym('x', [1, 2]).'), 2))
 fprintf("    > Observability energy: \n        Lo = 1/2 *(")
 disp(vpa(kronPolyEval(wtilde, sym('x', [1, 2]).'), 2))
+
+
 
 end
