@@ -57,18 +57,29 @@ if false%inputNormal
     end
 else
     for k = 3:degree
-        vtilde{k} = vec(T{k - 1}.' * V2 * T{1}) + vec(T{1}.' * V2 * T{k - 1});
-        wtilde{k} = vec(T{k - 1}.' * W2 * T{1}) + vec(T{1}.' * W2 * T{k - 1});
+        vtilde{k} = zeros(size(v{k}));
+        wtilde{k} = zeros(size(w{k}));
+        try % cursed, need to fix
+            vtilde{k} = vec(T{k - 1}.' * V2 * T{1}) + vec(T{1}.' * V2 * T{k - 1});
+            wtilde{k} = vec(T{k - 1}.' * W2 * T{1}) + vec(T{1}.' * W2 * T{k - 1});
+        catch
+        end
         
         for i = 2:k - 2
             j = k - i;
-            vtilde{k} = vtilde{k} + vec(T{j}.' * V2 * T{i});
-            wtilde{k} = wtilde{k} + vec(T{j}.' * W2 * T{i});
+            try
+                vtilde{k} = vtilde{k} + vec(T{j}.' * V2 * T{i});
+                wtilde{k} = wtilde{k} + vec(T{j}.' * W2 * T{i});
+            catch
+            end
         end
         
         for i = 3:k
-            vtilde{k} = vtilde{k} + calTTv(T, i, k, v{i});
-            wtilde{k} = wtilde{k} + calTTv(T, i, k, w{i});
+            try
+                vtilde{k} = vtilde{k} + calTTv(T, i, k, v{i});
+                wtilde{k} = wtilde{k} + calTTv(T, i, k, w{i});
+            catch
+            end
         end
         
         vtilde{k} = kronMonomialSymmetrize(vtilde{k},n,k);
