@@ -44,11 +44,6 @@ if relativeAngles % define joint 2 angle relative to joint 1 angle, as in [1,2]
 
     D = diag([mu1, mu2]);
 
-    J = [zeros(n / 2), eye(n / 2);
-         -eye(n / 2), zeros(n / 2)];
-    R = [zeros(n / 2), zeros(n / 2);
-         zeros(n / 2), D];
-
     fsym = [x3;
             x4;
             Minv * (gradient(K - P,[x1;x2]) - Mdot * [x3; x4] - D * [x3; x4])];

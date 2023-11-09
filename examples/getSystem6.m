@@ -395,6 +395,7 @@ else
           McholL.' \ (McholL \ RB0)];
 
     C = sparse(1, 2 * n); C(1, n - 1) = 1;
+     C(1, n - 2) = 1;
 
     % Construct N₂
     p = 2;
@@ -431,10 +432,19 @@ f = {full(N1), N2, N3};
 g = {full(G0), G1, G2, G3};
 h = {full(C)};
 
-A = full(N1);
-B = full(G0);
-C = full(C);
-N = full(N2);
-G = G1;
+return
 
+% Scale input/outputs to match f scaling
+T = diag([ones(n,1);1e-5*ones(n,1)]);
+
+A = f{1};
+At = T * f{1} / T;
+
+B = full(G0);
+Bt = diag([ones(n,1);1e5*ones(n,1)]) * B;
+
+% scaleFactor = 1e-9;
+% f = cellfun(@(x) x*scaleFactor,f,'un',0);
+% g = cellfun(@(x) x*scaleFactor,g,'un',0);
+% h = cellfun(@(x) x*scaleFactor,h,'un',0);
 end

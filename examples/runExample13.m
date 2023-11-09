@@ -42,25 +42,25 @@ fprintf("                             ->  Energy functions match.\n\n")
 %% Compute the output-diagonal transformation approximation, also giving the squared singular value functions
 [sigmaSquared, Tod] = outputDiagonalTransformation(v, w, Tin, diag(sigma), degree - 1, true);
 
-fprintf("\n  - Comparing our singular value functions with Gray/Scherpen 2001 Example 2.1:\n")
+fprintf("\n  - Comparing our singular value functions with Gray/Scherpen 2001 Example 2.1:\n\n")
 
 sigmaSquared(sigmaSquared < 1e-14) = 0;
 
 syms z
-fprintf("\n         𝜎_1^2(z) = tau_1(z,0) = ")
-disp(vpa(poly2sym(flip(sigmaSquared(1, :)), z), 2))
-fprintf("         𝜎_2^2(z) = tau_2(0,z) = ")
-disp(vpa(poly2sym(flip(sigmaSquared(2, :)), z), 2))
+for i=1:2
+    fprintf("         𝜎_%i^2(z) = tau_%i(z e_i) = ",i,i)
+    disp(vpa(poly2sym(flip(sigmaSquared(i, :)), z), 3))
+end
 
 fprintf("\n                             ->  Singular value functions match up to 1e-14.\n\n")
 
 %% Compare transformation
 fprintf("\n  - Comparing our transformation with Gray/Scherpen 2001 Example 2.1:\n")
 
-ourFullTransformation = composeTransformations(Tin,Tod);
+ourFullTransformation = composeTransformations(Tin, Tod);
 
-for i=2:length(ourFullTransformation)
-    ourFullTransformation{i}(abs(ourFullTransformation{i}) < 1e-14) = 0; 
+for i = 2:length(ourFullTransformation)
+    ourFullTransformation{i}(abs(ourFullTransformation{i}) < 1e-14) = 0;
 end
 
 fprintf("    > Our full input-normal/output-diagonal transformation is: \n\n         𝚽(z) = ")
@@ -71,9 +71,9 @@ z = sym('z', [1, 2]).'; syms(z);
 % Tsym = [(-1 + sqrt(1+4*z1))/2; z2];
 % [Tod2,~,~] = approxPolynomialDynamics(Tsym,[1;1],z1,z,3);
 Tin2 = {[1 0; 0 1], [0 0 0 -1; 0 0 0 0], zeros(2, 2 ^ 3)};
-Tod2 = {[1,-1; 1,1]./sqrt(2), zeros(2, 2 ^ 2), zeros(2, 2 ^ 3)};
+Tod2 = {[1, -1; 1, 1] ./ sqrt(2), zeros(2, 2 ^ 2), zeros(2, 2 ^ 3)};
 
-TGray = composeTransformations(Tin2,Tod2);
+TGray = composeTransformations(Tin2, Tod2);
 
 fprintf("    > The transformation supposed to be in Gray/Scherpen 2001 is: \n\n         𝚽(z) = ")
 % fprintf('%s \n', char(Tsym))
@@ -81,17 +81,14 @@ fprintf("    > The transformation supposed to be in Gray/Scherpen 2001 is: \n\n 
 % fprintf('%s \n', char(vpa(kronPolyEval(TGray, sym('z', [1, 2]).'), 2)))
 disp(vpa(kronPolyEval(TGray, sym('z', [1, 2]).'), 8))
 
-
 [vtilde, wtilde] = transformEnergyFunctions(v, w, TGray);
 
 thresh = 2e-14;
-vtilde{3}(abs(vtilde{3}) < thresh) = 0; vtilde{4}(abs(vtilde{4}) < thresh) = 0; wtilde{2}(abs(wtilde{2}) < thresh) = 0;wtilde{3}(abs(wtilde{3}) < thresh) = 0; wtilde{4}(abs(wtilde{4}) < thresh) = 0;
+vtilde{3}(abs(vtilde{3}) < thresh) = 0; vtilde{4}(abs(vtilde{4}) < thresh) = 0; wtilde{2}(abs(wtilde{2}) < thresh) = 0; wtilde{3}(abs(wtilde{3}) < thresh) = 0; wtilde{4}(abs(wtilde{4}) < thresh) = 0;
 
 fprintf("\n    > Controllability energy: \n        Lc = 1/2 *(")
 disp(vpa(kronPolyEval(vtilde, sym('x', [1, 2]).'), 2))
 fprintf("    > Observability energy: \n        Lo = 1/2 *(")
 disp(vpa(kronPolyEval(wtilde, sym('x', [1, 2]).'), 2))
-
-
 
 end

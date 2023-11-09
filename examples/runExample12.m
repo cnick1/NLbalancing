@@ -124,13 +124,13 @@ fprintf("     Note: in this paper, they start from an intermediate transformed s
 % Compute the output-diagonal transformation approximation, also giving the squared singular value functions
 [sigmaSquared, Tod] = outputDiagonalTransformation(v, w, Tin, diag(sigma), degree - 1, false);
 
-fprintf("\n  - Comparing our singular value functions with Fujimoto/Scherpen 2010 Example 5:\n")
+fprintf("\n  - Comparing our singular value functions with Fujimoto/Scherpen 2010 Example 5:\n\n")
 
 syms z
-fprintf("\n         𝜎_1^2(z) = tau_1(z,0) = ")
-disp(vpa(poly2sym(flip(sigmaSquared(1, :)), z), 2))
-fprintf("         𝜎_2^2(z) = tau_2(0,z) = ")
-disp(vpa(poly2sym(flip(sigmaSquared(2, :)), z), 2))
+for i = 1:2
+    fprintf("         𝜎_%i^2(z) = tau_%i(z e_i) = ", i, i)
+    disp(vpa(poly2sym(flip(sigmaSquared(i, :)), z), 3))
+end
 
 fprintf("                     ->  Singular value functions match.\n\n")
 
@@ -150,13 +150,11 @@ fprintf("                             ->  Example 5 results match.\n\n")
 fprintf("\n ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
 fprintf(" ~~~~~~~~~~~~~~~~~~~~ Now compare the entire transformation: ~~~~~~~~~~~~~~~~~~~~ \n\n")
 
-
 [f, g, h] = getSystem12(degree - 1, false);
 
 %  Compute the energy functions
 [v] = approxPastEnergy(f, g, h, eta, degree, false);
 [w] = approxFutureEnergy(f, g, h, eta, degree, false);
-
 
 z = sym('z', [1, 2]).'; syms(z);
 % The transformation provided in Fujimoto 2005; the one in 2001 has a typo
@@ -170,9 +168,8 @@ fujimotoFullTransformation = composeTransformations(T1, T2);
 fprintf("    > Fujimoto/Scherpen 2010's full input-normal/output-diagonal transformation is: \n\n         𝚽(z) = ")
 disp(vpa(kronPolyEval(fujimotoFullTransformation, sym('z', [1, 2]).'), 4))
 
-
-for i=1:length(ourFullTransformation)
-    ourFullTransformation{i}(abs(ourFullTransformation{i}) < 1e-14) = 0; 
+for i = 1:length(ourFullTransformation)
+    ourFullTransformation{i}(abs(ourFullTransformation{i}) < 1e-14) = 0;
 end
 fprintf("    > Our full input-normal/output-diagonal transformation is: \n\n         𝚽(z) = ")
 disp(vpa(kronPolyEval(ourFullTransformation(1:5), sym('z', [1, 2]).'), 4))
@@ -181,26 +178,25 @@ thresh = 1e-13;
 
 [vhat, what] = transformEnergyFunctions(v(1:6), w(1:6), fujimotoFullTransformation, false); % combined
 
-for i=2:length(vhat)
+for i = 2:length(vhat)
     vhat{i}(abs(vhat{i}) < thresh) = 0; what{i}(abs(what{i}) < thresh) = 0;
 end
 
 fprintf("\n    Controllability energy: \n        Lc = 1/2 *(")
-disp(vpa(kronPolyEval(vhat,sym('x', [1, 2]).'),2))
+disp(vpa(kronPolyEval(vhat, sym('x', [1, 2]).'), 2))
 fprintf("    Observability energy: \n        Lo = 1/2 *(")
-disp(vpa(kronPolyEval(what,sym('x', [1, 2]).'),8))
+disp(vpa(kronPolyEval(what, sym('x', [1, 2]).'), 8))
 
 [vhat, what] = transformEnergyFunctions(v(1:6), w(1:6), ourFullTransformation, false); % combined
 
-for i=2:length(vhat)
+for i = 2:length(vhat)
     vhat{i}(abs(vhat{i}) < thresh) = 0; what{i}(abs(what{i}) < thresh) = 0;
 end
 
 fprintf("\n    Controllability energy: \n        Lc = 1/2 *(")
-disp(vpa(kronPolyEval(vhat,sym('x', [1, 2]).'),2))
+disp(vpa(kronPolyEval(vhat, sym('x', [1, 2]).'), 2))
 fprintf("    Observability energy: \n        Lo = 1/2 *(")
-disp(vpa(kronPolyEval(what,sym('x', [1, 2]).'),8))
-
+disp(vpa(kronPolyEval(what, sym('x', [1, 2]).'), 8))
 
 return
 

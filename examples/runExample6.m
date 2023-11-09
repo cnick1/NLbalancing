@@ -38,7 +38,7 @@ if nargin < 4
 end
 
 eta = 0;
-
+warning("Should change eta")
 fprintf('Running Example 6\n')
 
 %%
