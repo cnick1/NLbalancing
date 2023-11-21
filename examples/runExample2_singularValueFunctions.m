@@ -89,7 +89,7 @@ eta = 0; % values should be between -\infty and 1.
 [w] = approxFutureEnergy(f, g(1:numGTermsApprox), C, eta, degree);
 
 % compute the input-normal transformation approximation
-[sigma, T] = inputNormalTransformation(v, w, degree - 1, true);
+[sigma, T] = inputNormalTransformation(v, w, degree - 1, [], true);
 
 %% Plot the past and future energy functions
 if (plotEnergy || plotBalancing)

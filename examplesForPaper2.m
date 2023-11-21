@@ -104,7 +104,7 @@ end
 %
 % compute the input-normal transformation approximation
 verbose = true;
-[sigma, T] = inputNormalTransformation(v, w, maxDegree, verbose);
+[sigma, T] = inputNormalTransformation(v, w, maxDegree, [], verbose);
 
 %
 %% Some convenient definitions

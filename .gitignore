@@ -5,6 +5,7 @@
 *.asv
 obsolete
 development/
+examples/systemData
 plots/
 chatGPT_FEM.m
 ode45Test.m

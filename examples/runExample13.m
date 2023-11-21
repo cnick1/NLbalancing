@@ -36,28 +36,27 @@ disp(vpa(kronPolyEval(w, sym('x', [1, 2]).') * 2, 2))
 
 fprintf("                             ->  Energy functions match.\n\n")
 
-%% Compute the input-normal transformation approximation
-[sigma, Tin] = inputNormalTransformation(v, w, degree -1, true);
-
-%% Compute the output-diagonal transformation approximation, also giving the squared singular value functions
-[sigmaSquared, Tod] = outputDiagonalTransformation(v, w, Tin, diag(sigma), degree - 1, true);
+%% Compute the input-normal/output-diagonal transformation approximation, also giving the squared singular value functions
+tic
+[sigmaSquared, Tod] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);
+fprintf("Input-normal/output-diagonal transformation took %f seconds. \n", toc)
 
 fprintf("\n  - Comparing our singular value functions with Gray/Scherpen 2001 Example 2.1:\n\n")
 
 sigmaSquared(sigmaSquared < 1e-14) = 0;
 
 syms z
-for i=1:2
-    fprintf("         𝜎_%i^2(z) = tau_%i(z e_i) = ",i,i)
+for i = 1:2
+    fprintf("         𝜎_%i^2(z) = tau_%i(z e_i) = ", i, i)
     disp(vpa(poly2sym(flip(sigmaSquared(i, :)), z), 3))
 end
 
-fprintf("\n                             ->  Singular value functions match up to 1e-14.\n\n")
+fprintf("\n                             ->  Squared singular value functions match up to 1e-14.\n\n")
 
 %% Compare transformation
 fprintf("\n  - Comparing our transformation with Gray/Scherpen 2001 Example 2.1:\n")
 
-ourFullTransformation = composeTransformations(Tin, Tod);
+ourFullTransformation = Tod;
 
 for i = 2:length(ourFullTransformation)
     ourFullTransformation{i}(abs(ourFullTransformation{i}) < 1e-14) = 0;

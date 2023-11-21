@@ -28,7 +28,8 @@ end
 vec = @(X) X(:);
 
 degree = length(w);
-n = sqrt(length(v{2}));
+% n = sqrt(length(v{2}));
+[n, r] = size(T{1});
 V2 = reshape(v{2}, n, n);
 W2 = reshape(w{2}, n, n);
 
@@ -82,8 +83,8 @@ else
             end
         end
         
-        vtilde{k} = kronMonomialSymmetrize(vtilde{k},n,k);
-        wtilde{k} = kronMonomialSymmetrize(wtilde{k},n,k);
+        vtilde{k} = kronMonomialSymmetrize(vtilde{k},r,k);
+        wtilde{k} = kronMonomialSymmetrize(wtilde{k},r,k);
     end
 end
 end

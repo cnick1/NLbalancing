@@ -21,10 +21,10 @@ eta = 1;
 
 fprintf('Running Example 6\n')
 
-[f, g, h] = getSystem6(numEls,1); 
+[f, g, h] = getSystem6(numEls, 1);
 g = g(1:2);
 scaleFactor = 1e-9;
-f = cellfun(@(x) x*scaleFactor,f,'un',0);
+f = cellfun(@(x) x * scaleFactor, f, 'un', 0);
 
 % A =  f{1}; B = g{1}; C = h{1};
 
@@ -34,13 +34,12 @@ degree = 6;
 [v] = approxPastEnergy(f, g, h, eta, degree, true);
 [w] = approxFutureEnergy(f, g, h, eta, degree, true);
 
-%% Compute the input-normal transformation approximation
-[sigma, Tin] = inputNormalTransformation(v, w, degree - 1, false);
+%% Compute the input-normal/output-diagonal transformation approximation, also giving the squared singular value functions
+tic
+[sigmaSquared, Tod] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);
+fprintf("Input-normal/output-diagonal transformation took %f seconds. \n", toc)
 
-%% Compute the output-diagonal transformation approximation, also giving the squared singular value functions
-[sigmaSquared, Tod] = outputDiagonalTransformation(v, w, Tin, diag(sigma), degree - 3, true);
-
-%% Plot the singular value functions
+%% Plot the squared singular value functions
 n = length(f{1});
 z = linspace(- .5, .5, 51);
 figure; hold on;
@@ -48,11 +47,11 @@ for i = 1:n
     plot(z, sqrt(polyval(flip(sigmaSquared(i, :)), z)))
 end
 
-fprintf("\n  - Singular value functions:\n\n")
+fprintf("\n  - Squared singular value functions:\n\n")
 
 syms z
-for i=1:n
-    fprintf("         𝜎_%i^2(z) = ",i)
+for i = 1:n
+    fprintf("         𝜎_%i^2(z) = ", i)
     disp(vpa(poly2sym(flip(sigmaSquared(i, :)), z), 3))
 end
 

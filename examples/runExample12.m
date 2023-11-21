@@ -71,11 +71,10 @@ disp(vpa(kronPolyEval(w, sym('x', [1, 2]).'), 8))
 
 fprintf("                             ->  Example 1 results match.\n\n")
 
-%% Compute the input-normal transformation approximation
-[sigma, Tin] = inputNormalTransformation(v, w, degree -1, false);
-
-%% Compute the output-diagonal transformation approximation, also giving the squared singular value functions
-[sigmaSquared, Tod] = outputDiagonalTransformation(v, w, Tin, diag(sigma), degree - 1, false);
+%% Compute the input-normal/output-diagonal transformation approximation, also giving the squared singular value functions
+tic
+[sigmaSquared, Tod] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);
+fprintf("Input-normal/output-diagonal transformation took %f seconds. \n", toc)
 
 fprintf("\n  - Comparing our singular value functions with Fujimoto/Scherpen 2001/2005 Example 3:\n")
 
@@ -87,7 +86,7 @@ g2 = full(cell2mat(s2)); g2sq = conv(g2, g2);
 
 fprintf("    > Maximum distance between singular value functions squared:          %e \n", ...
     norm([g1sq(1:degree - 1); g2sq(1:degree - 1)] - sigmaSquared, 'inf'))
-%% Plot the singular value functions
+%% Plot the squared singular value functions
 
 sigmaSquared(abs(sigmaSquared) < 1e-12) = 0;
 
@@ -118,11 +117,10 @@ fprintf("     Note: in this paper, they start from an intermediate transformed s
 [v] = approxPastEnergy(f, g, h, eta, degree, false);
 [w] = approxFutureEnergy(f, g, h, eta, degree, false);
 
-% Compute the input-normal transformation approximation
-[sigma, Tin] = inputNormalTransformation(v, w, degree -1, false);
-
-% Compute the output-diagonal transformation approximation, also giving the squared singular value functions
-[sigmaSquared, Tod] = outputDiagonalTransformation(v, w, Tin, diag(sigma), degree - 1, false);
+%% Compute the input-normal/output-diagonal transformation approximation, also giving the squared singular value functions
+tic
+[sigmaSquared, Tod] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);
+fprintf("Input-normal/output-diagonal transformation took %f seconds. \n", toc)
 
 fprintf("\n  - Comparing our singular value functions with Fujimoto/Scherpen 2010 Example 5:\n\n")
 
@@ -132,7 +130,7 @@ for i = 1:2
     disp(vpa(poly2sym(flip(sigmaSquared(i, :)), z), 3))
 end
 
-fprintf("                     ->  Singular value functions match.\n\n")
+fprintf("                     ->  Squared singular value functions match.\n\n")
 
 %% Compare transformation
 fprintf("\n  - Comparing our partial transformation with Fujimoto/Scherpen 2010 Example 5:\n")

@@ -1,13 +1,14 @@
-function [sigma,T] = inputNormalTransformation(v,w,degree,verbose)
+function [sigma,T] = inputNormalTransformation(v,w,degree,r,verbose)
 %inputNormalTransformation Computes the input-normal balancing for a polynomial control-affine dynamical system.
 %
-%   Usage: [sigma,T] = inputNormalTransformation(v, w, degree)
+%   Usage: [sigma,T] = inputNormalTransformation(v, w, degree, r)
 %
 %   Inputs:
 %       v,w     - cell arrays containing the polynomial energy function
 %                 coefficients; these should already be in input-normal form.
 %       degree  - desired degree of the computed transformation (default =
 %                 degree of energy functions - 1).
+%       r       - optional argument to compute a truncated transformation
 %       verbose - optional argument to print runtime information.
 %
 %   Outputs:
@@ -43,10 +44,17 @@ function [sigma,T] = inputNormalTransformation(v,w,degree,verbose)
 %
 %  Part of the NLbalancing repository.
 %%
-  if (nargin<4)
+  if (nargin<5)
     verbose = false;
+    if (nargin<4)
+        r = [];
+    end
   end
-
+  
+  if isempty(r)
+    r = sqrt(length(v{2}));
+  end
+  
   if (verbose)
     fprintf('Computing the degree %d input-normal balancing transformation\n',degree)
   end
@@ -74,19 +82,35 @@ function [sigma,T] = inputNormalTransformation(v,w,degree,verbose)
   n  = sqrt(length(v{2}));
   V2 = reshape(v{2},n,n);
   W2 = reshape(w{2},n,n);
-  R  = chol(V2,'lower');    % V2 = R*R.'
-  L  = chol(W2,'lower');    % W2 = L*L.'
-  
+try
+    R  = chol(V2,'lower');    % V2 = R*R.'
+catch
+    warning("inputNormalTransformation: Cholesky factorizatin failed; trying sqrtm()")
+    R  = sqrtm(V2);
+end
+try
+    L  = chol(W2,'lower');    % W2 = L*L.'
+catch
+    warning("inputNormalTransformation: Cholesky factorizatin failed; trying sqrtm()")
+    L  = sqrtm(W2);
+end
+
   [~,Xi,V] = svd(L.'/R.');  % from Theorem 2
+  
+  %% Truncate transformation to degree r
+  Xi = Xi(1:r,1:r);
+  V = V(:,1:r);
+  
+  %%
   sigma = diag(Xi);
   
   T{1} = R.'\V;
 
   if (degree>1)
     vT3  = kroneckerRight(v{3}.',T{1});
-    T{2} = -0.5*T{1}*reshape(vT3,n,n^2);
+    T{2} = -0.5*T{1}*reshape(vT3,r,r^2);
     for i=1:n
-      T{2}(i,:) = kronMonomialSymmetrize(T{2}(i,:),n,2);
+      T{2}(i,:) = kronMonomialSymmetrize(T{2}(i,:),r,2);
     end
   end
   
@@ -111,12 +135,14 @@ function [sigma,T] = inputNormalTransformation(v,w,degree,verbose)
 
       term = TVT + Tv;
       
-      T{k} = -0.5*T{1}*reshape(term,n^k,n).';
+      T{k} = -0.5*T{1}*reshape(term,r^k,r).';
       
 %       Symmetrize 
       for i=1:n
-        T{k}(i,:) = kronMonomialSymmetrize(T{k}(i,:),n,k);
+        T{k}(i,:) = kronMonomialSymmetrize(T{k}(i,:),r,k);
       end
+        % Unsymmetrize 
+%         T{k} = sparse(kronMonomialUnsymmetrize(T{k},r,k));
 
 %       if (verbose)
 %         fprintf('The residual error for T{%d} is %g\n',k,...

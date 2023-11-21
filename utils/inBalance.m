@@ -45,7 +45,7 @@ function [T, c, sigma, v, w] = inBalance(A, N, B, C, eta, maxDegree)
 [v] = approxPastEnergy(f, g, h, eta, maxDegree + 1);
 
 %% Approximate the Transformations using Algorithm 1.
-[sigma, T] = inputNormalTransformation(v, w, maxDegree);
+[sigma, T] = inputNormalTransformation(v, w, maxDegree, []);
 
 %% Approximate the singular value functions using Algorithm 2.
 [c] = approximateSingularValueFunctions(T, w, sigma, maxDegree - 1);

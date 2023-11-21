@@ -5,15 +5,18 @@
 %
 %    - Example 3: Jeff's finite element Burgers' equation
 %    - Example 6: a nonlinear (von Karman) Euler-Bernoulli beam with cable
-%      actuation that provides state dependent inputs. The drift and input
-%      dynamics are up-to cubic. The model can be made arbitrarily large.
+%                 actuation that provides state dependent inputs. The drift 
+%                 and input dynamics are up-to cubic. The model can be made
+%                 arbitrarily large.
 %    - Example 7: a popular 3D aircraft stall model from [2]. 
 %    - Example 12: a cooked up model to demonstrate nonlinear balancing 
-%      transformations, originally from Fujimoto 2001 [3] but used several 
-%      times in the literature. 
+%                  transformations, originally from Fujimoto 2001 [3] but
+%                  used several times in the literature.
 %    - Example 13: a cooked up model to demonstrate nonlinear balancing 
-%      transformations, originally from Gray 2001 [4].
+%                  transformations, originally from Gray 2001 [4].
 %    - Example 14: double pendulum model from Fujimoto 2008 [5].
+%    - Example 15: a simple mass-spring-damper system with cubic stiffness;
+%                  can be made arbitrarily large.
 %
 %  Authors:   Nick Corbin, UCSD
 %
@@ -46,11 +49,11 @@ addpath('utils')
 % exportData = true;
 
 %% Example 3: Burgers Equation
-% runExample3_outputDiagonalization()
+% runExample3_outputDiagonalization();
 
 
 %% Example 6: FEM Nonlinear Beam
-% runExample6_outputDiagonalization()
+% runExample6_outputDiagonalization();
 
 
 %% Example 7: Garrard 3D Airplane Stall, check diagonalization
@@ -61,13 +64,15 @@ addpath('utils')
 % norm(sigmaSquared1 - sigmaSquared2) 
 
 %% Example 12: Fujimoto 2D cooked up model for NL Balancing
-% runExample12()
+runExample12();
 
 %% Example 13: Gray 2D cooked up model for NL Balancing
-% runExample13()
+runExample13();
 
 %% Example 14: 4D double pendulum model
-% runExample14()
+runExample14();
 
+%% Example 15: Coupled nonlinear mass-spring-damper model
+runExample15(32); % change model size n here
 
 
