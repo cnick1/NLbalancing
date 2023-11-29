@@ -3,7 +3,14 @@ function runExample15()
 %
 %   Usage:  [v,w] = runExample15()
 %
-%   References: [1]
+%   References: [1] K. Fujimoto and D. Tsubakino, “On computation of
+%               nonlinear balanced realization and model reduction,” in
+%               2006 American Control Conference, IEEE, 2006. doi:
+%               10.1109/acc.2006.1655399
+%               [2] K. Fujimoto and D. Tsubakino, “Computation of nonlinear
+%               balanced realization and model reduction based on Taylor
+%               series expansion,” Systems & Control Letters, vol. 57, no.
+%               4, pp. 283–289, Apr. 2008, doi: 10.1016/j.sysconle.2007.08.015
 %
 %   Part of the NLbalancing repository.
 %%

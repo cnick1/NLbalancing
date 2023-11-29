@@ -1,9 +1,50 @@
 function [f, g, h] = getSystem16(degree)
-%getSystem16  Generates a polynomial approximation to the 6D model of a triple pendulum.
+%getSystem16  Returns a polynomial approximation to the 6D model of a triple pendulum.
 %
-%   Usage:  [f,g,h] = getSystem16(degree, relativeAngles)
+%   Usage:  [f,g,h] = getSystem16(degree)
 %
-%   References:
+%   Inputs:
+%       degree - desired degree of the computed polynomial dynamics.
+%
+%   Outputs:
+%       f,g,h  - Cell arrays containing the polynomial coefficients for the
+%                drift, input, and output (generalizations containing A,B,C)
+%
+%   Background: We consider a triple pendulum with rigid uniform slender
+%       links. Each joint also has an associated spring stiffness and
+%       damping. We derive the equations of motion using either a
+%       Lagrangian or Hamiltonian approach. We begin by defining the
+%       kinetic end potential energies of the system. The kinetic energy is
+%       composed of
+%           - m1 kinetic energy (fixed point)
+%           - m2 rotational kinetic energy
+%           - m2 translational kinetic energy
+%           - m3 rotational kinetic energy
+%           - m3 translational kinetic energy
+%           (see the code for the specific formulas; essentially one needs
+%           to use vector differentiation/geometry, along with Ig=m l^2/12)
+%       The potential energy is composed of
+%           - m1 potential energy (gravity)
+%           - k1 potential energy (spring)
+%           - m2 potential energy (gravity)
+%           - k2 potential energy (spring)
+%           - m3 potential energy (gravity)
+%           - k3 potential energy (spring)
+%           (see the code for the specific formulas; essentially one needs
+%           to use geometry to find the position of each center of gravity,
+%           and for the springs E = 1/2 k Δx^2)
+%
+%       With the kinetic energy T and potential energy V, we can either use
+%       Lagrange's equations or a port-Hamiltonian approach
+%           d/dt(∂L/∂ẋ) - ∂L/∂x = Q     or      ẋ = (J-R)∂H/∂x + Bu
+%       where the former requires inverting and differentiating a mass
+%       matrix to convert to first-order (state-space) equations.
+%
+%   References: [1] A. J. Krener, “Reduced order modeling of nonlinear
+%               control systems,” in Analysis and Design of Nonlinear
+%               Control Systems, Springer Berlin Heidelberg, 2008, pp.
+%               41–62. doi: 10.1007/978-3-540-74358-3_4.
+%
 %
 %%
 

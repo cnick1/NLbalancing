@@ -1,10 +1,13 @@
 function runExample16()
-%runExample16 Runs the example to test diagonalization.
+%runExample16 Runs the 6D triple pendulum example to test diagonalization.
 %
-%   Usage:  [v,w] = runExample16()
+%   Usage:  runExample16()
 %
-%   References: [1]
-%
+%   References: [1] A. J. Krener, “Reduced order modeling of nonlinear
+%               control systems,” in Analysis and Design of Nonlinear
+%               Control Systems, Springer Berlin Heidelberg, 2008, pp.
+%               41–62. doi: 10.1007/978-3-540-74358-3_4
+% 
 %   Part of the NLbalancing repository.
 %%
 fprintf('Running Example 16\n')
