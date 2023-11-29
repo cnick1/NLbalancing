@@ -1,17 +1,17 @@
-function runExample14()
-%runExample14 Runs the example to test diagonalization.
+function runExample15()
+%runExample15 Runs the example to test diagonalization.
 %
-%   Usage:  [v,w] = runExample14()
+%   Usage:  [v,w] = runExample15()
 %
 %   References: [1]
 %
 %   Part of the NLbalancing repository.
 %%
-fprintf('Running Example 14\n')
+fprintf('Running Example 15\n')
 eta = 0;
 
 degree = 4;
-[f, g, h] = getSystem14(degree - 1, 1);
+[f, g, h] = getSystem15(degree - 1, 1);
 
 %  Compute the energy functions
 [v] = approxPastEnergy(f, g, h, eta, degree, false);

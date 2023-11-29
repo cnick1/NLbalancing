@@ -4,8 +4,8 @@ function [f, g, h] = getSystem14(degree, model)
 %   Usage:  [f,g,h] = getSystem14(degree, model)
 %
 %   Inputs:
-%       degree - desired degree of the computed polynomial dynamics. 
-%       model  - used to select either the Scherpen/Gray [1,2] model (1 - default) 
+%       degree - desired degree of the computed polynomial dynamics.
+%       model  - used to select either the Scherpen/Gray [1,2] model (1 - default)
 %                or the Fujimoto [3] model (2).
 %                In [1,2], the values used are m1=m2=l1=l2=1 and G = 10;
 %                in [3], the values used are m1=l2=10, l1=m2=1 and G = 9.81.
@@ -14,13 +14,13 @@ function [f, g, h] = getSystem14(degree, model)
 %       f,g,h  - Cell arrays containing the polynomial coefficients for the
 %                drift, input, and output (generalizations containing A,B,C)
 %
-%   Background: This model has been used several times in the literature [1-3]. 
+%   Background: This model has been used several times in the literature [1-3].
 %       The system describes a set of dynamics related to the double
 %       pendulum; however, where the double pendulum would have 4D dynamics
 %       and only marginal stability, the associated 2D gradient system is
 %       asymptotically stable, and hence the model was more approachable
 %       when method were more limited.
-%        
+%
 %       Let the 2 x 2 mass matrix be given by the entries
 %           m11       = m1 l1^2 + m2 l1^2 + m2 l2^2 + 2 m2 l1 l2 cos x2
 %           m12 = m21 = m2 l2^2 + m2 l1 l2 cos x2
@@ -45,7 +45,7 @@ function [f, g, h] = getSystem14(degree, model)
 %               using energy functions,” IEEE Transactions on Automatic
 %               Control, vol. 45, no. 11, pp. 2079–2086, 2000, doi:
 %               10.1109/9.887630
-%               [1] K. Fujimoto and J. M. A. Scherpen, “Nonlinear
+%               [3] K. Fujimoto and J. M. A. Scherpen, “Nonlinear
 %               input-normal realizations based on the differential
 %               eigenstructure of Hankel operators,” IEEE Transactions on
 %               Automatic Control, vol. 50, no. 1, pp. 2–18, Jan. 2005,
@@ -87,8 +87,8 @@ m22 = m2 * l2 ^ 2;
 
 M = [m11, m12;
      m12, m22];
-Minv = 1 / (m11 * m22 - m12 ^ 2) *  [m22, -m12;
-                                    -m12, m11];
+Minv = 1 / (m11 * m22 - m12 ^ 2) * [m22, -m12;
+                                     -m12, m11];
 
 fsym = -Minv * gradient(V, x);
 gsym = Minv * [1; 0];
