@@ -22,8 +22,8 @@ function [f, g, h] = getSystem15(degree)
 %       The potential energy of the system is
 %           V(x) = - m1 g l1 cos x1 - m2 g (l1 cos x1 + l2 cos(x1 + x2))
 %
-%       and the kinetic energy is
-%           T(ẋ) = 1/2 ẋ.' * M * ẋ
+%       and the kinetic energy is (in [1,2], they have a typo  missing the 1/2)
+%           T(ẋ) = 1/2 ẋ.' * M * ẋ  
 %
 %       The Lagrangian is L(x,ẋ) = T(ẋ) - V(x). The Euler-Lagrange equations
 %       are
@@ -92,10 +92,11 @@ M = [m11, m12;
 Minv = 1 / (m11 * m22 - m12 ^ 2) * ...
     [m22, -m12;
  -m12, m11];
-Mdot =- [2 * m2 * l1 * l2 * sin(x2) * x4, m2 * l1 * l2 * sin(x2) * x4;
-         m2 * l1 * l2 * sin(x2) * x4, 0];
+Mdot =- [2 * m2 * l1 * l2 * sin(x2) * x4, m2 * l1 * l2 * sin(x2) * x4 ;
+         m2 * l1 * l2 * sin(x2) * x4 , 0];
 
-T = 0.5 * [x3; x4].' * M * [x3; x4];
+T = 0.5*[x3; x4].' * M * [x3; x4];
+% T = [x3; x4].' * M * [x3; x4];
 
 fsym = [x3;
         x4;
@@ -107,4 +108,42 @@ hsym = [l1 * sin(x1) + l2 * sin(x1 + x2);
 
 [f, g, h] = approxPolynomialDynamics(fsym, gsym, hsym, x, degree);
 
+
+if false
+%% port Hamiltonian approach 
+
+q = [x1; x2]; qdot = [x3; x4];
+
+L = T - V;
+
+% Generalized momenta conjugate to our choice of generalized coordinates
+% simplify(gradient(L, qdot) - M*qdot) % Check that M satisfies p = M*qdot
+
+% Define Hamiltonian using Legendre transform
+% simplify(T+V - (p.' * qdot - L)) % Check that H=T+V
+
+%% Port-Hamiltonian approach to deriving equations of motion
+% redefine Hamiltonian state
+clear x3 x4
+syms p1 p2
+y = [q; p1; p2];
+
+T = 1/2 * [p1; p2].' * Minv * [p1; p2];
+
+H = T+V;
+D = [mu1, 0;
+    0, mu2];
+
+J = [zeros(n / 2), eye(n / 2);
+    -eye(n / 2), zeros(n / 2)];
+R = [zeros(n / 2), zeros(n / 2);
+    zeros(n / 2), D];
+
+fsym = (J - R) * gradient(H, y);
+gsym = [0; 0; 1; 0];
+hsym = [l1 * sin(x1) + l2 * sin(x1 + x2);
+        l1 * cos(x1) + l2 * cos(x1 + x2)];
+
+[f, g, h] = approxPolynomialDynamics(fsym, gsym, hsym, y, degree);
+end
 end
