@@ -1,5 +1,5 @@
 function [v, w] = runExample11(exportPlotData, nFterms, degree, eta, varargin)
-%runExample11 Runs the 2D example to plot energy functions as contour plots
+%runExample11 Runs the 2D inverted pendulum example to plot energy functions as contour plots
 %
 %   Usage:  [v,w] = runExample11(degree,plotEnergy,plotBalancing,balancingDegree,
 %                               numGTermsModel, numGTermsApprox, exportPlotData, kawanoModel)

@@ -1,56 +1,83 @@
 function runExample14()
-%runExample14 Runs the example to test diagonalization.
+%runExample14 Runs the 2D gradient pendulum example to test diagonalization.
 %
 %   Usage:  [v,w] = runExample14()
 %
-%   References: [1]
+%   References: [1] J. M. A. Scherpen, “Balancing for nonlinear systems,”
+%               PhD Dissertation, University of Twente, 1994.
+%               [2] W. S. Gray and J. M. A. Scherpen, “Minimality and local
+%               state decompositions of a nonlinear state space realization
+%               using energy functions,” IEEE Transactions on Automatic
+%               Control, vol. 45, no. 11, pp. 2079–2086, 2000, doi:
+%               10.1109/9.887630
+%               [1] K. Fujimoto and J. M. A. Scherpen, “Nonlinear
+%               input-normal realizations based on the differential
+%               eigenstructure of Hankel operators,” IEEE Transactions on
+%               Automatic Control, vol. 50, no. 1, pp. 2–18, Jan. 2005,
+%               doi: 10.1109/tac.2004.840476
 %
 %   Part of the NLbalancing repository.
 %%
+
+sympref('PolynomialDisplayStyle', 'ascend');
+
 fprintf('Running Example 14\n')
 eta = 0;
 
+%% Scherpen 1994 and Scherpen/Gray 2000
+fprintf("Beginning comparisons with Scherpen/Gray 2000:\n")
+
 degree = 4;
-[f, g, h] = getSystem14(degree - 1);
+[f, g, h] = getSystem14(degree - 1, 1);
 
 %  Compute the energy functions
-[v] = approxPastEnergy(f, g, h, eta, degree, false);
-[w] = approxFutureEnergy(f, g, h, eta, degree, false);
+[v] = approxPastEnergy(f, g, h, eta, degree, true);
+[w] = approxFutureEnergy(f, g, h, eta, degree, true);
 
-fprintf("Beginning comparisons with Fujimoto/Tsubakino 2008:\n")
+fprintf("\n  - Comparing our energy function with Scherpen/Gray 2000:\n")
 
-%% Comparison with Gray 2001 Example 1
-% fprintf("\n  - Comparing our energy function with Fujimoto/Tsubakino 2008:\n")
+fprintf("    Observability energy: \n        Lo = ")
+disp(vpa(kronPolyEval(w, sym('x', [1, 2]).') / 2, 6))
 
-% v{3}(abs(v{3}) < 1e-14) = 0; v{4}(abs(v{4}) < 1e-14) = 0; w{3}(abs(w{3}) < 1e-14) = 0; w{4}(abs(w{4}) < 1e-14) = 0;
+fprintf("    Controllability energy: \n        Lc = ")
+disp(vpa(kronPolyEval(v, sym('x', [1, 2]).') / 2, 6))
 
-% fprintf("    Controllability energy: \n        Lc = 1/2 *(")
-% disp(vpa(kronPolyEval(v, sym('x', [1, 4]).'), 2))
-% fprintf("    Observability energy: \n        Lo = 1/2 *(")
-% disp(vpa(kronPolyEval(w, sym('x', [1, 4]).'), 2))
-%
-% fprintf("\n                             ->  Energy functions match.\n\n")
+fprintf("\n                             ->  Energy functions match.\n\n")
 
-%% Compute the input-normal/output-diagonal transformation approximation, also giving the squared singular value functions
+%% Fujimoto/Scherpen 2005
+fprintf("Beginning comparisons with Fujimoto/Scherpen 2005:\n")
+
+degree = 4;
+[f, g, h] = getSystem14(degree - 1, 2);
+
+%  Compute the energy functions
+[v] = approxPastEnergy(f, g, h, eta, degree, true);
+[w] = approxFutureEnergy(f, g, h, eta, degree, true);
+
+fprintf("\n  - Comparing our energy function with Fujimoto/Scherpen 2005:\n")
+
+fprintf("    Controllability energy: \n        Lc = ")
+disp(vpa(kronPolyEval(v, sym('x', [1, 2]).') / 2, 5))
+
+fprintf("    Observability energy: \n        Lo = ")
+disp(vpa(kronPolyEval(w, sym('x', [1, 2]).') / 2, 5))
+
+fprintf("\n                             ->  Energy functions match.\n\n")
+
+fprintf("\n  - Comparing our squared singular value functions with Fujimoto/Scherpen 2005:\n")
+
 tic
 [sigmaSquared, Tod] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);
 fprintf("Input-normal/output-diagonal transformation took %f seconds. \n", toc)
 
-fprintf("\n  - Comparing our singular value functions with Fujimoto/Tsubakino 2008:\n\n")
-
-sigmaSquared(sigmaSquared < 1e-14) = 0;
+fprintf("\n  - Squared singular value functions:\n\n")
 
 syms z
-for i = 1:4
-    fprintf("         𝜎_%i^2(z) = tau_%i(z e_i) = ", i, i)
-    disp(vpa(poly2sym(flip(sigmaSquared(i, :)), z), 3))
+for i = 1:2
+    fprintf("         𝜎_%i^2(z) = ", i)
+    disp(vpa(poly2sym(flip(sigmaSquared(i, :)), z), 5))
 end
 
-fprintf("\n                             ->  Hankel singular values match but not the functions.\n\n")
-
-return
-%% Compare transformation
-fprintf("\n  - Comparing our transformation with Fujimoto/Tsubakino 2008:\n")
-disp(vpa(kronPolyEval(Tod, sym('x', [1, 4]).'), 2))
+fprintf("\n                             ->  Squared singular value functions match.\n\n")
 
 end
