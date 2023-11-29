@@ -25,9 +25,9 @@ fprintf("Beginning comparisons with Fujimoto/Tsubakino 2008:\n")
 % v{3}(abs(v{3}) < 1e-14) = 0; v{4}(abs(v{4}) < 1e-14) = 0; w{3}(abs(w{3}) < 1e-14) = 0; w{4}(abs(w{4}) < 1e-14) = 0;
 
 % fprintf("    Controllability energy: \n        Lc = 1/2 *(")
-% disp(vpa(kronPolyEval(v, sym('x', [1, 2]).'), 2))
-% fprintf("    Observability energy: \n        Lo = 1/4 *(")
-% disp(vpa(kronPolyEval(w, sym('x', [1, 2]).') * 2, 2))
+% disp(vpa(kronPolyEval(v, sym('x', [1, 4]).'), 2))
+% fprintf("    Observability energy: \n        Lo = 1/2 *(")
+% disp(vpa(kronPolyEval(w, sym('x', [1, 4]).'), 2))
 %
 % fprintf("\n                             ->  Energy functions match.\n\n")
 
@@ -53,7 +53,4 @@ return
 fprintf("\n  - Comparing our transformation with Fujimoto/Tsubakino 2008:\n")
 disp(vpa(kronPolyEval(Tod, sym('x', [1, 4]).'), 2))
 
-%% Gray transformation
-Tod2 = {[1 0; 0 1], [1 0 0 0; 0 0 0 0], zeros(2, 2 ^ 3)};
-[vtilde, wtilde] = transformEnergyFunctions(v, w, Tod2)
 end

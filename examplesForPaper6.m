@@ -57,22 +57,30 @@ addpath('utils')
 
 
 %% Example 7: Garrard 3D Airplane Stall, check diagonalization
-[sigmaSquared1] = runExample7_outputDiagonalization();
+% [sigmaSquared1] = runExample7_outputDiagonalization();
 % [sigmaSquared2] = runExample7_outputDiagonalization();
 % If you modify outputDiag, you can check the effect of the different
 % solutions to the transformations
 % norm(sigmaSquared1 - sigmaSquared2) 
 
 %% Example 12: Fujimoto 2D cooked up model for NL Balancing
-runExample12();
+% runExample12();
 
 %% Example 13: Gray 2D cooked up model for NL Balancing
-runExample13();
+% runExample13();
+
+%% Example 14b: 2D double pendulum model gradient system
+% runExample14_gradient();
+
+%% Example 14c: Krener's 6D triple pendulum model
+% runExample14_krener()
 
 %% Example 14: 4D double pendulum model
+clc
 runExample14();
 
 %% Example 15: Coupled nonlinear mass-spring-damper model
-runExample15(32); % change model size n here
+% runExample15(32); % change model size n here
+
 
 
