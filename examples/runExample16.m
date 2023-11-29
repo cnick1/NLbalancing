@@ -1,17 +1,17 @@
-function runExample14_krener()
-%runExample14_krener Runs the example to test diagonalization.
+function runExample16()
+%runExample16 Runs the example to test diagonalization.
 %
-%   Usage:  [v,w] = runExample14_krener()
+%   Usage:  [v,w] = runExample16()
 %
 %   References: [1]
 %
 %   Part of the NLbalancing repository.
 %%
-fprintf('Running Example 14\n')
+fprintf('Running Example 16\n')
 eta = 0;
 
 degree = 4;
-[f, g, h] = getSystem14_krener(degree - 1);
+[f, g, h] = getSystem16(degree - 1);
 
 %  Compute the energy functions
 [v] = approxPastEnergy(f, g, h, eta, degree, false);
@@ -24,10 +24,9 @@ tic
 [sigmaSquared, Tod] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);
 fprintf("Input-normal/output-diagonal transformation took %f seconds. \n", toc)
 
-
 fprintf("\n  - Comparing our Hankel singular values with Krener 2008:\n\n    ")
 
-disp((sigmaSquared(:,1).').^(1/2))
+disp((sigmaSquared(:, 1).') .^ (1/2))
 fprintf("                         ->  Hankel singular values match.\n\n")
 
 fprintf("\n  - Comparing our squared singular value functions with Krener 2008:\n\n")
