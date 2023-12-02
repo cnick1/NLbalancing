@@ -1,5 +1,5 @@
 function [f, g, h] = getSystem13()
-%getSystem13  Generates a polynomial approximation to the 2D model from Gray [1]
+%getSystem13  Generates a polynomial approximation to the 2D model from Gray and Scherpen 2001 [1]
 %
 %   Usage:  [f,g,h] = getSystem13()
 %

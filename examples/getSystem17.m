@@ -27,13 +27,14 @@ else % construct it; can be slow since it uses symbolic calcs
 
     ms = ones(n, 1); % Warning; if you change this you need to uncomment and use the symbolic code
     ks = ones(n, 1); % Warning; if you change this you need to uncomment and use the symbolic code
-    ds = ones(n, 1);
+    ds = ones(n, 1); 
 
     M = diag(ms);
     Minv = diag(1 ./ ms);
     D = diag(ds);
     K = spdiags([-ks, 2 * ks, -ks], [-1 0 1], n, n);
 
+    %% Symbolic Lagrangian approach; symbolic computations very slow
     %     T = 0.5 * qdot.' * M * qdot;
     %
     %     %     V = -ks(1)*cos(x(1));
@@ -54,7 +55,7 @@ else % construct it; can be slow since it uses symbolic calcs
     %
     %     [f] = approxPolynomialDynamics(fsym,gsym,hsym, x, degree);
 
-    %%
+    %% Direct approach; since we know the analytical Taylor expansion, we code it directly speed improvement
     f{1} = [zeros(n), eye(n); -Minv * K, -D];
     f{2} = sparse(2 * n, (2 * n) ^ 2);
 
@@ -99,8 +100,10 @@ else % construct it; can be slow since it uses symbolic calcs
     idx = tt_sub2ind(tensorSize, [n n n - 1]); % -(x1^2*x2)/2
     f{3}(2 * n, idx) = -1/2;
 
-    g = speye(2 * n); h = speye(2 * n);
-
+%     g = speye(2 * n); h = speye(2 * n);
+%     g = diag([zeros(n,1);ones(n,1)]); h = diag([ones(n,1);zeros(n,1)]);
+    g = spdiags([zeros(n,1);ones(n,1)],0,2*n,2*n); h = spdiags([ones(n,1);zeros(n,1)],0,2*n,2*n); 
+    
     %% Save system data so it doesn't need to be computed every time
     save(filename, 'f', 'g', 'h')
 end

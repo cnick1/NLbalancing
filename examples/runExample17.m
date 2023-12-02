@@ -21,6 +21,7 @@ degree = 4;
 [v] = approxPastEnergy(f, g, h, eta, degree, true);
 [w] = approxFutureEnergy(f, g, h, eta, degree, true);
 
+
 %% Compute the input-normal/output-diagonal transformation approximation, also giving the squared singular value functions
 tic
 [sigmaSquared, Tod] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);

@@ -1,6 +1,5 @@
 function [f, g, h] = getSystem12(degree, transformedModel)
-%getSystem12  Generates a polynomial approximation to the 2D model from
-%   Fujimoto and Scherpen 2001, 2005, 2010 [1-3]
+%getSystem12  Generates a polynomial approximation to the 2D model from Fujimoto and Scherpen 2001, 2005, 2010 [1-3]
 %
 %   Usage:  [f,g,h] = getSystem12(degree)
 %

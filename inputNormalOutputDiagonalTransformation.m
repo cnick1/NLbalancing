@@ -184,12 +184,13 @@ switch method
             tic
             Tod{k - 1} = zeros(n, n ^ (k - 1));
             %     if k > 4
-%             Tod{k - 1}(indices) = CoeffMatrix \ RHS; % Method 1
-                Tod{k - 1}(indices) = lsqminnorm(CoeffMatrix, RHS);      % Method 2
+%             spparms('spumoni',2)
+            Tod{k - 1}(indices) = CoeffMatrix \ RHS; % Method 1
+%                 Tod{k - 1}(indices) = lsqminnorm(CoeffMatrix, RHS);      % Method 2
             
             %% Optional: adjust transformation by a random element from the null-space
-            nullDir = rand(diff(size(CoeffMatrix)),1); 
-            Tod{k - 1}(indices) = Tod{k - 1}(indices).' + null(full(CoeffMatrix)) * nullDir;
+%             nullDir = rand(diff(size(CoeffMatrix)),1); 
+%             Tod{k - 1}(indices) = Tod{k - 1}(indices).' + null(full(CoeffMatrix)) * nullDir;
             
             fprintf("%f seconds. \n", toc)
         end

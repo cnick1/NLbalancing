@@ -104,7 +104,7 @@ fsym = [x3;
 
 gsym = [0; 0; Minv * [1; 0]];
 hsym = [l1 * sin(x1) + l2 * sin(x1 + x2);
-        l1 * cos(x1) + l2 * cos(x1 + x2)];
+        l1 * (1-cos(x1)) + l2 * (1-cos(x1 + x2))];
 
 [f, g, h] = approxPolynomialDynamics(fsym, gsym, hsym, x, degree);
 

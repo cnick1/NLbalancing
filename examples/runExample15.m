@@ -37,7 +37,7 @@ fprintf("\n  - Comparing our singular value functions with Fujimoto/Tsubakino 20
 
 syms z
 for i = 1:4
-    fprintf("         𝜎_%i^2(z) = tau_%i(z e_i) = ", i, i)
+    fprintf("         𝜎_%i^2(z) = ", i, i)
     disp(vpa(poly2sym(flip(sigmaSquared(i, :)), z), 3))
 end
 
