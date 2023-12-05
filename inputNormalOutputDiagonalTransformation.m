@@ -185,7 +185,7 @@ switch method
             Tod{k - 1} = zeros(n, n ^ (k - 1));
             %     if k > 4
 %             spparms('spumoni',2)
-            Tod{k - 1}(indices) = CoeffMatrix \ RHS; % Method 1
+            Tod{k - 1}(indices) = CoeffMatrix \ RHS; % Method 1: matlab uses sparse QR from SuiteSparseQR
 %                 Tod{k - 1}(indices) = lsqminnorm(CoeffMatrix, RHS);      % Method 2
             
             %% Optional: adjust transformation by a random element from the null-space
