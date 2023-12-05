@@ -50,7 +50,13 @@ addpath('utils')
 % runExample12();
 
 %% Example 17: Coupled nonlinear mass-spring-damper model
-runExample17(32); % change model size n here
+% runExample17(32); % change model size n here
+
+%
+[ns,energyTimings,transformationTimings] = runExample17_timings(3);
+[ns,energyTimings,transformationTimings] = runExample17_timings(4);
+[ns,energyTimings,transformationTimings] = runExample17_timings(5);
+[ns,energyTimings,transformationTimings] = runExample17_timings(6);
 
 %% Other/old models
 % Example 13: Gray 2D cooked up model for NL Balancing
