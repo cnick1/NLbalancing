@@ -30,7 +30,7 @@ function [f, g, h, D, y] = getSystem9(eps, N, y0)
 %
 %%
 if nargin < 3
-    y0 = 0.25;
+    y0 = [];
     if nargin < 2
         N = 20;
         if nargin < 1
@@ -39,35 +39,27 @@ if nargin < 3
     end
 end
 
-filename = fullfile('examples', 'systemData', sprintf('system9_eps=%.0e_N=%i_y0=%.0e.mat', eps,N,y0));
+% Differentiation matrix
+[D,y] = cheb(N); D2 = D^2;
+D2([1 N+1],:) = zeros(2,N+1);
 
-if isfile(filename) % load saved system
-    load(filename);
-    [D,y] = cheb(N);
-else % construct it; can be slow since it uses symbolic calcs
+% Construct shifted dynamics with u(x)=tanh((x-x0)/sqrt(2*eps)) equilibrium @ origin
+n = N+1;
 
-    % Differentiation matrix
-    [D,y] = cheb(N); D2 = D^2;
-    D2([1 N+1],:) = zeros(2,N+1);
-
-    % Construct original dynamics with unstable u(x)=0 equilibrium @ origin
-    n = N+1;
-    A = eps*D2 + eye(n);
-    F3 = sparse(1:n,linspace(1,n^3,n),-1);
-
-    % Shift reference equilibrium to the origin
-    % vref = tanh((y-y0)/sqrt(2*eps));
+% Shift reference equilibrium to the origin
+% vref = tanh((y-y0)/sqrt(2*eps));
+if isempty(y0)
+    vref= 0;
+else
     load(fullfile('examples', 'systemData',sprintf('system9_equilibria_N=%i.mat',N)))
     vref = d(y0); vref = vref{1}; plot(y,vref)
-
-    x = sym('x', [1, n]).';
-    fsym = A*(x+vref) + F3*kron(x+vref,kron(x+vref,x+vref));
-    gsym = eye(n); hsym = x;
-
-    [f,g,h] = approxPolynomialDynamics(fsym,gsym,hsym,x,3);
-
-    save(filename, 'f', 'g', 'h')
 end
+
+f{1} = eps*D2 + eye(n) - 3*diag(vref.^2);
+f{2} = sparse(1:n,linspace(1,n^2,n),-3*vref);
+f{3} = sparse(1:n,linspace(1,n^3,n),-1);
+g = eye(n);
+h = eye(n);
 
 end
 
