@@ -73,7 +73,12 @@ for d=1:degree
         locsF = map_symbolic_vectors(Tf, xn);
         
         %  Apply that mapping to C, write to coefficient
-        F{d}(i,locsF) = double(Cf);
+        try
+            F{d}(i,locsF) = double(Cf);
+        catch
+            warning("Dynamics contain an affine contribution; discarding it")
+            F{d}(i,locsF) = double(Cf(1:end-1));
+        end
     end
     
     % Construct G cell array

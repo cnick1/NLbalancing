@@ -1,5 +1,5 @@
 function [f, g, h] = getSystem8(numElements, elementOrder)
-%getSystem8  Generates a cubic finite element model system for testing
+%getSystem8  Generates a cubic finite element heat equation model system for testing
 %            energy functions. The system is a finite element model for a
 %            nonlinear heat equation, i.e. a reaction-diffusion equation.
 %            The function returns a finite element model with either linear

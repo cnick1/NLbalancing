@@ -1,5 +1,5 @@
 function [f, g, h] = getSystem6(numElements, actuatorConfig, rotaryInertia)
-%getSystem6  Generates a cubic finite element model system for testing
+%getSystem6  Generates a cubic finite element beam model system for testing
 %            energy functions. The system is a finite element model for a
 %            nonlinear (due to von Karman strains) Euler-Bernoulli Beam.
 %            For a model with numElements elements, the returned
