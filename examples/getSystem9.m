@@ -52,7 +52,7 @@ if isempty(y0)
     vref= 0;
 else
     load(fullfile('examples', 'systemData',sprintf('system9_equilibria_N=%i.mat',N)))
-    vref = d(y0); vref = vref{1}; plot(y,vref)
+    vref = d(y0); vref = vref{1}; %plot(y,vref)
 end
 
 f{1} = eps*D2 + eye(n) - 3*diag(vref.^2);
