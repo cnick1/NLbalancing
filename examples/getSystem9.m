@@ -58,8 +58,10 @@ end
 f{1} = eps*D2 + eye(n) - 3*diag(vref.^2);
 f{2} = sparse(1:n,linspace(1,n^2,n),-3*vref);
 f{3} = sparse(1:n,linspace(1,n^3,n),-1);
-g = eye(n);
+g = eye(n); 
 h = eye(n);
+
+% Select controls |--*--*--*--|
 
 end
 
