@@ -18,12 +18,13 @@ function [] = runExample9()
 
 fprintf('Running Example 9\n')
 
+%% Construct controller 
 % Get system
-% for y0 = [-.5 -.25 0 .25 .5]
-eps = 0.01; N = 32; y0 = .25;
-[f, B, ~, ~, y] = getSystem9(eps, N, y0);
+y0 = .25; % Desired interface location
+
+eps = 0.01; N = 32; 
+[f, B, ~, D, y] = getSystem9(eps, N, y0);
 fprintf("Maximum eigenvalue of A is %f; should be zero I think.\n",max(eigs(full(f{1}),N+1)))
-% end
 
 % Reference configuration (@ origin) -> v = v+vref
 if isempty(y0)
@@ -32,13 +33,39 @@ else
     vref = tanh((y-y0)/sqrt(2*eps));
 end
 
-%% Construct stabilizing controller 
 Q = eye(N+1); R = eye(N+1); 
 [ValueFun] = pqr(f, B, Q, R);
 % u = @(z) zeros(N+1,1);
-u = @(z) (- R * B.' * kronPolyDerivEval(ValueFun, z).' / 2);
-% u = @(z) (- R * B.' * kronPolyDerivEval(ValueFun(1:2), z).' / 2);
+u = @(z) (- R * B.' * kronPolyDerivEval(ValueFun(1:2), z).' / 2);
 
+%% Solve PDE by Euler formula and plot results:
+% Construct originial system dynamics
+D2 = D^2; D2([1 N+1],:) = zeros(2,N+1); % For boundary conditions
+
+% Initial condition
+v0 = .53*y + .47*sin(-1.5*pi*y);
+% v0 = tanh((y-(-0.125))/sqrt(2*eps*10));
+v = v0;
+
+% Time-stepping
+dt = min([.001,50*N^(-4)/eps]); t = 0; 
+tmax = 100; tplot = 2; nplots = round(tmax/tplot);
+plotgap = round(tplot/dt); dt = tplot/plotgap;
+xx = -1:.025:1; vv = polyval(polyfit(y,v,N),xx);
+plotdata = [vv; zeros(nplots,length(xx))]; tdata = t;
+for i = 1:nplots
+    fprintf('%i',i)
+    for n = 1:plotgap
+        t = t+dt; v = v + dt*(eps*D2*v + v - v.^3 + B*u(v-vref));    % Euler
+    end
+    vv = polyval(polyfit(y,v,N),xx);
+    plotdata(i+1,:) = vv; tdata = [tdata; t];
+end
+figure, subplot('position',[.1 .4 .8 .5])
+mesh(xx,tdata,plotdata), grid on, axis([-1 1 0 tmax -1 1]),
+view(-60,55), colormap(1e-6*[1 1 1]); xlabel x, ylabel t, zlabel u
+
+return;
 
 %% Solve PDE by Euler formula and plot results:
 % Initial condition
@@ -77,7 +104,6 @@ plot3(xx,100*ones(size(xx)),polyval(polyfit(y,v+vref,N),xx),"*")
 % plot3(xx,100*ones(size(xx)),polyval(polyfit(y,cell2mat(d(y0)),N),xx),"g*")
 
 % view(180,0)
-return;
 
 % figure
 % hold on
