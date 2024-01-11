@@ -48,6 +48,7 @@ controllers = {uOpenLoop, uLinear, uCubic};
 
 for idx = 1:3
     u = controllers{idx};
+    Lagrangian = zeros(100001,1);
 
     %% Solve PDE by Euler formula and plot results:
     % Construct originial system dynamics
@@ -67,7 +68,10 @@ for idx = 1:3
     for i = 1:nplots
         fprintf('%i',i)
         for n = 1:plotgap
-            t = t+dt; v = v + dt*(eps*D2*v + v - v.^3 + B*u(v-vref));    % Euler
+            xbar = v-vref;
+            Ux = u(xbar);
+            Lagrangian(n+(i-1)*plotgap) = 1/2*(xbar.'*Q2*xbar + Ux.'*R*Ux + 4*sum(xbar.^4)); % hardcoded v.^4 instead of Q4 for speed
+            t = t+dt; v = v + dt*(eps*D2*v + v - v.^3 + B*Ux);    % Euler
         end
         vv = polyval(polyfit(y,v,N),xx);
         plotdata(i+1,:) = vv; tdata = [tdata; t];
@@ -77,16 +81,21 @@ for idx = 1:3
     view(-60,55), colormap([0 0 0]); xlabel x, ylabel t, zlabel u
     drawnow
 
-    exportgraphics(gcf,'barchart.png','Resolution',300)
+    % Compute performance Index (cost)
+    performanceIndex = trapz((0:dt:tmax), Lagrangian);
+    fprintf("\n\n   The performance index is %f\n\n",performanceIndex)
 
 end
 
-    exportgraphics(gcf,'plots/example9_cubic.pdf', 'ContentType', 'vector')
-    close 
-    exportgraphics(gcf,'plots/example9_linear.pdf', 'ContentType', 'vector')
-    close 
-    exportgraphics(gcf,'plots/example9_openloop.pdf', 'ContentType', 'vector')
-    close 
+
+
+
+exportgraphics(gcf,'plots/example9_cubic.pdf', 'ContentType', 'vector')
+close
+exportgraphics(gcf,'plots/example9_linear.pdf', 'ContentType', 'vector')
+close
+exportgraphics(gcf,'plots/example9_openloop.pdf', 'ContentType', 'vector')
+close
 
 
 
