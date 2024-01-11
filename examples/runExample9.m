@@ -34,7 +34,7 @@ else
 end
 
 B = B(:,linspace(1,N+1,5)); B(:,[1 5]) = []; m = size(B,2);
-Q2 = .1; Q3 = sparse((N+1)^3,1) ; Q4 = sparse((N+1)^4,1); Q4(linspace(1,(N+1)^4,(N+1))) = 4;
+Q2 = .1; Q3 = sparse((N+1)^3,1) ; Q4 = sparse(linspace(1,(N+1)^4,N+1),1,4);
 q = {[],Q2,Q3,Q4};
 R = 1;
 
@@ -74,10 +74,20 @@ for idx = 1:3
     end
     figure, subplot('position',[.1 .4 .8 .5])
     mesh(xx,tdata,plotdata), grid on, axis([-1 1 0 tmax -1 1]),
-    view(-60,55), colormap(1e-6*[1 1 1]); xlabel x, ylabel t, zlabel u
+    view(-60,55), colormap([0 0 0]); xlabel x, ylabel t, zlabel u
     drawnow
 
+    exportgraphics(gcf,'barchart.png','Resolution',300)
+
 end
+
+    exportgraphics(gcf,'plots/example9_cubic.pdf', 'ContentType', 'vector')
+    close 
+    exportgraphics(gcf,'plots/example9_linear.pdf', 'ContentType', 'vector')
+    close 
+    exportgraphics(gcf,'plots/example9_openloop.pdf', 'ContentType', 'vector')
+    close 
+
 
 
     function [D,x] = cheb(N)
