@@ -1,118 +1,91 @@
-function [v, w] = runExample11_periodicSim(exportPlotData, nFterms, degree, eta, varargin)
-%runExample11 Runs the 2D example to plot energy functions as contour plots
+function v = approxPastEnergy(f, g, h, eta, degree, verbose)
+%approxPastEnergy  Compute the past energy function for a polynomial control-affine dynamical system.
 %
-%   Usage:  [v,w] = runExample11(degree,plotEnergy,plotBalancing,balancingDegree,
-%                               numGTermsModel, numGTermsApprox, exportPlotData, kawanoModel)
-%
-%   runExample11() runs the default case of a quadratic model from [1] which
-%                 is based on a model from [2].
+%   Usage: v = approxPastEnergy(f,g,h,eta,d,verbose)
 %
 %   Inputs:
-%       degree          is the degree of energy function approximations
-%       exportPlotData   Boolean variable to determine if plots/data are exported
+%       f,g,h   - cell arrays containing the polynomial coefficients
+%                 for the drift, input, and output.
+%                   • f must contain at least linear and quadratic coefficients
+%                   • g must contain at least a linear input (B matrix)
+%                   • h must contain at least a linear input (C matrix)
+%       eta     - η=1-1/γ^2, where γ is the H∞ gain parameter. For open-loop
+%                 balancing, use eta=0. For closed-loop (HJB) balancing, use
+%                 eta=1. Any other value between -1 and ∞ corresponds to
+%                 H∞ balancing.
+%       degree  - desired degree of the computed energy function. A degree d
+%                 energy function uses information from f,g,h up-to degree d-1.
+%                 The default choice of d is lf+1, where lf is the degree of
+%                 the drift.
+%       verbose - optional argument to print runtime information
 %
+%   Output:
+%       v       - cell array containing the polynomial energy function coefficients
 %
-%   Outputs:
-%       v,w              are coefficients of the past and future energy
-%                        function approximations, respectively.
+%   Background: Computes a degree d polynomial approximation to the past energy function
 %
-%   The value of eta is set below.
+%          E^-(x) = 1/2 ( v{2}'*(x⊗x) + ... + v{d}'*(...⊗x) )
 %
-%   References: [1]
+%   for the polynomial control-affine system
 %
-%   Part of the NLbalancing repository.
-%% Process inputs
-if nargin < 4
-    if nargin < 3
-        if nargin < 2
-            if nargin < 1
-                exportPlotData = false;
-            end
-            nFterms = 9;
-        end
-        degree = 8;
+%    \dot{x} = Ax + F2*(x⊗x) + F3*(x⊗x⊗x) + ...
+%              + Bu + G1*(x⊗u) + G2*(x⊗x⊗u) + ...
+%          y = Cx + H2*(x⊗x) + H3*(x⊗x⊗x) + ...
+%
+%   where eta = η=1-1/γ^2, where γ is the H∞ gain parameter. v{2} = vec(V2) = V2(:)
+%   solves the Algebraic Riccati Equation
+%
+%    A'*V2 + V2*A + V2*B*B'*V2 - eta*C'*C = 0.
+%
+%   and the remaining v{i} solve linear systems arising from the Past H∞
+%   Hamilton-Jacobi-Bellman Partial Differential Equation.
+%
+%   Details are in Section III.B of reference [1] or III.A of reference [2].
+%
+%   Requires the following functions from the KroneckerTools repository
+%      KroneckerSumSolver
+%      kronMonomialSymmetrize
+%      LyapProduct
+%
+%   Authors: Jeff Borggaard, Virginia Tech
+%            Nick Corbin, UCSD
+%
+%   License: MIT
+%
+%   Reference: [1] B. Kramer, S. Gugercin, J. Borggaard, and L. Balicki, “Nonlinear
+%               balanced truncation: Part 1—computing energy functions,” arXiv,
+%               Dec. 2022. doi: 10.48550/ARXIV.2209.07645
+%              [2] N. A. Corbin and B. Kramer, “Scalable computation of 𝓗_∞
+%               energy functions for polynomial control-affine systems,” 2023.
+%
+%             See Algorithm 1 in [1].
+%
+%  Part of the NLbalancing repository.
+%%
+
+if (nargin < 6)
+    verbose = false;
+    if (nargin < 5)
+        degree = length(f{1});
     end
-    % Compute energy functions
-    eta = 1; % values should be between -\infty and 1.
-    % eta=1 is HJB/closed-loop balancing, 0 is open loop.
 end
 
-if nFterms == 1
-    nFterms = 2; % Note F2 is zero, this is just to be able to compute a controller and ignore the error if F2 doesn't exist
+% Print what type of energy function is being computed
+if eta == 0
+    message = sprintf('Computing open-loop balancing controllability energy function (η=%g ↔ γ=%g)', eta, 1 / sqrt(1 - eta));
+    q = 0;
+elseif eta == 1
+    message = sprintf('Computing closed-loop balancing past energy function (η=%g ↔ γ=%g)', eta, 1 / sqrt(1 - eta));
+    q = cellfun(@(x) x * (-1), h2q(h), 'un', 0);
+else
+    message = sprintf('Computing 𝓗∞ balancing past energy function (η=%g ↔ γ=%g)', eta, 1 / sqrt(1 - eta));
+    q = cellfun(@(x) x * (-eta), h2q(h), 'un', 0);
+end
+if verbose
+    disp(message)
 end
 
-%% Get model and compute energy functions
-scale = .1767; scaling = 1 / sqrt(scale); % For plot and initial condition scaling, hardcoded
-
-m = 1; L = 10; gravity = 9.81;
-[f, g, h] = getSystem11(nFterms, m, L);
-
-%% Closed loop phase portraits
-% Define the range of initial conditions
-tspan = [0 7];
-
-x0 = [-2];
-y0 = [-4];
-
-[w] = pqr(f, g, h, 1 / eta, degree, true);
-
-% Create a figure and set up subplots
-figure; hold on;
-
-% Loop over the initial conditions and solve the ODE
-for i = 1:length(y0)
-    [t, y] = ode45(@(t, y) [y(2); 3 * gravity / (2 * L) * sin(y(1))], tspan, [x0(i); y0(i)]);
-    y(:, 1) = mod(y(:, 1) + pi, 2 * pi) - pi;
-    [X, Y] = parseTrajectories(y);
-    plot(X, Y, 'k', 'LineWidth', 2);
-    [t, y] = ode45(@(t, y) kronPolyEval(f, y), tspan, [x0(i); y0(i)]);
-    plot(y(:, 1), y(:, 2), 'r');
-    %     y(:,1) = mod(y(:,1) + pi, 2*pi) - pi;
-    %     [X, Y] = parseTrajectories(y);
-    plot(X, Y, 'r-.', 'LineWidth', 2);
-    [t, y] = ode45(@(t, y) kronPolyEvalMod(f, y), tspan, [x0(i); y0(i)]); y(:, 1) = mod(y(:, 1) + pi, 2 * pi) - pi;
-    [X, Y] = parseTrajectories(y);
-    plot(X, Y, 'g--', 'LineWidth', 2);
-end
-
-% Set up the plot
-xlim([-pi pi]); ylim([-2 * scaling 2 * scaling]); xlabel('x'); title('closed loop pendulum');
-
-end
-
-function FofY = kronPolyEvalMod(f, y)
-y(1) = mod(y(1) + pi, 2 * pi) - pi;
-FofY = kronPolyEval(f, y);
-end
-
-function [X, Y] = parseTrajectories(y)
-
-% Find the indices where the trajectory crosses the boundary
-boundary_crossings = find(abs(diff(y(:, 1))) > pi);
-
-max_length = length(y(:, 1));
-X = NaN(max_length, 1); Y = X;
-
-% Initialize plot variables
-start_idx = 1;
-
-% Loop through each segment
-for i = 1:length(boundary_crossings) + 1
-    if i <= length(boundary_crossings)
-        end_idx = boundary_crossings(i);
-    else
-        end_idx = size(y, 1);
-    end
-
-    % Plot the current segment
-    %     plot(y(start_idx:end_idx, 1), y(start_idx:end_idx, 2), 'b-'); % Adjust line style as needed
-
-    % Pad the shorter vector with NaNs to match the maximum length
-    X = [X, [y(start_idx:end_idx, 1); NaN(max_length - length(y(start_idx:end_idx, 1)), 1)]];
-    Y = [Y, [y(start_idx:end_idx, 2); NaN(max_length - length(y(start_idx:end_idx, 2)), 1)]];
-
-    % Update the starting index for the next segment
-    start_idx = end_idx + 1;
-end
+% Rewritten by N Corbin to use ppr()
+[v] = ppr(f, g, q, -1, degree, verbose);
 
 end

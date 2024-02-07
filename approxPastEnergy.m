@@ -85,7 +85,7 @@ if verbose
     disp(message)
 end
 
-% Rewritten by N Corbin to use pqr()
-[v] = pqr(f, g, q, -1, degree, verbose);
+% Rewritten by N Corbin to use ppr()
+[v] = ppr(f, g, q, -1, degree, verbose);
 
 end
