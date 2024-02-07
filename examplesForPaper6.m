@@ -47,7 +47,7 @@ addpath('examples')
 addpath('utils')
 
 %% Example 12: Fujimoto 2D cooked up model for NL Balancing
-% runExample12();
+runExample12();
 
 %% Example 17: Coupled nonlinear mass-spring-damper model
 % runExample17(32); % change model size n here
