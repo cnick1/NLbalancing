@@ -84,6 +84,6 @@ if verbose
 end
 
 % Rewritten by N Corbin to use ppr()
-[w] = ppr(f, g, h2q(h), eta, degree, verbose);
+[w] = ppr(f, g, h2q(h), 1/eta, degree, verbose);
 
 end
