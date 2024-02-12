@@ -1,7 +1,7 @@
-function v = approxPastEnergy(f, g, h, eta, degree, verbose)
-%approxPastEnergy  Compute the past energy function for a polynomial control-affine dynamical system.
+function w = approxFutureEnergy(f, g, h, eta, degree, verbose)
+%approxFutureEnergy  Compute the future energy function for a polynomial control-affine dynamical system.
 %
-%   Usage: v = approxPastEnergy(f,g,h,eta,d,verbose)
+%   Usage: w = approxFutureEnergy(f,g,h,eta,d,verbose)
 %
 %   Inputs:
 %       f,g,h   - cell arrays containing the polynomial coefficients
@@ -20,11 +20,11 @@ function v = approxPastEnergy(f, g, h, eta, degree, verbose)
 %       verbose - optional argument to print runtime information
 %
 %   Output:
-%       v       - cell array containing the polynomial energy function coefficients
+%       w       - cell array containing the polynomial energy function coefficients
 %
-%   Background: Computes a degree d polynomial approximation to the past energy function
+%   Background: Computes a degree d polynomial approximation to the energy function
 %
-%          E^-(x) = 1/2 ( v{2}'*(x⊗x) + ... + v{d}'*(...⊗x) )
+%          E^+(x) = 1/2 ( w{2}'*(x⊗x) + ... + w{d}'*(...⊗x) )
 %
 %   for the polynomial control-affine system
 %
@@ -32,20 +32,21 @@ function v = approxPastEnergy(f, g, h, eta, degree, verbose)
 %              + Bu + G1*(x⊗u) + G2*(x⊗x⊗u) + ...
 %          y = Cx + H2*(x⊗x) + H3*(x⊗x⊗x) + ...
 %
-%   where eta = η=1-1/γ^2, where γ is the H∞ gain parameter. v{2} = vec(V2) = V2(:)
-%   solves the Algebraic Riccati Equation
+%   where eta = η=1-1/γ^2, where γ is the H∞ gain parameter. w{2} = vec(W2) = W2(:)
+%   solves the H∞ Algebraic Riccati Equation
 %
-%    A'*V2 + V2*A + V2*B*B'*V2 - eta*C'*C = 0.
+%    A'*W2 + W2*A - eta*W2*B*B'*W2 + C'*C = 0,
 %
-%   and the remaining v{i} solve linear systems arising from the Past H∞
+%   and the remaining w{i} solve linear systems arising from the Future H∞
 %   Hamilton-Jacobi-Bellman Partial Differential Equation.
 %
 %   Details are in Section III.B of reference [1] or III.A of reference [2].
 %
-%   Requires the following functions from the KroneckerTools repository
+%   Requires the following functions from the KroneckerTools repository:
 %      KroneckerSumSolver
 %      kronMonomialSymmetrize
 %      LyapProduct
+%      h2q
 %
 %   Authors: Jeff Borggaard, Virginia Tech
 %            Nick Corbin, UCSD
@@ -72,20 +73,17 @@ end
 
 % Print what type of energy function is being computed
 if eta == 0
-    message = sprintf('Computing open-loop balancing controllability energy function (η=%g ↔ γ=%g)', eta, 1 / sqrt(1 - eta));
-    q = 0;
+    message = sprintf('Computing open-loop balancing observability energy function (η=%g ↔ γ=%g)', eta, 1 / sqrt(1 - eta));
 elseif eta == 1
-    message = sprintf('Computing closed-loop balancing past energy function (η=%g ↔ γ=%g)', eta, 1 / sqrt(1 - eta));
-    q = cellfun(@(x) x * (-1), h2q(h), 'un', 0);
+    message = sprintf('Computing closed-loop balancing future energy function (η=%g ↔ γ=%g)', eta, 1 / sqrt(1 - eta));
 else
-    message = sprintf('Computing 𝓗∞ balancing past energy function (η=%g ↔ γ=%g)', eta, 1 / sqrt(1 - eta));
-    q = cellfun(@(x) x * (-eta), h2q(h), 'un', 0);
+    message = sprintf('Computing 𝓗∞ balancing future energy function (η=%g ↔ γ=%g)', eta, 1 / sqrt(1 - eta));
 end
 if verbose
     disp(message)
 end
 
 % Rewritten by N Corbin to use ppr()
-[v] = ppr(f, g, q, -1, degree, verbose);
+[w] = ppr(f, g, h2q(h), eta, degree, verbose);
 
 end

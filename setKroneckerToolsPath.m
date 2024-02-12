@@ -21,9 +21,9 @@ catch
 end
 
 try
-    addpath('../PQR')
-    addpath('../PQR/utils')
+    addpath('../PPR')
+    addpath('../PPR/utils')
 catch
-    disp("Run 'git clone https://github.com/cnick1/PQR' in the parent directory")
+    disp("Run 'git clone https://github.com/cnick1/PPR' in the parent directory")
     error("tensor_toolbox repo not found, please clone it.")
 end
