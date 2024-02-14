@@ -1,91 +1,300 @@
-function v = approxPastEnergy(f, g, h, eta, degree, verbose)
-%approxPastEnergy  Compute the past energy function for a polynomial control-affine dynamical system.
+function [v, w] = runExample11(exportPlotData, nFterms, degree, eta, varargin)
+%runExample11 Runs the 2D inverted pendulum example to plot energy functions as contour plots
 %
-%   Usage: v = approxPastEnergy(f,g,h,eta,d,verbose)
+%   Usage:  [v,w] = runExample11(degree,plotEnergy,plotBalancing,balancingDegree,
+%                               numGTermsModel, numGTermsApprox, exportPlotData, kawanoModel)
+%
+%   runExample11() runs the default case of a quadratic model from [1] which
+%                 is based on a model from [2].
 %
 %   Inputs:
-%       f,g,h   - cell arrays containing the polynomial coefficients
-%                 for the drift, input, and output.
-%                   • f must contain at least linear and quadratic coefficients
-%                   • g must contain at least a linear input (B matrix)
-%                   • h must contain at least a linear input (C matrix)
-%       eta     - η=1-1/γ^2, where γ is the H∞ gain parameter. For open-loop
-%                 balancing, use eta=0. For closed-loop (HJB) balancing, use
-%                 eta=1. Any other value between -1 and ∞ corresponds to
-%                 H∞ balancing.
-%       degree  - desired degree of the computed energy function. A degree d
-%                 energy function uses information from f,g,h up-to degree d-1.
-%                 The default choice of d is lf+1, where lf is the degree of
-%                 the drift.
-%       verbose - optional argument to print runtime information
+%       degree          is the degree of energy function approximations
+%       exportPlotData   Boolean variable to determine if plots/data are exported
 %
-%   Output:
-%       v       - cell array containing the polynomial energy function coefficients
 %
-%   Background: Computes a degree d polynomial approximation to the past energy function
+%   Outputs:
+%       v,w              are coefficients of the past and future energy
+%                        function approximations, respectively.
 %
-%          E^-(x) = 1/2 ( v{2}'*(x⊗x) + ... + v{d}'*(...⊗x) )
+%   The value of eta is set below.
 %
-%   for the polynomial control-affine system
+%   References: [1]
 %
-%    \dot{x} = Ax + F2*(x⊗x) + F3*(x⊗x⊗x) + ...
-%              + Bu + G1*(x⊗u) + G2*(x⊗x⊗u) + ...
-%          y = Cx + H2*(x⊗x) + H3*(x⊗x⊗x) + ...
-%
-%   where eta = η=1-1/γ^2, where γ is the H∞ gain parameter. v{2} = vec(V2) = V2(:)
-%   solves the Algebraic Riccati Equation
-%
-%    A'*V2 + V2*A + V2*B*B'*V2 - eta*C'*C = 0.
-%
-%   and the remaining v{i} solve linear systems arising from the Past H∞
-%   Hamilton-Jacobi-Bellman Partial Differential Equation.
-%
-%   Details are in Section III.B of reference [1] or III.A of reference [2].
-%
-%   Requires the following functions from the KroneckerTools repository
-%      KroneckerSumSolver
-%      kronMonomialSymmetrize
-%      LyapProduct
-%
-%   Authors: Jeff Borggaard, Virginia Tech
-%            Nick Corbin, UCSD
-%
-%   License: MIT
-%
-%   Reference: [1] B. Kramer, S. Gugercin, J. Borggaard, and L. Balicki, “Nonlinear
-%               balanced truncation: Part 1—computing energy functions,” arXiv,
-%               Dec. 2022. doi: 10.48550/ARXIV.2209.07645
-%              [2] N. A. Corbin and B. Kramer, “Scalable computation of 𝓗_∞
-%               energy functions for polynomial control-affine systems,” 2023.
-%
-%             See Algorithm 1 in [1].
-%
-%  Part of the NLbalancing repository.
-%%
-
-if (nargin < 6)
-    verbose = false;
-    if (nargin < 5)
-        degree = length(f{1});
+%   Part of the NLbalancing repository.
+%% Process inputs
+if nargin < 4
+    if nargin < 3
+        if nargin < 2
+            if nargin < 1
+                exportPlotData = false;
+            end
+            nFterms = 5;
+        end
+        degree = 8;
     end
+    % Compute energy functions
+    eta = 1; % values should be between -\infty and 1.
+    % eta=1 is HJB/closed-loop balancing, 0 is open loop.
 end
 
-% Print what type of energy function is being computed
-if eta == 0
-    message = sprintf('Computing open-loop balancing controllability energy function (η=%g ↔ γ=%g)', eta, 1 / sqrt(1 - eta));
-    q = 0;
-elseif eta == 1
-    message = sprintf('Computing closed-loop balancing past energy function (η=%g ↔ γ=%g)', eta, 1 / sqrt(1 - eta));
-    q = cellfun(@(x) x * (-1), h2q(h), 'un', 0);
-else
-    message = sprintf('Computing 𝓗∞ balancing past energy function (η=%g ↔ γ=%g)', eta, 1 / sqrt(1 - eta));
-    q = cellfun(@(x) x * (-eta), h2q(h), 'un', 0);
-end
-if verbose
-    disp(message)
+if nFterms == 1
+    nFterms = 2; % Note F2 is zero, this is just to be able to compute a controller and ignore the error if F2 doesn't exist
 end
 
-% Rewritten by N Corbin to use ppr()
-[v] = ppr(f, g, q, -1, degree, verbose);
+%% Get model and compute energy functions
+scale = .1767; scaling = 1 / sqrt(scale); % For plot and initial condition scaling, hardcoded
 
+m = 1; L = 10; %56.5962*scale;
+gravity = 9.81;
+[f, g, h] = getSystem11(nFterms, m, L);
+fprintf('Running Example 11\n')
+
+%% Open loop phase portraits
+% Define the range of initial conditions
+y0 = [-2, -1.7, -1.5, -1.3, -1.1, - .9, - .8, - .6, - .4, - .2, - .05, - .01, 0., 0.01, 0.05, 0.2, 0.4, 0.6, 0.8, .95, 1.1, 1.3, 1.5, 1.7, 2] * scaling;
+x0 = [zeros(1, 11) + pi, zeros(1, 3), zeros(1, 11) - pi];
+
+y0 = [y0, sqrt(6 * gravity / L)];
+x0 = [x0, -pi];
+
+tspan = [0 7];
+
+% Create a figure and set up subplots
+figure('Position', [600 60 860 240]); subplot(1, 3, 1); hold on;
+
+xsNL = {}; ysNL = {};
+% Loop over the initial conditions and solve the ODE
+for i = 1:length(y0) - 1
+    [t, y] = ode45(@(t, y) [y(2); 3 * gravity / (2 * L) * sin(y(1))], tspan, [x0(i); y0(i)]);
+    plot(y(:, 1), y(:, 2), 'r'); xsNL{end + 1} = y(:, 1); ysNL{end + 1} = y(:, 2);
+    [t, y] = ode45(@(t, y) [y(2); 3 * gravity / (2 * L) * sin(y(1))], -tspan, [x0(i); y0(i)]);
+    plot(y(:, 1), y(:, 2), 'r'); xsNL{end + 1} = y(:, 1); ysNL{end + 1} = y(:, 2);
+end
+i = length(y0);
+[t, y] = ode23(@(t, y) [y(2); 3 * gravity / (2 * L) * sin(y(1))], tspan, [x0(i); y0(i)]);
+plot(y(:, 1), y(:, 2), 'b'); xsNL{end + 1} = y(:, 1); ysNL{end + 1} = y(:, 2);
+[t, y] = ode23(@(t, y) [y(2); 3 * gravity / (2 * L) * sin(y(1))], -tspan, [x0(i); y0(i)]);
+plot(y(:, 1), y(:, 2), 'b'); xsNL{end + 1} = y(:, 1); ysNL{end + 1} = y(:, 2);
+
+% Set up the plot
+xlim([-pi pi]); ylim([-2 * scaling 2 * scaling]); xlabel('x'); title('pendulum');
+
+% Set up the second subplot
+subplot(1, 3, 2); hold on;
+
+xsPoly = {}; ysPoly = {};
+% Loop over the initial conditions and solve the ODE
+for i = 1:length(y0) - 1
+    [t, y] = ode45(@(t, x) kronPolyEval(f, x), tspan, [x0(i); y0(i)]);
+    plot(y(:, 1), y(:, 2), 'r'); xsPoly{end + 1} = y(:, 1); ysPoly{end + 1} = y(:, 2);
+    [t, y] = ode45(@(t, x) kronPolyEval(f, x), -tspan, [x0(i); y0(i)]);
+    plot(y(:, 1), y(:, 2), 'r'); xsPoly{end + 1} = y(:, 1); ysPoly{end + 1} = y(:, 2);
+end
+
+i = length(y0);
+[t, y] = ode45(@(t, x) kronPolyEval(f, x), tspan, [x0(i); y0(i)]);
+plot(y(:, 1), y(:, 2), 'b'); xsPoly{end + 1} = y(:, 1); ysPoly{end + 1} = y(:, 2);
+[t, y] = ode45(@(t, x) kronPolyEval(f, x), -tspan, [x0(i); y0(i)]);
+plot(y(:, 1), y(:, 2), 'b'); xsPoly{end + 1} = y(:, 1); ysPoly{end + 1} = y(:, 2);
+
+% Set up the plot
+xlim([-pi pi]); ylim([-2 * scaling 2 * scaling]); xlabel('x'); title('polynomial approx.');
+
+if exportPlotData
+    xs = xsNL; ys = ysNL;
+    fprintf('Writing data to plots/example11_openLoopPhasePortraits_nonlinear.dat \n')
+    fileID = fopen('plots/example11_openLoopPhasePortraits_nonlinear.dat', 'w');
+    fprintf(fileID, '# Figure X-a Data\n');
+    fprintf(fileID, '# pendulum open loop phase portrait trajectory data\n');
+    
+    % Calculate the maximum number of points in any line
+    max_points = max(cellfun(@numel, xs));
+    
+    % Determine the number of lines (sets of points)
+    num_lines = length(xs);
+    
+    % Write the header
+    fprintf(fileID, '       x01     &      y01      & ');
+    
+    % Write the rest of the header
+    for i = 2:num_lines - 1
+        fprintf(fileID, '      x%02d     &      y%02d      & ', i, i);
+    end
+    fprintf(fileID, '      x%02d     &      y%02d      \n ', i + 1, i + 1);
+    
+    % Iterate over the number of points
+    for j = 1:max_points
+        % Iterate over each line
+        for i = 1:num_lines
+            x_line = xs{i};
+            y_line = ys{i};
+            if j <= numel(x_line) && abs(x_line(j)) < 4.5 % If this line has j or more points
+                fprintf(fileID, '%+1.6e & %+1.6e', x_line(j), y_line(j));
+                % Add '&' delimiter unless it's the last line
+                if i < num_lines
+                    fprintf(fileID, ' & ');
+                else
+                    fprintf(fileID, ' \n ');
+                end
+            else % this line doesn't have a jth point
+                fprintf(fileID, '              &              ');
+                % Add '&' delimiter unless it's the last line
+                if i < num_lines
+                    fprintf(fileID, ' & ');
+                else
+                    fprintf(fileID, ' \n ');
+                end
+            end
+        end
+    end
+    % Close the data file
+    fclose(fileID);
+    
+    xs = xsPoly; ys = ysPoly;
+    fprintf('Writing data to plots/example11_openLoopPhasePortraits_polynomial%i.dat \n', nFterms)
+    fileID = fopen(sprintf('plots/example11_openLoopPhasePortraits_polynomial%i.dat', nFterms), 'w');
+    fprintf(fileID, '# Figure X-b Data\n');
+    fprintf(fileID, '# pendulum open loop phase portrait trajectory data, degree %i approximation\n', nFterms);
+    
+    % Calculate the maximum number of points in any line
+    max_points = max(cellfun(@numel, xs));
+    
+    % Determine the number of lines (sets of points)
+    num_lines = length(xs);
+    
+    % Write the header
+    fprintf(fileID, '       x01     &      y01      & ');
+    
+    % Write the rest of the header
+    for i = 2:num_lines - 1
+        fprintf(fileID, '      x%02d     &      y%02d      & ', i, i);
+    end
+    fprintf(fileID, '      x%02d     &      y%02d      \n ', i + 1, i + 1);
+    
+    % Iterate over the number of points
+    for j = 1:max_points
+        % Iterate over each line
+        for i = 1:num_lines
+            x_line = xs{i};
+            y_line = ys{i};
+            if j <= numel(x_line) && abs(x_line(j)) < 4.5 % If this line has j or more points
+                fprintf(fileID, '%+1.6e & %+1.6e', x_line(j), y_line(j));
+                % Add '&' delimiter unless it's the last line
+                if i < num_lines
+                    fprintf(fileID, ' & ');
+                else
+                    fprintf(fileID, ' \n ');
+                end
+            else % this line doesn't have a jth point
+                fprintf(fileID, '              &              ');
+                % Add '&' delimiter unless it's the last line
+                if i < num_lines
+                    fprintf(fileID, ' & ');
+                else
+                    fprintf(fileID, ' \n ');
+                end
+            end
+        end
+    end
+    % Close the data file
+    fclose(fileID);
+end
+
+%% Closed loop phase portraits
+% Define the range of initial conditions
+% x0 = [-2, -1.7, -1.5, -1.3, -1.1, - .9, - .8, - .6, - .4, - .2, - .05, - .01, 0., 0.01, 0.05, 0.2, 0.4, 0.6, 0.8, .95, 1.1, 1.3, 1.5, 1.7, 2] * scaling;
+% y0 = [zeros(1, 11), zeros(1, 3), zeros(1, 11)];
+
+%  Compute the polynomial approximations to the past future energy function
+% [v] = approxPastEnergy(f, N, g, h, eta, degree, true);
+% [w] = ppr(f, g, h2q(h), eta, degree, true);
+[w] = ppr(f, g, 0, eta, degree, true);
+
+% Create a figure and set up subplots
+subplot(1, 3, 3); hold on;
+
+options = odeset('Events', @myEvent);
+
+xsNL = {}; ysNL = {};
+% Loop over the initial conditions and solve the ODE
+for i = 1:length(y0)
+    [t, y] = ode45(@(t, y) [y(2); 3 * gravity / (2 * L) * sin(y(1))] - eta * g{1} * g{1}.' * (0.5 * kronPolyDerivEval(w, y).'), tspan, [x0(i); y0(i)], options);
+    plot(y(:, 1), y(:, 2), 'r'); xsNL{end + 1} = y(:, 1); ysNL{end + 1} = y(:, 2);
+    [t, y] = ode45(@(t, y) [y(2); 3 * gravity / (2 * L) * sin(y(1))] - eta * g{1} * g{1}.' * (0.5 * kronPolyDerivEval(w, y).'), -tspan, [x0(i); y0(i)], options);
+    plot(y(:, 1), y(:, 2), 'r'); xsNL{end + 1} = y(:, 1); ysNL{end + 1} = y(:, 2);
+end
+
+i = length(y0);
+[t, y] = ode45(@(t, y) [y(2); 3 * gravity / (2 * L) * sin(y(1))] - eta * g{1} * g{1}.' * (0.5 * kronPolyDerivEval(w, y).'), tspan, [x0(i); y0(i)], options);
+plot(y(:, 1), y(:, 2), 'b'); xsNL{end + 1} = y(:, 1); ysNL{end + 1} = y(:, 2);
+[t, y] = ode45(@(t, y) [y(2); 3 * gravity / (2 * L) * sin(y(1))] - eta * g{1} * g{1}.' * (0.5 * kronPolyDerivEval(w, y).'), -tspan, [x0(i); y0(i)], options);
+plot(y(:, 1), y(:, 2), 'b'); xsNL{end + 1} = y(:, 1); ysNL{end + 1} = y(:, 2);
+
+% Set up the plot
+xlim([-pi pi]); ylim([-2 * scaling 2 * scaling]); xlabel('x'); title('closed loop pendulum');
+
+if exportPlotData
+    xs = xsNL; ys = ysNL;
+    fprintf('Writing data to plots/example11_closedLoopPhasePortraits_d%i_polynomial%i.dat \n', degree, nFterms)
+    fileID = fopen(sprintf('plots/example11_closedLoopPhasePortraits_d%i_polynomial%i.dat', degree, nFterms), 'w');
+    fprintf(fileID, '# Figure X-a Data\n');
+    fprintf(fileID, '# pendulum closed loop phase portrait trajectory data\n');
+    
+    % Calculate the maximum number of points in any line
+    max_points = max(cellfun(@numel, xs));
+    
+    % Determine the number of lines (sets of points)
+    num_lines = length(xs);
+    
+    % Write the header
+    fprintf(fileID, '       x01     &      y01      & ');
+    
+    % Write the rest of the header
+    for i = 2:num_lines - 1
+        fprintf(fileID, '      x%02d     &      y%02d      & ', i, i);
+    end
+    fprintf(fileID, '      x%02d     &      y%02d      \n ', i + 1, i + 1);
+    
+    % Iterate over the number of points
+    for j = 1:max_points
+        if exist('count', 'var') == 1 && count == 50
+            break
+        else
+            count = 0;
+        end
+        % Iterate over each line
+        for i = 1:num_lines
+            x_line = xs{i};
+            y_line = ys{i};
+            if j <= numel(x_line) && abs(x_line(j)) < 4.5 % If this line has j or more points
+                fprintf(fileID, '%+1.6e & %+1.6e', x_line(j), y_line(j));
+                % Add '&' delimiter unless it's the last line
+                if i < num_lines
+                    fprintf(fileID, ' & ');
+                else
+                    fprintf(fileID, ' \n ');
+                end
+            else % this line doesn't have a jth point
+                count = count + 1;
+                fprintf(fileID, '              &              ');
+                % Add '&' delimiter unless it's the last line
+                if i < num_lines
+                    fprintf(fileID, ' & ');
+                else
+                    fprintf(fileID, ' \n ');
+                end
+            end
+        end
+    end
+    % Close the data file
+    fclose(fileID);
+    
+end
+
+end
+
+function [value, isterminal, direction] = myEvent(T, Y)
+value = max(abs(Y)) > 15; % check if any element of Y is greater than 1e6
+isterminal = 1; % stop the integration if value is true
+direction = 0; % direction doesn't matter
 end

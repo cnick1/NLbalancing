@@ -1,91 +1,151 @@
-function v = approxPastEnergy(f, g, h, eta, degree, verbose)
-%approxPastEnergy  Compute the past energy function for a polynomial control-affine dynamical system.
+function [v, w] = runExample11_plotEnergyFunctions(exportPlotData, nFterms, degree, eta, varargin)
+%runExample11_plotEnergyFunctions Runs the 2D example to plot energy functions as contour plots
 %
-%   Usage: v = approxPastEnergy(f,g,h,eta,d,verbose)
+%   Usage:  [v,w] = runExample11_plotEnergyFunctions(degree,plotEnergy,plotBalancing,balancingDegree,
+%                               numGTermsModel, numGTermsApprox, exportPlotData, kawanoModel)
+%
+%   runExample11_plotEnergyFunctions() runs the default case of a quadratic model from [1] which
+%                 is based on a model from [2].
 %
 %   Inputs:
-%       f,g,h   - cell arrays containing the polynomial coefficients
-%                 for the drift, input, and output.
-%                   • f must contain at least linear and quadratic coefficients
-%                   • g must contain at least a linear input (B matrix)
-%                   • h must contain at least a linear input (C matrix)
-%       eta     - η=1-1/γ^2, where γ is the H∞ gain parameter. For open-loop
-%                 balancing, use eta=0. For closed-loop (HJB) balancing, use
-%                 eta=1. Any other value between -1 and ∞ corresponds to
-%                 H∞ balancing.
-%       degree  - desired degree of the computed energy function. A degree d
-%                 energy function uses information from f,g,h up-to degree d-1.
-%                 The default choice of d is lf+1, where lf is the degree of
-%                 the drift.
-%       verbose - optional argument to print runtime information
+%       degree          is the degree of energy function approximations
+%       exportPlotData   Boolean variable to determine if plots/data are exported
 %
-%   Output:
-%       v       - cell array containing the polynomial energy function coefficients
 %
-%   Background: Computes a degree d polynomial approximation to the past energy function
+%   Outputs:
+%       v,w              are coefficients of the past and future energy
+%                        function approximations, respectively.
 %
-%          E^-(x) = 1/2 ( v{2}'*(x⊗x) + ... + v{d}'*(...⊗x) )
+%   The value of eta is set below.
 %
-%   for the polynomial control-affine system
+%   References: [1]
 %
-%    \dot{x} = Ax + F2*(x⊗x) + F3*(x⊗x⊗x) + ...
-%              + Bu + G1*(x⊗u) + G2*(x⊗x⊗u) + ...
-%          y = Cx + H2*(x⊗x) + H3*(x⊗x⊗x) + ...
-%
-%   where eta = η=1-1/γ^2, where γ is the H∞ gain parameter. v{2} = vec(V2) = V2(:)
-%   solves the Algebraic Riccati Equation
-%
-%    A'*V2 + V2*A + V2*B*B'*V2 - eta*C'*C = 0.
-%
-%   and the remaining v{i} solve linear systems arising from the Past H∞
-%   Hamilton-Jacobi-Bellman Partial Differential Equation.
-%
-%   Details are in Section III.B of reference [1] or III.A of reference [2].
-%
-%   Requires the following functions from the KroneckerTools repository
-%      KroneckerSumSolver
-%      kronMonomialSymmetrize
-%      LyapProduct
-%
-%   Authors: Jeff Borggaard, Virginia Tech
-%            Nick Corbin, UCSD
-%
-%   License: MIT
-%
-%   Reference: [1] B. Kramer, S. Gugercin, J. Borggaard, and L. Balicki, “Nonlinear
-%               balanced truncation: Part 1—computing energy functions,” arXiv,
-%               Dec. 2022. doi: 10.48550/ARXIV.2209.07645
-%              [2] N. A. Corbin and B. Kramer, “Scalable computation of 𝓗_∞
-%               energy functions for polynomial control-affine systems,” 2023.
-%
-%             See Algorithm 1 in [1].
-%
-%  Part of the NLbalancing repository.
-%%
+%   Part of the NLbalancing repository.
+%% Process inputs
+if nargin < 4
+    if nargin < 3
+        if nargin < 2
+            if nargin < 1
+                exportPlotData = false;
+            end
+            nFterms = 1;
+        end
+        degree = nFterms + 1;
+    end
+    % Compute energy functions
+    eta = 1; % values should be between -\infty and 1.
+    % eta=1 is HJB/closed-loop balancing, 0 is open loop.
+end
 
-if (nargin < 6)
-    verbose = false;
-    if (nargin < 5)
-        degree = length(f{1});
+if nFterms == 1
+    nFterms = 2; % Note F2 is zero; this is just to be able to compute a controller and ignore the error if F2 doesn't exist
+end
+
+%% Get model and compute energy functions
+scale = .1767; scaling = 1 / sqrt(scale); % For plot and initial condition scaling, hardcoded
+
+m = 1; L = 10; %56.5962*scale;
+gravity = 9.81;
+[f, g, h] = getSystem11(nFterms, m, L);
+fprintf('Running Example 11\n')
+
+%  Compute the polynomial approximations to the past future energy function
+% [v] = approxPastEnergy(f, N, g, h, eta, degree, true);
+[w] = ppr(f, g, h2q(h), eta, degree, true);
+
+nX = 301; nY = nX;
+xLim = pi; yLim = 5;
+xPlot = linspace(-xLim, xLim, nX);
+yPlot = linspace(-yLim, yLim, nY);
+[X, Y] = meshgrid(xPlot, yPlot);
+
+eFuture = zeros(nY, nX);
+eFuture = zeros(nY, nX);
+
+for i = 1:nY
+    for j = 1:nX
+        x = [X(i, j); Y(i, j)];
+        eFuture(i, j) = 0.5 * kronPolyEval(w, x, degree);
+        wRES(i, j) = computeResidualFutureHJB_2D_example11(gravity, L, g, h, eta, w, degree, x);
+        if eFuture(i, j) < 0
+            eFuture(i, j) = NaN;
+        end
     end
 end
 
-% Print what type of energy function is being computed
-if eta == 0
-    message = sprintf('Computing open-loop balancing controllability energy function (η=%g ↔ γ=%g)', eta, 1 / sqrt(1 - eta));
-    q = 0;
-elseif eta == 1
-    message = sprintf('Computing closed-loop balancing past energy function (η=%g ↔ γ=%g)', eta, 1 / sqrt(1 - eta));
-    q = cellfun(@(x) x * (-1), h2q(h), 'un', 0);
-else
-    message = sprintf('Computing 𝓗∞ balancing past energy function (η=%g ↔ γ=%g)', eta, 1 / sqrt(1 - eta));
-    q = cellfun(@(x) x * (-eta), h2q(h), 'un', 0);
-end
-if verbose
-    disp(message)
+fig1 = figure;
+% ('Position',[600 50 1000 400])
+% subplot(1,2,1)
+contourf(X, Y, eFuture, 16, 'w'); hold on;
+xlabel('$x_1$', 'interpreter', 'latex');
+ylabel('$x_2$', 'interpreter', 'latex');
+set(gca, 'FontSize', 16)
+xticks([-pi, 0, pi])
+xticklabels({'-\pi', '0', '\pi'})
+%     axis equal
+if degree > 2 && nFterms > 2
+    %     caxis([0 1e4])
 end
 
-% Rewritten by N Corbin to use ppr()
-[v] = ppr(f, g, q, -1, degree, verbose);
+%         set(h, 'ylim', [0 1.5])
+load(fullfile('utils', 'YlGnBuRescaled.mat'))
+colormap(flip(YlGnBuRescaled))
+
+if exportPlotData
+    %     fprintf('Exporting matlab2tikz standalone tex file to: \n     plots/example11_futureEnergy_d%i_polynomial%i.tex\n',degree,nFterms)
+    %     matlab2tikz('showInfo', false,'standalone',true,sprintf('plots/example11_futureEnergy_d%i_polynomial%i.tex',degree,nFterms))
+    %     data = [ X(:) Y(:) eFuture(:) ];
+    %     save plots/P.dat data -ASCII
+    caxis([0 4e4])
+    axis off
+    fprintf('Exporting figure to: \n     plots/example11_futureEnergy_d%i_polynomial%i.pdf\n', degree, nFterms)
+    exportgraphics(fig1, sprintf('plots/example11_futureEnergy_d%i_polynomial%i.pdf', degree, nFterms), 'ContentType', 'vector', 'BackgroundColor', 'none');
+end
+colorbar('FontSize', 16, 'TickLabelInterpreter', 'latex', 'XTick', 0:10000:4e4, 'XTickLabel', {'0', '1e4', '2e4', '3e4', '4e4'});
+
+% title('Future Energy Function')
+
+fig2 = figure;
+%     subplot(1,2,2)
+pcolor(X, Y, log10(abs(wRES))); shading interp;
+%     pcolor(X, Y, abs(wRES)); shading interp; colorbar;
+% contourf(X, Y, abs(wRES), 50, 'w'); hold on;
+xlabel('$x_1$', 'interpreter', 'latex');
+ylabel('$x_2$', 'interpreter', 'latex');
+set(gca, 'FontSize', 16)
+xticks([-pi, 0, pi])
+xticklabels({'-\pi', '0', '\pi'})
+load('utils\YlGnBuRescaled.mat')
+colormap(flip(YlGnBuRescaled))
+% caxis([0 1e3])
+caxis([-3 9])
+% XTickLabels = cellstr(num2str(round(log10(XTick(:))), '10^%d'));
+
+if exportPlotData
+    %     fprintf('Exporting matlab2tikz standalone tex file to: \n     plots/example11_futureEnergy-HJB-Error_d%i_polynomial%i.tex\n',degree,nFterms)
+    %     matlab2tikz('showInfo', false,'standalone',true,sprintf('plots/example11_futureEnergy-HJB-Error_d%i_polynomial%i.tex',degree,nFterms))
+    axis off
+    
+    fprintf('Exporting figure to: \n     plots/example11_futureEnergy-HJB-Error_d%i_polynomial%i.pdf\n', degree, nFterms)
+    exportgraphics(fig2, sprintf('plots/example11_futureEnergy-HJB-Error_d%i_polynomial%i.pdf', degree, nFterms), 'ContentType', 'vector', 'BackgroundColor', 'none');
+end
+colorbar('FontSize', 16, 'TickLabelInterpreter', 'latex', 'XTick', -3:3:9, 'XTickLabel', {'1e-3', '1e0', '1e3', '1e6', '1e9'});
+% title('HJB Residual')
+
+end
+
+function [res] = computeResidualFutureHJB_2D_example11(gravity, L, g, h, eta, w, degree, x)
+
+w = w(1:degree);
+
+%         constant B input
+res = (0.5 * kronPolyDerivEval(w, x)) * [x(2); 3 * gravity / (2 * L) * sin(x(1))] ...
+    - eta / 2 * 0.25 * kronPolyDerivEval(w, x) * g{1} * g{1}.' * kronPolyDerivEval(w, x).' ...
+    + 0.5 * kronPolyEval(h, x).' * kronPolyEval(h, x);
+
+%         Polynomial input
+% res = (0.5 * kronPolyDerivEval(w, x)) * kronPolyEval(f, x) ...
+%     - eta / 2 * 0.25 * kronPolyDerivEval(w, x) * (g{1} + kronPolyEval(g(2:end), x)) * (g{1} + kronPolyEval(g(2:end), x)).' * kronPolyDerivEval(w, x).' ...
+%     + 0.5 * kronPolyEval(h, x).' * kronPolyEval(h, x);
 
 end

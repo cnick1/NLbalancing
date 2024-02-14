@@ -1,91 +1,112 @@
-function v = approxPastEnergy(f, g, h, eta, degree, verbose)
-%approxPastEnergy  Compute the past energy function for a polynomial control-affine dynamical system.
+function [] = runExample9()
+%runExample9 Runs the Allen-Cahn example.
 %
-%   Usage: v = approxPastEnergy(f,g,h,eta,d,verbose)
+%   Usage:  [v,w] = runExample9()
 %
 %   Inputs:
-%       f,g,h   - cell arrays containing the polynomial coefficients
-%                 for the drift, input, and output.
-%                   • f must contain at least linear and quadratic coefficients
-%                   • g must contain at least a linear input (B matrix)
-%                   • h must contain at least a linear input (C matrix)
-%       eta     - η=1-1/γ^2, where γ is the H∞ gain parameter. For open-loop
-%                 balancing, use eta=0. For closed-loop (HJB) balancing, use
-%                 eta=1. Any other value between -1 and ∞ corresponds to
-%                 H∞ balancing.
-%       degree  - desired degree of the computed energy function. A degree d
-%                 energy function uses information from f,g,h up-to degree d-1.
-%                 The default choice of d is lf+1, where lf is the degree of
-%                 the drift.
-%       verbose - optional argument to print runtime information
 %
-%   Output:
-%       v       - cell array containing the polynomial energy function coefficients
+%   Outputs:
 %
-%   Background: Computes a degree d polynomial approximation to the past energy function
+%   Background: Based on p34.m from [1].
 %
-%          E^-(x) = 1/2 ( v{2}'*(x⊗x) + ... + v{d}'*(...⊗x) )
+%   Reference: [1] L. N. Trefethen, Spectral methods in MATLAB. Society
+%              for Industrial and Applied Mathematics, 2000.
+%              doi: 10.1137/1.9780898719598.
 %
-%   for the polynomial control-affine system
-%
-%    \dot{x} = Ax + F2*(x⊗x) + F3*(x⊗x⊗x) + ...
-%              + Bu + G1*(x⊗u) + G2*(x⊗x⊗u) + ...
-%          y = Cx + H2*(x⊗x) + H3*(x⊗x⊗x) + ...
-%
-%   where eta = η=1-1/γ^2, where γ is the H∞ gain parameter. v{2} = vec(V2) = V2(:)
-%   solves the Algebraic Riccati Equation
-%
-%    A'*V2 + V2*A + V2*B*B'*V2 - eta*C'*C = 0.
-%
-%   and the remaining v{i} solve linear systems arising from the Past H∞
-%   Hamilton-Jacobi-Bellman Partial Differential Equation.
-%
-%   Details are in Section III.B of reference [1] or III.A of reference [2].
-%
-%   Requires the following functions from the KroneckerTools repository
-%      KroneckerSumSolver
-%      kronMonomialSymmetrize
-%      LyapProduct
-%
-%   Authors: Jeff Borggaard, Virginia Tech
-%            Nick Corbin, UCSD
-%
-%   License: MIT
-%
-%   Reference: [1] B. Kramer, S. Gugercin, J. Borggaard, and L. Balicki, “Nonlinear
-%               balanced truncation: Part 1—computing energy functions,” arXiv,
-%               Dec. 2022. doi: 10.48550/ARXIV.2209.07645
-%              [2] N. A. Corbin and B. Kramer, “Scalable computation of 𝓗_∞
-%               energy functions for polynomial control-affine systems,” 2023.
-%
-%             See Algorithm 1 in [1].
-%
-%  Part of the NLbalancing repository.
+%   Part of the NLbalancing repository.
 %%
 
-if (nargin < 6)
-    verbose = false;
-    if (nargin < 5)
-        degree = length(f{1});
-    end
-end
+fprintf('Running Example 9\n')
 
-% Print what type of energy function is being computed
-if eta == 0
-    message = sprintf('Computing open-loop balancing controllability energy function (η=%g ↔ γ=%g)', eta, 1 / sqrt(1 - eta));
-    q = 0;
-elseif eta == 1
-    message = sprintf('Computing closed-loop balancing past energy function (η=%g ↔ γ=%g)', eta, 1 / sqrt(1 - eta));
-    q = cellfun(@(x) x * (-1), h2q(h), 'un', 0);
+%% Construct controller
+% Get system
+y0 = .5; % Desired interface location
+
+eps = 0.01; N = 32;
+[f, B, ~, D, y] = getSystem9(eps, N, y0);
+fprintf("Maximum eigenvalue of A is %f; should be zero I think.\n",max(eigs(full(f{1}),N+1)))
+
+% Reference configuration (@ origin) -> v = v+vref
+if isempty(y0)
+    vref=zeros(N+1,1);
 else
-    message = sprintf('Computing 𝓗∞ balancing past energy function (η=%g ↔ γ=%g)', eta, 1 / sqrt(1 - eta));
-    q = cellfun(@(x) x * (-eta), h2q(h), 'un', 0);
-end
-if verbose
-    disp(message)
+    vref = tanh((y-y0)/sqrt(2*eps));
 end
 
-% Rewritten by N Corbin to use ppr()
-[v] = ppr(f, g, q, -1, degree, verbose);
+B = B(:,linspace(1,N+1,5)); B(:,[1 5]) = []; m = size(B,2);
+Q2 = .1; Q3 = sparse((N+1)^3,1) ; Q4 = sparse(linspace(1,(N+1)^4,N+1),1,4);
+q = {[],Q2,Q3,Q4};
+R = 1;
+
+
+[ValueFun] = ppr(f, B, q, R);
+uOpenLoop = @(z) zeros(m,1);
+uLinear = @(z) (- R * B.' * kronPolyDerivEval(ValueFun(1:2), z).' / 2);
+uCubic = @(z) (- R * B.' * kronPolyDerivEval(ValueFun(1:4), z).' / 2);
+
+controllers = {uOpenLoop, uLinear, uCubic};
+
+for idx = 1:3
+    u = controllers{idx};
+    Lagrangian = zeros(100001,1);
+    
+    %% Solve PDE by Euler formula and plot results:
+    % Construct originial system dynamics
+    D2 = D^2; D2([1 N+1],:) = zeros(2,N+1); % For boundary conditions
+    
+    % Initial condition
+    v0 = .53*y + .47*sin(-1.5*pi*y);
+    % v0 = tanh((y-(-0.125))/sqrt(2*eps*10));
+    v = v0;
+    
+    % Time-stepping
+    dt = min([.001,50*N^(-4)/eps]); t = 0;
+    tmax = 100; tplot = 2; nplots = round(tmax/tplot);
+    plotgap = round(tplot/dt); dt = tplot/plotgap;
+    xx = -1:.025:1; vv = polyval(polyfit(y,v,N),xx);
+    plotdata = [vv; zeros(nplots,length(xx))]; tdata = t;
+    for i = 1:nplots
+        fprintf('%i',i)
+        for n = 1:plotgap
+            xbar = v-vref;
+            Ux = u(xbar);
+            Lagrangian(n+(i-1)*plotgap) = 1/2*(xbar.'*Q2*xbar + Ux.'*R*Ux + 4*sum(xbar.^4)); % hardcoded v.^4 instead of Q4 for speed
+            t = t+dt; v = v + dt*(eps*D2*v + v - v.^3 + B*Ux);    % Euler
+        end
+        vv = polyval(polyfit(y,v,N),xx);
+        plotdata(i+1,:) = vv; tdata = [tdata; t];
+    end
+    figure, subplot('position',[.1 .4 .8 .5])
+    mesh(xx,tdata,plotdata), grid on, axis([-1 1 0 tmax -1 1]),
+    view(-60,55), colormap([0 0 0]); xlabel x, ylabel t, zlabel u
+    drawnow
+    
+    % Compute performance Index (cost)
+    performanceIndex = trapz((0:dt:tmax), Lagrangian);
+    fprintf("\n\n   The performance index is %f\n\n",performanceIndex)
+    
+end
+
+
+
+
+exportgraphics(gcf,'plots/example9_cubic.pdf', 'ContentType', 'vector')
+close
+exportgraphics(gcf,'plots/example9_linear.pdf', 'ContentType', 'vector')
+close
+exportgraphics(gcf,'plots/example9_openloop.pdf', 'ContentType', 'vector')
+close
+
+
+
+    function [D,x] = cheb(N)
+        if N==0, D=0; x=1; return, end
+        x = cos(pi*(0:N)/N)';
+        c = [2; ones(N-1,1); 2].*(-1).^(0:N)';
+        X = repmat(x,1,N+1);
+        dX = X-X';
+        D  = (c*(1./c)')./(dX+(eye(N+1)));      % off-diagonal entries
+        D  = D - diag(sum(D'));                 % diagonal entries
+    end
 
 end

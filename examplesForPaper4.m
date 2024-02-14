@@ -27,7 +27,7 @@ setKroneckerToolsPath
 addpath('examples')
 addpath('utils')
 
-exportData = true;
+exportData = false;
 
 %% Example 8: Finite Element Heat Nonlinear Equation
-[w] = runExample8(exportData, 1e-5);
+[w] = runExample8(exportData, 5e-5);
