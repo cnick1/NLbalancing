@@ -86,6 +86,6 @@ if verbose
 end
 
 % Rewritten by N Corbin to use ppr()
-[v] = ppr(f, g, q, -1, degree, verbose);
+[v] = ppr(f, g, q, -1, degree, true, verbose);
 
 end
