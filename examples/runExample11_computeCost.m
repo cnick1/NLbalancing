@@ -57,8 +57,9 @@ y0 = [sqrt(6 * gravity / L)]; x0 = [-pi];
 tspan = [0 10];
 
 %  Compute the polynomial approximations to the past future energy function
-% [w] = ppr(f, g, h2q(h), eta, degree, true);
-[w] = ppr(f, g, Q, R, degree, true);
+% [w] = ppr(f, g, h2q(h), eta, degree);
+options.verbose = true;
+[w] = ppr(f, g, Q, R, degree, options);
 
 syms x1 x2
 vpa(-Rinv * g{1}.' * kronPolyDerivEval(w, [x1; x2]).') / 2

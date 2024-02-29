@@ -206,9 +206,8 @@ end
 % y0 = [zeros(1, 11), zeros(1, 3), zeros(1, 11)];
 
 %  Compute the polynomial approximations to the past future energy function
-% [v] = approxPastEnergy(f, N, g, h, eta, degree, true);
-% [w] = ppr(f, g, h2q(h), eta, degree, true);
-[w] = ppr(f, g, 0, eta, degree, true);
+options.verbose = true;
+[w] = ppr(f, g, 0, eta, degree, options);
 
 % Create a figure and set up subplots
 subplot(1, 3, 3); hold on;

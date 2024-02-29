@@ -51,7 +51,8 @@ fprintf('Running Example 11\n')
 
 %  Compute the polynomial approximations to the past future energy function
 % [v] = approxPastEnergy(f, N, g, h, eta, degree, true);
-[w] = ppr(f, g, h, 1 / eta, degree, true);
+options.verbose = true;
+[w] = ppr(f, g, h, 1 / eta, degree, options);
 
 nX = 301; nY = nX;
 xLim = pi; yLim = 5;

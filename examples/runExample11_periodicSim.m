@@ -54,7 +54,8 @@ tspan = [0 7];
 x0 = [-2];
 y0 = [-4];
 
-[w] = ppr(f, g, h, 1 / eta, degree, true);
+options.verbose = true;
+[w] = ppr(f, g, h, 1 / eta, degree, options);
 
 % Create a figure and set up subplots
 figure; hold on;
