@@ -74,6 +74,7 @@ end
 % Print what type of energy function is being computed
 if eta == 0
     message = sprintf('Computing open-loop balancing observability energy function (η=%g ↔ γ=%g)', eta, 1 / sqrt(1 - eta));
+    eta = Inf; % Need 1/eta to be zero, and if eta = 0 this doesn't work. Basically R = R^-1 = 0 is what we need in ppr() 
 elseif eta == 1
     message = sprintf('Computing closed-loop balancing future energy function (η=%g ↔ γ=%g)', eta, 1 / sqrt(1 - eta));
 else
