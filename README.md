@@ -17,6 +17,7 @@ Software that uses polynomials to approximately solve the nonlinear (NL) balanci
 ## Installation Notes
 Clone these repository: 
 ```
+  git clone https://www.github.com/cnick1/PPR.git
   git clone https://www.github.com/cnick1/KroneckerTools.git
   git clone https://www.github.com/cnick1/NLbalancing.git
   git clone https://gitlab.com/tensors/tensor_toolbox.git
