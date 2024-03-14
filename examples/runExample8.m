@@ -1,18 +1,13 @@
-function [w] = runExample8(exportData, x0)
+function runExample8(exportData, x0)
 %runExample8 Runs the finite element heat equation example to demonstrate
 %            convergence and scalability.
 %
-%   Usage:  [v,w] = runExample8(plotEnergy,plotBalancing,balancingDegree,
-%                               numGTermsModel, numGTermsApprox, exportData)
+%   Usage:  runExample8(exportData, x0)
 %
 %   Inputs:
 %       exportData      - Boolean variable to determine if
 %                         plots/data are exported
 %       x0              - Initial condition
-%
-%   Outputs:
-%       v,w             - Coefficients of the past and future energy
-%                         function approximations, respectively
 %
 %   The value of eta is set below.
 %
@@ -223,131 +218,5 @@ if exportData
     end
     fclose(fileID);
 end
-
-% %%
-% %  Computational performance of the energy function approximations.
-% %  Since the initial times are so short, we average nTest times
-% %
-% %  This builds TABLE III
-% %
-% numEl = 32;
-%
-% fileID = 1; % Standard command window output if not writing to a file
-%
-% fprintf(fileID, '# Table III Data\n');
-% fprintf(fileID, '# finite element heat equation model, convergence and scalability results \n');
-% fprintf(fileID, '# numEls = %d   -->   n = %d \n', numEl, numEl-1);
-%
-% %print the header
-% fprintf(fileID, 'd      ');
-% % fprintf(fileID, '& CPU-sec   & E_d^-(x_0)     ');
-% fprintf(fileID, '& CPU-sec-2    & E_d^+(x_0)      \n');
-%
-% % compute and print the results
-% nTest = 3;
-%
-% [f, g, h] = getSystem8(numEl);
-% % Initial condition where the nodes are displaced but have no initial
-% % velocity or "rotation"
-% numNodes = numEl + 1;
-% % Initial condition from Mark Embree's talk
-% L = 30; x = linspace(0,L,numEl+1).';
-% initialCondition = x0 * x .* (x-L).*(x-L/2);
-%
-% initialCondition = initialCondition(2:end-1);
-%
-% pastTimes = []; futureTimes = []; pastEnergies = []; futureEnergies = [];
-% degrees = 2:4;
-% for degree = degrees
-%     fprintf(fileID, '%d      & ', degree);
-%
-%     %     % Past
-%     %     tic; for i = 1:nTest,
-%     %         [v] = approxPastEnergy(f, g, C, eta, degree);
-%     %     end, tt = toc / nTest;
-%     %
-%     %     fprintf(fileID, '%8.2e  & ', tt);
-%     %     pastTimes = [pastTimes, tt];
-%
-%     %
-%     %     vzInit = 0.5 * kronPolyEval(v, initialCondition, degree);
-%     %     fprintf(fileID, '%12.6e    ', vzInit);
-%     %     pastEnergies = [pastEnergies, vzInit];
-%
-%     % Future
-%     tic; for i = 1:nTest,
-%         [w] = approxFutureEnergy(f, g, h, eta, degree);
-%     end, tt = toc / nTest;
-%
-%     fprintf(fileID, '%8.2e  & ', tt);
-%     futureTimes = [futureTimes, tt];
-%
-%     wzInit = 0.5 * kronPolyEval(w, initialCondition, degree);
-%     fprintf(fileID, '%12.6e    \n', wzInit);
-%     futureEnergies = [futureEnergies, wzInit];
-% end
-%
-% % For run-time, only run the higher cases if exporting data, and only
-% % run once since the run time is longer so error is less sensitive
-% if exportData
-%     nTest = 1;
-%     for degree = 5:6
-%         degrees = [degrees, degree];
-%         fprintf(fileID, '%d      & ', degree);
-%
-%         %     % Past
-%         %     tic; for i = 1:nTest,
-%         %         [v] = approxPastEnergy(f, g, C, eta, degree);
-%         %     end, tt = toc / nTest;
-%         %
-%         %     fprintf(fileID, '%8.2e  & ', tt);
-%         %     pastTimes = [pastTimes, tt];
-%
-%         %
-%         %     vzInit = 0.5 * kronPolyEval(v, initialCondition, degree);
-%         %     fprintf(fileID, '%12.6e    ', vzInit);
-%         %     pastEnergies = [pastEnergies, vzInit];
-%
-%         % Future
-%         tic; for i = 1:nTest,
-%             [w] = approxFutureEnergy(f, g, h, eta, degree);
-%         end, tt = toc / nTest;
-%
-%         fprintf(fileID, '%8.2e  & ', tt);
-%         futureTimes = [futureTimes, tt];
-%
-%         wzInit = 0.5 * kronPolyEval(w, initialCondition, degree);
-%         fprintf(fileID, '%12.6e    \n', wzInit);
-%         futureEnergies = [futureEnergies, wzInit];
-%
-%     end
-% end
-% %% Export data
-% if exportData
-%     if x0 == 0.01
-%         fileName = sprintf('plots/example8_convergenceData_e%d.dat', numEl);
-%     else
-%         fileName = sprintf('plots/example8_convergenceData_e%d_biggerIC.dat', numEl);
-%     end
-%     fprintf("Writing data to " + fileName + '\n')
-%     fileID = fopen(fileName, 'w');
-%
-%     fprintf(fileID, '# Table III Data\n');
-%     fprintf(fileID, '# finite element heat equation model, convergence and scalability results \n');
-%     fprintf(fileID, '# numEls = %d   -->   n = %d \n', numEl, numEl-1);
-%
-%     %print the header
-%     fprintf(fileID, 'd      ');
-%     % fprintf(fileID, '& CPU-sec   & E_d^-(x_0)     ');
-%     fprintf(fileID, '& CPU-sec-2    & E_d^+(x_0)      \n');
-%     for i = 1:length(degrees)
-%         fprintf(fileID, '%d      & ', degrees(i));
-%         %     fprintf(fileID, '%8.2e  & ', pastTimes(i));
-%         %     fprintf(fileID, '%12.6e    ', pastEnergies(i));
-%         fprintf(fileID, '%8.2e     & ', futureTimes(i));
-%         fprintf(fileID, '%12.6e    \n', futureEnergies(i));
-%     end
-%     fclose(fileID);
-% end
 
 end

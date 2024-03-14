@@ -27,8 +27,10 @@ setKroneckerToolsPath
 addpath('examples')
 addpath('utils')
 
-exportData = false;
+% If set to false, the code will only run the examples that are small
+% enough to run on 16GB ram; set to true to run all of the examples in the
+% paper.
+exportData = false; 
 
 %% Example 8: Finite Element Heat Nonlinear Equation
 [w] = runExample8(exportData, 5e-5);
-runExample8_convergence_wrt_d(exportData, 5e-5);
