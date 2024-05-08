@@ -107,14 +107,16 @@ if (plotEnergy || plotBalancing)
     set(groot, 'defaulttextinterpreter', 'latex');
     set(groot, 'defaultLegendInterpreter', 'latex');
 
-    fig1 = figure;
+    fig1 = figure('Position',[273 287 363.3333 470.6667]);
     contourf(X, Y, ePast, 16, 'w'); hold on;
+    load(fullfile('utils', 'YlGnBuRescaled.mat'))
+    colormap(flip(YlGnBuRescaled))
     logMaxEPast = log10(max(max(ePast)));
     contour(X, Y, ePast, [0, logspace(-2, ceil(logMaxEPast), 20)] ./ (10 ^ (ceil(logMaxEPast) - logMaxEPast)))
     %    mesh(X,Y,ePast)
     xlabel('$x_1$', 'interpreter', 'latex');
     ylabel('$x_2$', 'interpreter', 'latex');
-    h = colorbar('FontSize', 16, 'TickLabelInterpreter', 'latex');
+    h = colorbar('FontSize', 16, 'TickLabelInterpreter', 'latex','Location','southoutside');
     set(gca, 'FontSize', 16)
     xticks([-1:1])
     yticks([-1:1])
@@ -122,17 +124,16 @@ if (plotEnergy || plotBalancing)
     if kawanoModel
         caxis([0 80])
         set(h, 'ylim', [0 80])
-        load(fullfile('utils', 'YlGnBuRescaled.mat'))
-        colormap(flip(YlGnBuRescaled))
+
     end
 
-    fig2 = figure
+    fig2 = figure('Position',[673 287 363.3333 470.6667]);
     contourf(X, Y, eFuture, 16, 'w'); hold on;
     logMaxEFuture = log10(max(max(eFuture)));
     contour(X, Y, eFuture, [0, logspace(-3, ceil(logMaxEFuture), 20)] ./ (10 ^ (ceil(logMaxEFuture) - logMaxEFuture)))
     xlabel('$x_1$', 'interpreter', 'latex');
     ylabel('$x_2$', 'interpreter', 'latex');
-    h = colorbar('FontSize', 16, 'TickLabelInterpreter', 'latex');
+    h = colorbar('FontSize', 16, 'TickLabelInterpreter', 'latex','Location','southoutside');
     set(gca, 'FontSize', 16)
     xticks([-1:1])
     yticks([-1:1])

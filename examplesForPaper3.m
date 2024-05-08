@@ -27,18 +27,18 @@ addpath('utils')
 
 exportData = true;
 %%  Example 1: 1D ODE with analytical energy functions
-% This generates Figure 1
+% This generates Figure 1 (the energy functions)
 runExample1(3, 3, exportData);
 
-% This generates Figures 2 and 3
+% This generates Figures 2 and 3 (the error plots)
 runExample1_regionOfAccuracy(exportData);
 
 %%  Example 2: 2D Energy Functions
-% This generates the data for Figure 4
-runExample2(4, true, false, 4, 2, 2, exportData, true);
+% This generates the data for Figure 4 (the energy functions)
+runExample2_energyFunctionPlots(exportData);
 
-% This generates Figure 5
-runExample2_regionOfAccuracy_res();
+% This generates Figure 5 (the HJB residuals)
+runExample2_regionOfAccuracy_res(exportData);
 
 %% Example 6: Finite Element Beam Convergence
 % This generates the data for Tables II and III, which are plotted in

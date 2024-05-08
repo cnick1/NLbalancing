@@ -1,71 +1,69 @@
-function runExample2_regionOfAccuracy_res()
-%runExample2_regionOfAccuracy_res Runs 1D ODE example to compare computed and
-%analytical energy functions. This function plots a) error vs region size
-%comparing degree of approximation for a polynomial function, and b) error
-%vs region size comparing degree of assuemed model.
+function runExample2_regionOfAccuracy_res(exportPlotData)
+%runExample2_regionOfAccuracy_res Runs the 2D quadratic-bilinear example from [1] to plot HJB residuals as contour plots
 %
-%   Usage:  runExample2_regionOfAccuracy_res()
+%   Usage:  runExample2_regionOfAccuracy_res(exportPlotData)
 %
-%   Part of the NLbalancing repository.
+%   Inputs:
+%       exportPlotData   Boolean variable to determine if plots/data are exported
+%
+%   Reference: [1] Y. Kawano and J. M. A. Scherpen, “Model reduction by
+%               differential balancing based on nonlinear hankel operators,”
+%               IEEE Transactions on Automatic Control, vol. 62, no. 7,
+%               pp. 3293–3308, Jul. 2017, doi: 10.1109/tac.2016.2628201.
+%              [2] N. A. Corbin and B. Kramer, “Scalable computation of 𝓗_∞
+%               energy functions for polynomial control-affine systems,” 2023.
 %%
+load(fullfile('utils', 'YlGnBuRescaled.mat'))
 
-%% 1st Figure: all energy functions, big mess but just for me.
+%% Process inputs
+if nargin < 1
+    exportPlotData = false;
+end
+degree = 4;
+
+%% Get model and compute energy functions
+[f, g, h] = getSystem2(true);
+fprintf('Running Example 2\n')
 
 eta = 0; % values should be between -\infty and 1.
 
-[f, g, h] = getSystem2(true);
-
 %  Compute the polynomial approximations to the future energy function
+[v] = approxPastEnergy(f, g, h, eta, degree, true);
+[w] = approxFutureEnergy(f, g, h, eta, degree, true);
+
+%% Plot the past and future HJB residuals
 N = 301;
-xPlot = linspace(-1, 1, N);
-yPlot = linspace(-1, 1, N);
+xPlot = linspace(-1, 1, N); yPlot = linspace(-1, 1, N);
 [X, Y] = meshgrid(xPlot, yPlot);
-[v] = approxPastEnergy(f, g, h, eta, 4, true);
-[w] = approxFutureEnergy(f, g, h, eta, 4, true);
 
-set(groot, 'defaultAxesTickLabelInterpreter', 'latex');
-set(groot, 'defaulttextinterpreter', 'latex');
-set(groot, 'defaultLegendInterpreter', 'latex');
+vRES = computeResidualPastHJB(f, g, h, eta, v, degree, 1, 301);
+wRES = computeResidualFutureHJB(f, g, h, eta, w, degree, 1, 301);
 
-for d = 4
+set(groot, 'defaultColorbarTickLabelInterpreter', 'latex','defaultAxesTickLabelInterpreter', 'latex', 'defaulttextinterpreter', 'latex', 'defaultLegendInterpreter', 'latex');
 
-    vRES = computeResidualPastHJB(f, g, h, eta, v, d, 1, 301);
-    wRES = computeResidualFutureHJB(f, g, h, eta, w, d, 1, 301);
+fig1 = figure('Position',[880 287 363.3333 470.6667]);
+contourf(X, Y, abs(vRES), 16, 'w'); colormap(flip(YlGnBuRescaled))
+xlabel('$x_1$'); ylabel('$x_2$');
+xticks(-1:1); yticks(-1:1)
+h = colorbar('FontSize', 16,'Location','southoutside');
+set(gca, 'FontSize', 16)
+set(h,'YTick',0:2e-9:4e-9,'TickLabels',{'0','$2\cdot10^{-9}$','$4\cdot10^{-9}$'})
+fprintf('The residual of the HJB equation on the unit square is %g\n', norm(vRES, 'inf'));
 
-    fig1 = figure;
-    contourf(X, Y, abs(vRES), 16, 'w'); colorbar;
-    xlabel('$x_1$', 'interpreter', 'latex');
-    ylabel('$x_2$', 'interpreter', 'latex');
-    h = colorbar('FontSize', 16, 'TickLabelInterpreter', 'latex');
-    set(gca, 'FontSize', 16)
-    xticks([-1:1])
-    yticks([-1:1])
-    axis equal
-    load('utils\YlGnBuRescaled.mat')
-    colormap(flip(YlGnBuRescaled))
-    fprintf('The residual of the HJB equation on the unit square is %g\n', norm(vRES, 'inf'));
+fig2 = figure('Position',[1270 287 363.3333 470.6667]);
+pcolor(X, Y, abs(wRES)); shading interp; colormap(flip(YlGnBuRescaled))
+xlabel('$x_1$'); ylabel('$x_2$');
+xticks(-1:1); yticks(-1:1)
+h = colorbar('FontSize', 16,'Location','southoutside');
+set(gca, 'FontSize', 16)
+set(h,'YTick',0:2e-16:4e-16,'TickLabels',{'0','$2\cdot10^{-16}$','$4\cdot10^{-16}$'})
+fprintf('The residual of the HJB equation on the unit square is %g\n', norm(wRES, 'inf'));
 
-    fig2 = figure;
-    pcolor(X, Y, abs(wRES)); shading interp; colorbar;
-    xlabel('$x_1$', 'interpreter', 'latex');
-    ylabel('$x_2$', 'interpreter', 'latex');
-    h = colorbar('FontSize', 16, 'TickLabelInterpreter', 'latex');
-    set(gca, 'FontSize', 16)
-    xticks([-1:1])
-    yticks([-1:1])
-    h = get(gca, 'DataAspectRatio');
-    if h(3) == 1
-        set(gca, 'DataAspectRatio', [1 1 1 / max(h(1:2))])
-    else
-        set(gca, 'DataAspectRatio', [1 1 h(3)])
-    end
-    load('utils\YlGnBuRescaled.mat')
-    colormap(flip(YlGnBuRescaled))
-    fprintf('The residual of the HJB equation on the unit square is %g\n', norm(wRES, 'inf'));
-
+if exportPlotData
     exportgraphics(fig1, 'plots/example2_pastEnergy_residual.pdf', 'ContentType', 'vector');
     exportgraphics(fig2, 'plots/example2_futureEnergy_residual.pdf', 'ContentType', 'vector');
-
+else
+    figure(fig1); title('Past HJB Residual')
+    figure(fig2); title('Future HJB Residual')
 end
-
 end
