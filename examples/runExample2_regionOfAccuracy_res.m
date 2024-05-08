@@ -47,7 +47,7 @@ xlabel('$x_1$'); ylabel('$x_2$');
 xticks(-1:1); yticks(-1:1)
 h = colorbar('FontSize', 16,'Location','southoutside');
 set(gca, 'FontSize', 16)
-set(h,'YTick',0:2e-9:4e-9,'TickLabels',{'0','$2\cdot10^{-9}$','$4\cdot10^{-9}$'})
+set(h,'YTick',0:4e-10:8e-10,'TickLabels',{'0','$4\cdot10^{-10}$','$8\cdot10^{-10}$'})
 fprintf('The residual of the HJB equation on the unit square is %g\n', norm(vRES, 'inf'));
 
 fig2 = figure('Position',[1270 287 363.3333 470.6667]);

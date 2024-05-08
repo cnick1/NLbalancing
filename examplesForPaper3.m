@@ -26,7 +26,7 @@ addpath('examples')
 addpath('utils')
 
 exportData = true;
-%%  Example 1: 1D ODE with analytical energy functions
+%%  Example 1: 1D ODE with analytical energy functions1
 % This generates Figure 1 (the energy functions)
 runExample1(3, 3, exportData);
 
@@ -42,7 +42,7 @@ runExample2_regionOfAccuracy_res(exportData);
 
 %% Example 6: Finite Element Beam Convergence
 % This generates the data for Tables II and III, which are plotted in
-% Figures 7, 8, and 9. (Note: this takes a few hours on a good modern
+% Figures 7, 8, and 9. (Note: this takes ~20 minutes on a good modern
 % laptop with 16GB RAM)
-runExample6(4, 4, exportData, 0.1); % run this first to get the larger IC xb
-runExample6(4, 4, exportData, 0.01); % run this first to get the smaller IC xa
+runExample6(exportData, 0.1); % run this first to get the larger IC xb
+runExample6(exportData, 0.01); % run this first to get the smaller IC xa
