@@ -28,7 +28,7 @@ if nargin < 2
     x0 = 0.01;
 end
 
-eta = 0.1; 
+eta = 0.1;
 
 %% Table II: convergence & scalability wrt n (d=3)
 %  Since the initial times are so short, we average nTest times
@@ -36,21 +36,22 @@ eta = 0.1;
 degree = 3;
 
 % print results to command window as we run, then write to file
-fprintf('\n# Table II Data\n, # finite element beam model, convergence and scalability results; d=%d \nnumElements &   n  &     n^%d       &  CPU-sec  &  E_%d^+(x_0)     \n', degree, degree, degree);
+fprintf('\n# Table II Data\n# finite element beam model, convergence and scalability results; d=%d \nnumElements &   n  &     n^%d       &  CPU-sec  &  E_%d^+(x_0)     \n', degree, degree, degree);
 
-nTest = 10;
-nd = []; times = []; energies = [];
-numEls = [1, 2, 4, 8, 16];
-for numEl = numEls
-    fprintf(' %5d      &%4d  & ', numEl, 6 * numEl);
-
+nTest = [10, 10, 10, 10, 10, 1, 1, 1, 1];
+numEls = [1, 2, 4, 8, 16, 32, 64, 128, 180];
+nd = zeros(size(numEls)); times = zeros(size(numEls)); energies = zeros(size(numEls));
+if exportData, numTestCases = 7; else, numTestCases = 5; end % If running with 16GB ram, 7; if 256GB ram, 9
+for i=1:numTestCases
+    fprintf(' %5d      &%4d  & ', numEls(i), 6 * numEls(i));
+    
     % Compute energy functions and CPU time
-    [f, g, h] = getSystem6(numEl, 2);
-    tic; for i = 1:nTest, [w] = approxFutureEnergy(f, g, h, eta, degree); end, tt = toc / nTest;
+    [f, g, h] = getSystem6(numEls(i), 2);
+    tic; for j = 1:nTest(i), [w] = approxFutureEnergy(f, g, h, eta, degree); end, tt = toc / nTest(i);
     
     % Evaluate energy function at x0 corresponding to nodes having linear
     % displacement but no rotation or initial velocity
-    numNodes = numEl + 1;
+    numNodes = numEls(i) + 1;
     initialCondition = x0 / (numNodes - 1) * ...
         [[(0:numNodes - 1);
         (0:numNodes - 1);
@@ -60,45 +61,14 @@ for numEl = numEls
     initialCondition = initialCondition(:);
     
     wzInit = 0.5 * kronPolyEval(w, initialCondition, degree);
-
+    
     % Print results to command window
     fprintf(' %10.4e   & %8.2e  & %12.6e    \n', length(w{degree}), tt, wzInit);
-
+    
     % log results to write to file later
-    nd = [nd, length(w{degree})]; times = [times, tt]; energies = [energies, wzInit];
+    nd(i)= length(w{degree}); times(i) = tt; energies(i) = wzInit;
 end
 
-% For run-time, only run the higher cases if exporting data, and only
-% run once since the run time is longer so error is less sensitive
-if exportData
-    nTest = 1;
-    for numEl = [32, 64]%, 128] %128 runs out of ram in kroneckerLeft.m
-        fprintf(' %5d      &%4d  & ', numEl, 6 * numEl);
-
-        % Compute energy functions and CPU time
-        [f, g, h] = getSystem6(numEl, 2);
-        tic; for i = 1:nTest, [w] = approxFutureEnergy(f, g, h, eta, degree); end, tt = toc / nTest;
-
-        % Evaluate energy function at x0 corresponding to nodes having linear
-        % displacement but no rotation or initial velocity
-        numNodes = numEl + 1;
-        initialCondition = x0 / (numNodes - 1) * ...
-            [[(0:numNodes - 1);
-            (0:numNodes - 1);
-            0 * (0:numNodes - 1)].';
-            zeros(numNodes, 3)].'; % Full initial condition
-        initialCondition(:, 1) = []; initialCondition(:, 1 + numNodes) = []; % Remove the first node DOFs
-        initialCondition = initialCondition(:);
-
-        wzInit = 0.5 * kronPolyEval(w, initialCondition, degree);
-
-        % Print results to command window
-        fprintf(' %10.4e   & %8.2e  & %12.6e    \n', length(w{degree}), tt, wzInit);
-
-        % log results to write to file later
-        numEls = [numEls, numEl]; nd = [nd, length(w{degree})]; times = [times, tt]; energies = [energies, wzInit];
-    end
-end
 if exportData
     logy = log10(times); % take the natural log of y data
     logx = log10(6 * numEls); % take the natural log of x data
@@ -110,7 +80,7 @@ if exportData
     fileID = fopen('plots/example6_convergenceData_d3.dat', 'w');
     fprintf(fileID, '# Table I Data\n# finite element beam model, convergence and scalability results; d=%d \nnumElements &    n & n^%d           & CPU-sec   & E_%d^+(x_0)     &  exponentCoeff  &  exponentFit \n', degree, degree, degree);
     %print the header
-    for i = 1:length(numEls)
+    for i = 1:numTestCases
         fprintf(fileID, '%5d       &%5d & %10.4e    & %8.2e  & %12.6e   &  %2.2f  &  %2.2f \n', numEls(i), 6 * numEls(i), nd(i), times(i), energies(i), a, d);
     end
     fclose(fileID);
@@ -123,19 +93,20 @@ degree = 4;
 fprintf('\n# Table II Data\n# finite element beam model, convergence and scalability results; d=%d \nnumElements &   n  &     n^%d       &  CPU-sec  &  E_%d^+(x_0)     \n', degree, degree, degree);
 
 % compute and print the results
-nTest = 3;
-nd = []; times = []; energies = [];
-numEls = [1, 2, 4];
-for numEl = numEls
-    fprintf(' %5d      &%4d  & ', numEl, 6 * numEl);
-
+nTest = [3, 3, 3, 1, 1];
+numEls = [1, 2, 4, 8, 16];
+nd = zeros(size(numEls)); times = zeros(size(numEls)); energies = zeros(size(numEls));
+if exportData, numTestCases = 5; else, numTestCases = 3; end
+for i=1:numTestCases
+    fprintf(' %5d      &%4d  & ', numEls(i), 6 * numEls(i));
+    
     % Compute energy functions and CPU time
-    [f, g, h] = getSystem6(numEl, 2);
-    tic; for i = 1:nTest, [w] = approxFutureEnergy(f, g, h, eta, degree); end, tt = toc / nTest;
+    [f, g, h] = getSystem6(numEls(i), 2);
+    tic; for j = 1:nTest(i), [w] = approxFutureEnergy(f, g, h, eta, degree); end, tt = toc / nTest(i);
     
     % Evaluate energy function at x0 corresponding to nodes having linear
     % displacement but no rotation or initial velocity
-    numNodes = numEl + 1;
+    numNodes = numEls(i) + 1;
     initialCondition = x0 / (numNodes - 1) * ...
         [[(0:numNodes - 1);
         (0:numNodes - 1);
@@ -145,44 +116,12 @@ for numEl = numEls
     initialCondition = initialCondition(:);
     
     wzInit = 0.5 * kronPolyEval(w, initialCondition, degree);
-
+    
     % Print results to command window
     fprintf(' %10.4e   & %8.2e  & %12.6e    \n', length(w{degree}), tt, wzInit);
-
+    
     % log results to write to file later
-    nd = [nd, length(w{degree})]; times = [times, tt]; energies = [energies, wzInit];
-end
-
-% For run-time, only run the higher cases if exporting data, and only
-% run once since the run time is longer so error is less sensitive
-if exportData
-    nTest = 1;
-    for numEl = [8, 16]%, 32, 64]
-        fprintf(' %5d      &%4d  & ', numEl, 6 * numEl);
-
-        % Compute energy functions and CPU time
-        [f, g, h] = getSystem6(numEl, 2);
-        tic; for i = 1:nTest, [w] = approxFutureEnergy(f, g, h, eta, degree); end, tt = toc / nTest;
-
-        % Evaluate energy function at x0 corresponding to nodes having linear
-        % displacement but no rotation or initial velocity
-        numNodes = numEl + 1;
-        initialCondition = x0 / (numNodes - 1) * ...
-            [[(0:numNodes - 1);
-            (0:numNodes - 1);
-            0 * (0:numNodes - 1)].';
-            zeros(numNodes, 3)].'; % Full initial condition
-        initialCondition(:, 1) = []; initialCondition(:, 1 + numNodes) = []; % Remove the first node DOFs
-        initialCondition = initialCondition(:);
-
-        wzInit = 0.5 * kronPolyEval(w, initialCondition, degree);
-
-        % Print results to command window
-        fprintf(' %10.4e   & %8.2e  & %12.6e    \n', length(w{degree}), tt, wzInit);
-
-        % log results to write to file later
-        numEls = [numEls, numEl]; nd = [nd, length(w{degree})]; times = [times, tt]; energies = [energies, wzInit];
-    end
+    nd(i)= length(w{degree}); times(i) = tt; energies(i) = wzInit;
 end
 if exportData
     logy = log10(times); % take the natural log of y data
@@ -194,7 +133,7 @@ if exportData
     fprintf('The exponent fit gives n^%f compared with n^%d. \nWriting data to plots/example6_convergenceData_d4.dat \n', d, degree)
     fileID = fopen('plots/example6_convergenceData_d4.dat', 'w');
     fprintf(fileID, '# Table II Data\n# finite element beam model, convergence and scalability results; d=%d \nnumElements &    n & n^%d           & CPU-sec   & E_%d^+(x_0)     &  exponentCoeff  &  exponentFit \n', degree, degree, degree);
-    for i = 1:length(numEls)
+    for i = 1:numTestCases
         fprintf(fileID, '%5d       &%5d & %10.4e    & %8.2e  & %12.6e   &  %2.2f  &  %2.2f \n', numEls(i), 6 * numEls(i), nd(i), times(i), energies(i), a, d);
     end
     fclose(fileID);
@@ -207,8 +146,6 @@ numEl = 3;
 fprintf('\n# Table III Data\n# finite element beam model, convergence and scalability results \n# numEls = %d   -->   n = %d \n   d   &  CPU-sec-2   & E_d^+(x_0)      \n', numEl, 6 * numEl);
 
 % compute and print the results
-nTest = 3;
-
 [f, g, h] = getSystem6(numEl);
 
 % Evaluate energy function at x0 corresponding to nodes having linear
@@ -222,32 +159,20 @@ initialCondition = x0 / (numNodes - 1) * ...
 initialCondition(:, 1) = []; initialCondition(:, 1 + numNodes) = []; % Remove the first node DOFs
 initialCondition = initialCondition(:);
 
-pastTimes = []; futureTimes = []; pastEnergies = []; futureEnergies = [];
-degrees = 2:4;
-for degree = degrees
+degrees = 2:6;
+nTest = [3, 3, 3, 3, 3];
+futureTimes = zeros(size(degrees)); futureEnergies = zeros(size(degrees));
+if exportData, numTestCases = 5; else, numTestCases = 3; end
+for i=1:numTestCases
     % Compute Future energy function
-    tic; for i = 1:nTest, [w] = approxFutureEnergy(f, g, h, eta, degree); end, tt = toc / nTest;
+    tic; for j = 1:nTest(i), [w] = approxFutureEnergy(f, g, h, eta, degrees(i)); end, tt = toc / nTest(i);
     
-    wzInit = 0.5 * kronPolyEval(w, initialCondition, degree);
-
-    fprintf('   %d   &   %8.2e   & %12.6e    \n', degree, tt, wzInit);
-    futureTimes = [futureTimes, tt]; futureEnergies = [futureEnergies, wzInit];
+    wzInit = 0.5 * kronPolyEval(w, initialCondition, degrees(i));
+    
+    fprintf('   %d   &   %8.2e   & %12.6e    \n', degrees(i), tt, wzInit);
+    futureTimes(i) = tt; futureEnergies(i) = wzInit;
 end
 
-% For run-time, only run the higher cases if exporting data, and only
-% run once since the run time is longer so error is less sensitive
-if exportData
-    nTest = 1;
-    for degree = 5:6
-        % Compute Future energy function
-        tic; for i = 1:nTest, [w] = approxFutureEnergy(f, g, h, eta, degree); end, tt = toc / nTest;
-
-        wzInit = 0.5 * kronPolyEval(w, initialCondition, degree);
-
-        fprintf('   %d   &   %8.2e   & %12.6e    \n', degree, tt, wzInit);
-        degrees = [degrees, degree]; futureTimes = [futureTimes, tt]; futureEnergies = [futureEnergies, wzInit];
-    end
-end
 %% Export data
 if exportData
     if x0 == 0.01
@@ -257,9 +182,9 @@ if exportData
     end
     fileID = fopen(fileName, 'w'); fprintf("Writing data to " + fileName + '\n')
     
-    fprintf(fileID, '# Table III Data\n# finite element beam model, convergence and scalability results \n# numEls = %d   -->   n = %d \n   d   & CPU-sec-2    & E_d^+(x_0)      \n', numEl, 6 * numEl);
+    fprintf(fileID, '# Table III Data\n# finite element beam model, convergence and scalability results \n# numEls = %d   -->   n = %d \n   d   & CPU-sec-2    &  E_d^+(x_0)     \n', numEl, 6 * numEl);
     
-    for i = 1:length(degrees)
+    for i = 1:numTestCases
         fprintf(fileID, '   %d   &   %8.2e      & %12.6e    \n', degrees(i), futureTimes(i), futureEnergies(i));
     end
     fclose(fileID);
