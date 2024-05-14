@@ -1,4 +1,4 @@
-function [f, g, h] = getSystem6(numElements, actuatorConfig, rotaryInertia)
+function [f, g, h, IC] = getSystem6(numElements, actuatorConfig, rotaryInertia)
 %getSystem6  Generates a cubic finite element beam model system for testing
 %            energy functions. The system is a finite element model for a
 %            nonlinear (due to von Karman strains) Euler-Bernoulli Beam.
@@ -394,8 +394,8 @@ else
     G0 = [sparse(n, 2);
           McholL.' \ (McholL \ RB0)];
 
-    C = sparse(2, 2 * n); C(1, n - 1) = 1*1e6;
-     C(2, n - 2) = 1*1e6;
+    C = sparse(2, 2 * n); C(1, n - 1) = 1;
+     C(2, n - 2) = 1;
 
     % Construct N₂
     p = 2;
@@ -427,13 +427,26 @@ else
           McholL.' \ (McholL \ RB3), sparse(n, 2 * n ^ 3)] * kron(In3, Im); % Can take a while due to linear solves; consider replacing with Minv actually because it is just n linear solves, not n^3
 end
 
+%% Scale input/output matrices?
+% warning("Look into rescaling for improved numerical performance")
+C = C*1e6;
+
 %% Format outputs
 f = {full(N1), N2, N3};
 g = {full(G0), G1, G2, G3};
 h = {full(C)};
 
+%% Form initial condition
+IC = 1 / (numNodes - 1) * ...
+    [[(0:numNodes - 1);
+    (0:numNodes - 1);
+    0 * (0:numNodes - 1)].';
+    zeros(numNodes, 3)].'; % Full initial condition
+IC(:, 1) = []; IC(:, 1 + numNodes) = []; % Remove the first node DOFs
+IC = IC(:);
+    
 return
-
+% currently not running last bit of code
 % Scale input/outputs to match f scaling
 T = diag([ones(n,1);1e-5*ones(n,1)]);
 

@@ -31,8 +31,6 @@ end
 eta = 0.1;
 
 %% Table II: convergence & scalability wrt n (d=3)
-%  Since the initial times are so short, we average nTest times
-
 degree = 3;
 
 % print results to command window as we run, then write to file
@@ -46,20 +44,12 @@ for i=1:numTestCases
     fprintf(' %5d      &%4d  & ', numEls(i), 6 * numEls(i));
     
     % Compute energy functions and CPU time
-    [f, g, h] = getSystem6(numEls(i), 2);
+    [f, g, h, IC] = getSystem6(numEls(i), 2);
     tic; for j = 1:nTest(i), [w] = approxFutureEnergy(f, g, h, eta, degree); end, tt = toc / nTest(i);
     
     % Evaluate energy function at x0 corresponding to nodes having linear
     % displacement but no rotation or initial velocity
-    numNodes = numEls(i) + 1;
-    initialCondition = x0 / (numNodes - 1) * ...
-        [[(0:numNodes - 1);
-        (0:numNodes - 1);
-        0 * (0:numNodes - 1)].';
-        zeros(numNodes, 3)].'; % Full initial condition
-    initialCondition(:, 1) = []; initialCondition(:, 1 + numNodes) = []; % Remove the first node DOFs
-    initialCondition = initialCondition(:);
-    
+    initialCondition = x0 * IC;
     wzInit = 0.5 * kronPolyEval(w, initialCondition, degree);
     
     % Print results to command window
@@ -96,20 +86,12 @@ for i=1:numTestCases
     fprintf(' %5d      &%4d  & ', numEls(i), 6 * numEls(i));
     
     % Compute energy functions and CPU time
-    [f, g, h] = getSystem6(numEls(i), 2);
+    [f, g, h, IC] = getSystem6(numEls(i), 2);
     tic; for j = 1:nTest(i), [w] = approxFutureEnergy(f, g, h, eta, degree); end, tt = toc / nTest(i);
     
     % Evaluate energy function at x0 corresponding to nodes having linear
     % displacement but no rotation or initial velocity
-    numNodes = numEls(i) + 1;
-    initialCondition = x0 / (numNodes - 1) * ...
-        [[(0:numNodes - 1);
-        (0:numNodes - 1);
-        0 * (0:numNodes - 1)].';
-        zeros(numNodes, 3)].'; % Full initial condition
-    initialCondition(:, 1) = []; initialCondition(:, 1 + numNodes) = []; % Remove the first node DOFs
-    initialCondition = initialCondition(:);
-    
+    initialCondition = x0 * IC;
     wzInit = 0.5 * kronPolyEval(w, initialCondition, degree);
     
     % Print results to command window
@@ -130,27 +112,19 @@ if exportData
 end
 
 %% Table III: convergence & scalability wrt d (n=18)
-
 numEl = 3;
 
 fprintf('\n# Table III Data\n# finite element beam model, convergence and scalability results \n# numEls = %d   -->   n = %d \n   d   &  CPU-sec-2   & E_d^+(x_0)      \n', numEl, 6 * numEl);
 
 % compute and print the results
-[f, g, h] = getSystem6(numEl, 2);
+[f, g, h, IC] = getSystem6(numEl, 2);
 
 % Evaluate energy function at x0 corresponding to nodes having linear
 % displacement but no rotation or initial velocity
-numNodes = numEl + 1;
-initialCondition = x0 / (numNodes - 1) * ...
-    [[(0:numNodes - 1);
-    (0:numNodes - 1);
-    0 * (0:numNodes - 1)].';
-    zeros(numNodes, 3)].'; % Full initial condition
-initialCondition(:, 1) = []; initialCondition(:, 1 + numNodes) = []; % Remove the first node DOFs
-initialCondition = initialCondition(:);
+initialCondition = x0 * IC;
 
 degrees = 2:6;
-nTest = [3, 3, 3, 3, 3];
+nTest = [3, 3, 3, 3, 1];
 futureTimes = zeros(size(degrees)); futureEnergies = zeros(size(degrees));
 if exportData, numTestCases = 5; else, numTestCases = 3; end
 for i=1:numTestCases
@@ -184,10 +158,11 @@ end
 end
 
 function [a, d] = getExpFit(times, numEls)
+% CPU time scales as O(n^d) for some d; this return d
 logy = log10(times); % take the natural log of y data
 logx = log10(6 * numEls); % take the natural log of x data
 X = [ones(length(logx), 1) logx']; % create matrix of x data with a column of ones
 beta = X \ logy'; % solve for beta coefficients using linear least squares
-a = beta(1); % calculate exponent d
-d = beta(2); % calculate exponent d
+a = beta(1); % line y intercept (moves line up and down)
+d = beta(2); % calculate exponent d (slope of the line)
 end
