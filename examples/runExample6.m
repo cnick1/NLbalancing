@@ -70,12 +70,7 @@ for i=1:numTestCases
 end
 
 if exportData
-    logy = log10(times); % take the natural log of y data
-    logx = log10(6 * numEls); % take the natural log of x data
-    X = [ones(length(logx), 1) logx']; % create matrix of x data with a column of ones
-    beta = X \ logy'; % solve for beta coefficients using linear least squares
-    a = beta(1); % calculate exponent d
-    d = beta(2); % calculate exponent d
+    [a, d] = getExpFit(times, numEls);
     fprintf('The exponent fit gives n^%f compared with n^%d. \nWriting data to plots/example6_convergenceData_d3.dat \n', d, degree)
     fileID = fopen('plots/example6_convergenceData_d3.dat', 'w');
     fprintf(fileID, '# Table I Data\n# finite element beam model, convergence and scalability results; d=%d \nnumElements &    n & n^%d           & CPU-sec   & E_%d^+(x_0)     &  exponentCoeff  &  exponentFit \n', degree, degree, degree);
@@ -124,12 +119,7 @@ for i=1:numTestCases
     nd(i)= length(w{degree}); times(i) = tt; energies(i) = wzInit;
 end
 if exportData
-    logy = log10(times); % take the natural log of y data
-    logx = log10(6 * numEls); % take the natural log of x data
-    X = [ones(length(logx), 1) logx']; % create matrix of x data with a column of ones
-    beta = X \ logy'; % solve for beta coefficients using linear least squares
-    a = beta(1); % calculate exponent d
-    d = beta(2); % calculate exponent d
+    [a, d] = getExpFit(times, numEls);
     fprintf('The exponent fit gives n^%f compared with n^%d. \nWriting data to plots/example6_convergenceData_d4.dat \n', d, degree)
     fileID = fopen('plots/example6_convergenceData_d4.dat', 'w');
     fprintf(fileID, '# Table II Data\n# finite element beam model, convergence and scalability results; d=%d \nnumElements &    n & n^%d           & CPU-sec   & E_%d^+(x_0)     &  exponentCoeff  &  exponentFit \n', degree, degree, degree);
@@ -146,7 +136,7 @@ numEl = 3;
 fprintf('\n# Table III Data\n# finite element beam model, convergence and scalability results \n# numEls = %d   -->   n = %d \n   d   &  CPU-sec-2   & E_d^+(x_0)      \n', numEl, 6 * numEl);
 
 % compute and print the results
-[f, g, h] = getSystem6(numEl);
+[f, g, h] = getSystem6(numEl, 2);
 
 % Evaluate energy function at x0 corresponding to nodes having linear
 % displacement but no rotation or initial velocity
@@ -191,4 +181,13 @@ if exportData
 end
 
 
+end
+
+function [a, d] = getExpFit(times, numEls)
+logy = log10(times); % take the natural log of y data
+logx = log10(6 * numEls); % take the natural log of x data
+X = [ones(length(logx), 1) logx']; % create matrix of x data with a column of ones
+beta = X \ logy'; % solve for beta coefficients using linear least squares
+a = beta(1); % calculate exponent d
+d = beta(2); % calculate exponent d
 end
