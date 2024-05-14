@@ -394,8 +394,8 @@ else
     G0 = [sparse(n, 2);
           McholL.' \ (McholL \ RB0)];
 
-    C = sparse(1, 2 * n); C(1, n - 1) = 1;
-     C(1, n - 2) = 1;
+    C = sparse(2, 2 * n); C(1, n - 1) = 1*1e6;
+     C(2, n - 2) = 1*1e6;
 
     % Construct N₂
     p = 2;
