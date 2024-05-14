@@ -35,7 +35,7 @@ fprintf('\n# Table II Data\n# finite element beam model, convergence and scalabi
 nTest = [10, 10, 10, 10, 10, 1, 1, 1, 1];
 numEls = [1, 2, 4, 8, 16, 32, 64, 128, 180];
 nd = zeros(size(numEls)); times = zeros(size(numEls)); energies = zeros(size(numEls)); RES = zeros(size(numEls));
-if exportData, numTestCases = 7; else, numTestCases = 5; end % If running with 16GB ram, 7; if 256GB ram, 9
+if exportData, numTestCases = 6; else, numTestCases = 5; end % If running with 16GB ram, 7; if 256GB ram, 9
 for i=1:numTestCases
     fprintf(' %5d      &%4d  & ', numEls(i), 6 * numEls(i));
     
@@ -80,7 +80,7 @@ fprintf('\n# Table II Data\n# finite element beam model, convergence and scalabi
 nTest = [3, 3, 3, 1, 1];
 numEls = [1, 2, 4, 8, 16];
 nd = zeros(size(numEls)); times = zeros(size(numEls)); energies = zeros(size(numEls)); RES = zeros(size(numEls));
-if exportData, numTestCases = 5; else, numTestCases = 3; end
+if exportData, numTestCases = 4; else, numTestCases = 3; end
 for i=1:numTestCases
     fprintf(' %5d      &%4d  & ', numEls(i), 6 * numEls(i));
     
@@ -177,9 +177,8 @@ function RES = getFutureHJBResidual(f, g, h, eta, w, x)
 % it is represents the error (residual)
 dEdX = 0.5 * kronPolyDerivEval(w, x);
 FofX = kronPolyEval(f, x);
-% GofX = g{1} + kronPolyEval(g(2:end), x);
 GofX = g{1}; lg = length(g); Im = speye(size(g{1},2));
-xk = 1; for k=2:lg; xk = kron(xk, x); GofX = g{k} * kron(xk, Im); end
+xk = 1; for k=2:lg; xk = kron(xk, x); GofX = GofX + g{k} * kron(xk, Im); end
 HofX = kronPolyEval(h, x);
 
 RES = dEdX*FofX - eta/2*dEdX*(GofX*GofX.')*dEdX.' + 0.5*(HofX.'*HofX);

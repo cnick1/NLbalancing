@@ -57,15 +57,13 @@ function [f, g, h, IC] = getSystem6(numElements, actuatorConfig, rotaryInertia)
 
 vec = @(X) X(:);
 
-if nargin < 1
-    numElements = 3;
-end
-
-if nargin < 2
-    actuatorConfig = 2;
-end
-
 if nargin < 3
+    if nargin < 2
+        if nargin < 1
+            numElements = 3;
+        end
+        actuatorConfig = 2;
+    end
     rotaryInertia = false;
 end
 
@@ -437,11 +435,12 @@ g = {full(G0), G1, G2, G3};
 h = {full(C)};
 
 %% Form initial condition
-IC = 1 / (numNodes - 1) * ...
-    [[(0:numNodes - 1);
-    (0:numNodes - 1);
+% Full initial condition
+IC = 1 / (numNodes - 1) * ... 
+    [[(0:numNodes - 1);                  % linear axial displacement field 
+    -(0:numNodes - 1);                    % linear transverse displacement field 
     0 * (0:numNodes - 1)].';
-    zeros(numNodes, 3)].'; % Full initial condition
+    zeros(numNodes, 3)].'; 
 IC(:, 1) = []; IC(:, 1 + numNodes) = []; % Remove the first node DOFs
 IC = IC(:);
     
