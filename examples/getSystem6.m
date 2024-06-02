@@ -338,7 +338,7 @@ freeDOFsCubed = setdiff(1:TotalDOFs ^ 3, fixedDOFsCubed);
 K3G = K3G(freeDOFs, freeDOFsCubed);
 RB3 = RB3(freeDOFs, [freeDOFsCubed, freeDOFsCubed + TotalDOFs ^ 3]);
 
-D1G = 0.00001 * M1G + 0.00001 * K1G; % Add some damping for numerical stability
+D1G = 0.00005 * M1G + 0.00005 * K1G; % Add some damping for numerical stability
 
 %% Convert to state-space representation
 if false

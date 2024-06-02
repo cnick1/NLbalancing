@@ -74,15 +74,15 @@ degree = 4;
 fprintf('\n# Table II Data\n# finite element beam model, convergence and scalability results; d=%d \nnumElements &   n  &     n^%d       &  CPU-sec  &  E_%d^+(x_0)     \n', degree, degree, degree);
 
 % compute and print the results
-nTest = [3, 3, 3, 1, 1];
-numEls = [1, 2, 4, 8, 16];
+nTest = [3, 3, 3, 1, 1, 1];
+numEls = [1, 2, 4, 8, 16, 24];
 nd = zeros(size(numEls)); times = zeros(size(numEls)); energies = zeros(size(numEls)); 
-if exportData, numTestCases = 4; else, numTestCases = 3; end
+if exportData, numTestCases = 6; else, numTestCases = 3; end
 for i=1:numTestCases
     fprintf(' %5d      &%4d  & ', numEls(i), 6 * numEls(i));
     
     % Compute energy functions and CPU time
-    [f, g, h, IC] = getSystem6(numEls(i), 2);
+    [f, g, h, IC] = getSystem6(numEls(i), 2); 
     tic; for j = 1:nTest(i), [w] = approxFutureEnergy(f, g, h, eta, degree); end, tt = toc / nTest(i);
     
     % Evaluate energy function at x0 corresponding to nodes having linear
