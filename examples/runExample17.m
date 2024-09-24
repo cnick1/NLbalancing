@@ -1,4 +1,4 @@
-function sigmaSquared = runExample17(n)
+function [sigmaSquared, vbar, wbar, v, w] = runExample17(n)
 %runExample17 Runs the example to test diagonalization.
 %
 %   Usage:  [v,w] = runExample17()
@@ -24,7 +24,7 @@ degree = 4;
 
 %% Compute the input-normal/output-diagonal transformation approximation, also giving the squared singular value functions
 tic
-[sigmaSquared, Tod] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);
+[sigmaSquared, Tod, vbar, wbar] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);
 fprintf("Input-normal/output-diagonal transformation took %f seconds. \n", toc)
 
 end

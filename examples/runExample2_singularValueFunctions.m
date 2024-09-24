@@ -75,7 +75,7 @@ zmax = 0.2; zmin = -zmax;
 % Npts = 51;
 
 %% Get model and compute energy functions and input normal transformation
-[f, g, h] = getSystem2(kawanoModel);
+[f, g, h] = getSystem2(kawanoModel); C = h{1};
 g(numGTermsModel + 1:end) = deal({0}); % Adjust FOM to be Quadratic, QB, etc.
 % n = size(A, 1);
 

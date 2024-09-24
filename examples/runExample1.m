@@ -82,7 +82,7 @@ ylabel('$\mathcal{E}_\gamma^+$', ...
     'FontSize', 20, ...
     'fontweight', 'bold')
 xlim([-6 6])
-ylim([-1 10])
+ylim([0 20])
 
 if exportPlotData
     %  Save data to generate tikz plots for the paper
@@ -146,7 +146,7 @@ ylabel('$\mathcal{E}_\gamma^-$', ...
     'fontweight', 'bold')
 
 xlim([-6 6])
-ylim([0 20])
+ylim([-1.5 10])
 
 if exportPlotData
     fid = fopen('plots/ex1_past_a.txt', 'w');

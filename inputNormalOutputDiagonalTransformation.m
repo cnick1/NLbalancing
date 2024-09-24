@@ -1,4 +1,4 @@
-function [sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree, verbose)
+function [sigmaSquared, TinOd, vbar, wbar] = inputNormalOutputDiagonalTransformation(v, w, degree, verbose)
 %inputNormalOutputDiagonalTransformation Compute the input-normal/output-diagonal transformation for a polynomial control-affine dynamical system.
 %
 %   Usage: [sigmaSquared,Tbar] = outputDiagonalTransformation(v, w, Tin, Sigma, degree)
@@ -56,7 +56,7 @@ if (nargin < 4)
 end
 
 if (verbose)
-    fprintf('Computing the degree %d input-normal/output-diagonal balancing transformation\n', degree)
+    fprintf('Computing the degree %d input-normal/output-diagonal balancing transformation...\n', degree)
 end
 
 % Create a vec function for readability
@@ -127,7 +127,7 @@ switch method
             
             [Nk, Nkhat] = equivalenceClassIndices(n, k);
             
-            %$ Form input-normal equations coefficient matrix
+            %% Form input-normal equations coefficient matrix
             CoeffMatrix = 2 * Nk;
             
             % Construct the RHS vector
@@ -179,20 +179,20 @@ switch method
             indices = 1:n ^ k; indices(idxs) = [];
             
             %% Solve equations
-            fprintf("Computing degree %i transformation... ", k - 1)
+            fprintf("    Computing degree %i transformation... ", k - 1)
             %         disp(size(indices))
             tic
             Tod{k - 1} = zeros(n, n ^ (k - 1));
             %     if k > 4
 %             spparms('spumoni',2)
             Tod{k - 1}(indices) = CoeffMatrix \ RHS; % Method 1: matlab uses sparse QR from SuiteSparseQR
-%                 Tod{k - 1}(indices) = lsqminnorm(CoeffMatrix, RHS);      % Method 2
+                % Tod{k - 1}(indices) = lsqminnorm(CoeffMatrix, RHS);      % Method 2
             
             %% Optional: adjust transformation by a random element from the null-space
 %             nullDir = rand(diff(size(CoeffMatrix)),1); 
 %             Tod{k - 1}(indices) = Tod{k - 1}(indices).' + null(full(CoeffMatrix)) * nullDir;
             
-            fprintf("%f seconds. \n", toc)
+            fprintf("completed in %f seconds. \n", toc)
         end
         
         %% Combine transformation with linear input normal transformation
@@ -219,7 +219,7 @@ for k = 2:degree + 1
     if verbose
         [N] = equivalenceClassIndices(n, k);
         
-        fprintf("  - The largest entry in v%i is %.1e; ", k, max(abs(N * vbar{k}))) % Should be zero, other than the first time which is one
+        fprintf("      - The largest entry in v%i is %.1e; ", k, max(abs(N * vbar{k}))) % Should be zero, other than the first time which is one
         fprintf("the largest off-diagonal entry in w%i is %.1e\n", k, max(abs(N(n + 1:end, :) * wbar{k}))) % Should be diagonal
         
         %         sigmaSquared{k - 1} = N(1:n, :) * wbar{k}; % Since the index set is already computed

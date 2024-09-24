@@ -58,6 +58,14 @@ runExample12();
 [ns,energyTimings,transformationTimings] = runExample17_timings(5);
 [ns,energyTimings,transformationTimings] = runExample17_timings(6);
 
+runExample17_checkDiag(6)
+runExample17_checkDiag(8)
+runExample17_checkDiag(16)
+runExample17_checkDiag(32)
+runExample17_checkDiag(50)
+runExample17_checkDiag(64)
+close all
+
 %% Other/old models
 % Example 13: Gray 2D cooked up model for NL Balancing
 % runExample13();

@@ -30,31 +30,35 @@ transformationTimings = [];
 i = 0;
 
 if degree == 6
-    ns = [4*ones(1,10),8*ones(1,10),16*ones(1,3)];
+    ns = [4,8,16];
+    % ns = [4*ones(1,10),8*ones(1,10),16*ones(1,3)];
 elseif degree == 5 
-    ns = [4*ones(1,10),8*ones(1,10),16*ones(1,3),32];
+    ns = [4,8,16,32];
+    % ns = [4*ones(1,10),8*ones(1,10),16*ones(1,3),32];
 elseif degree == 4
-    ns = [4*ones(1,10),8*ones(1,10),16*ones(1,10),32*ones(1,3),64*ones(1,3),128];
+    ns = [4,8,16,32,64,128];
+    % ns = [4*ones(1,10),8*ones(1,10),16*ones(1,10),32*ones(1,3),64*ones(1,3),128];
 elseif degree == 3   
-    ns = [4*ones(1,10),8*ones(1,10),16*ones(1,10),32*ones(1,3),64*ones(1,3),128, 256, 512];
+    ns = [4,8,16,32,64,128, 256, 512];
+    % ns = [4*ones(1,10),8*ones(1,10),16*ones(1,10),32*ones(1,3),64*ones(1,3),128, 256, 512];
 end
 
 for n=ns
     [f, g, h] = getSystem17(degree - 1, n / 2);
     
     %  Compute the energy functions
-    tic
+    fprintf("Computing energy functions for n=%i, d=%i ... ", n, degree); tic
     [v] = approxPastEnergy(f, g, h, eta, degree, false);
     [w] = approxFutureEnergy(f, g, h, eta, degree, false);
     energyTimings = [energyTimings, toc];
-    fprintf("Computing the energy functions took %f seconds. \n", energyTimings(end))
+    fprintf("completed in %f seconds. \n", energyTimings(end))
     
     clear f g h % save some ram
     %% Compute the input-normal/output-diagonal transformation approximation, also giving the squared singular value functions
     tic
     [sigmaSquared, Tod] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);
     transformationTimings = [transformationTimings, toc];
-    fprintf("Input-normal/output-diagonal transformation took %f seconds. \n", transformationTimings(end))
+    fprintf("\n    -> Transformation computed in %f seconds. \n\n", transformationTimings(end))
     
     if true %exportData
         i = i+1;

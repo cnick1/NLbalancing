@@ -37,7 +37,7 @@ if nargin < 2
     if nargin < 1
         exportData = false;
     end
-    x0 = 1e-4;
+    x0 = 5e-5;
 end
 
 eta = 0.5;
@@ -56,10 +56,10 @@ fprintf('# Table II Data\n# finite element heat equation model, convergence and 
 energies = [];
 if exportData
     numEl = 16;
-    ds = 2:2:8;
+    ds = 2:2:6;
 else 
     numEl = 8;
-    ds = 2:2:10;
+    ds = 2:2:8;
 end
 for d = ds
     fprintf('%1d & ', d); 
