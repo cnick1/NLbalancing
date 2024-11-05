@@ -21,6 +21,7 @@ Clone these repository:
   git clone https://www.github.com/cnick1/PPR.git
   git clone https://www.github.com/cnick1/KroneckerTools.git
   git clone https://www.github.com/cnick1/NLbalancing.git
+  git clone https://gitlab.com/tensors/tensor_toolbox.git
 ```
 then modify the path in **setKroneckerToolsPath.m**
 
