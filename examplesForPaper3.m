@@ -14,7 +14,7 @@
 %  Authors:   Nick Corbin, UCSD
 % 
 %  Reference: [1] N. A. Corbin and B. Kramer, “Scalable computation of 𝓗_∞
-%             energy functions for polynomial control-affine systems,” 2023.
+%             energy functions for polynomial control-affine systems,” 2024.
 %             [2] Y. Kawano and J. M. A. Scherpen, “Model reduction by
 %             differential balancing based on nonlinear hankel operators,”
 %             IEEE Transactions on Automatic Control, vol. 62, no. 7,
@@ -25,24 +25,25 @@ setKroneckerToolsPath
 addpath('examples')
 addpath('utils')
 
-exportData = true;
+exportData = false; % if set to true, will run and store all the data as in the paper, but it takes a little longer to run 
+
 %%  Example 1: 1D ODE with analytical energy functions1
 % This generates Figure 1 (the energy functions)
-% runExample1(3, 3, exportData);
+runExample1(3, 3, exportData);
 
-% This generates Figures 2 and 3 (the error plots)
-% runExample1_regionOfAccuracy(exportData);
+% This generates the data for Figure 2 (the error plots)
+runExample1_regionOfAccuracy(exportData);
 
 %%  Example 2: 2D Energy Functions
-% This generates the data for Figure 4 (the energy functions)
-% runExample2_energyFunctionPlots(exportData);
+% This generates the data for Figure 3 (the energy functions)
+runExample2_energyFunctionPlots(exportData);
 
-% This generates Figure 5 (the HJB residuals)
-% runExample2_regionOfAccuracy_res(exportData);
+% This generates the data for Figure 3 (the HJB residuals)
+runExample2_regionOfAccuracy_res(exportData);
 
 %% Example 6: Finite Element Beam Convergence
 % This generates the data for Tables II and III, which are plotted in
-% Figures 7, 8, and 9. (Note: this takes ~20 minutes on a good modern
+% Figures 5, 6, and 7. (Note: this takes ~20 minutes on a good modern
 % laptop with 16GB RAM)
 runExample6(exportData, 0.1); % run this first to get the larger IC xb
 runExample6(exportData, 0.01); % run this first to get the smaller IC xa

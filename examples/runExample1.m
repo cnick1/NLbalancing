@@ -86,6 +86,7 @@ ylim([0 20])
 
 if exportPlotData
     %  Save data to generate tikz plots for the paper
+    mkdir plots
     fid = fopen('plots/ex1_future_a.txt', 'w');
     fprintf(fid, '%g %g\n', [x; EPlusAnalytic]);
     fclose(fid);

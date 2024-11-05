@@ -141,6 +141,7 @@ hold on;
 semilogy(intervalSize, Ep4_errorFun_full)
 semilogy(intervalSize, Ep6_errorFun_full)
 semilogy(intervalSize, Ep8_errorFun_full)
+semilogy(intervalSize, Ep8_errorFun_Q, 'k:')
 
 legend('degree 2', 'degree 4', 'degree 6', 'degree 8', 'Location', 'southeast')
 xlabel('Region radius from origin', 'interpreter', 'latex', 'FontSize', 12, 'fontweight', 'bold')
@@ -149,20 +150,20 @@ grid on;
 ylim([1e-16 2e2])
 
 % Plot the data for figure 4
-figure(5); colororder({'#D95319', '#EDB120', '#7E2F8E', '#77AC30'});
-set(figure(5), 'DefaultLineLineWidth', 2);
-
-semilogy(intervalSize, Ep4_errorFun_full)
-hold on;
-semilogy(intervalSize, Ep8_errorFun_full, ':')
-semilogy(intervalSize, Ep8_errorFun_QB, ':')
-semilogy(intervalSize, Ep8_errorFun_Q, ':')
-
-legend('degree 4', 'degree 8 full', 'degree 8 QB', 'degree 8 Q', 'Location', 'southeast')
-xlabel('Region radius from origin', 'interpreter', 'latex', 'FontSize', 12, 'fontweight', 'bold')
-ylabel('Linfty error for energy function approximation', 'interpreter', 'latex', 'FontSize', 12, 'fontweight', 'bold')
-grid on;
-ylim([1e-16 2e2])
+% figure(5); colororder({'#D95319', '#EDB120', '#7E2F8E', '#77AC30'});
+% set(figure(5), 'DefaultLineLineWidth', 2);
+% 
+% semilogy(intervalSize, Ep4_errorFun_full)
+% hold on;
+% semilogy(intervalSize, Ep8_errorFun_full, ':')
+% semilogy(intervalSize, Ep8_errorFun_QB, ':')
+% semilogy(intervalSize, Ep8_errorFun_Q, ':')
+% 
+% legend('degree 4', 'degree 8 full', 'degree 8 QB', 'degree 8 Q', 'Location', 'southeast')
+% xlabel('Region radius from origin', 'interpreter', 'latex', 'FontSize', 12, 'fontweight', 'bold')
+% ylabel('Linfty error for energy function approximation', 'interpreter', 'latex', 'FontSize', 12, 'fontweight', 'bold')
+% grid on;
+% ylim([1e-16 2e2])
 
 if exportData
     fileName = sprintf('plots/example1_regionOfAccuracy.dat');
