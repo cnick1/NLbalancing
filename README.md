@@ -1,5 +1,5 @@
 # NLbalancing
-Software that uses polynomials to approximately solve the nonlinear (NL) balancing problem for systems with polynomial nonlinearities.  The description of the NL balancing algorithms are provided in papers [1-5].
+Software that uses polynomials to approximately solve the nonlinear (NL) balancing problem for systems with polynomial nonlinearities.  The description of the NL balancing algorithms are provided in papers [1-6].
 
 [1] J. Borggaard and L. Zietsman, “The quadratic-quadratic regulator problem: approximating feedback controls for quadratic-in-state nonlinear systems,” in 2020 American Control Conference (ACC), Jul. 2020, pp. 818–823. doi: 10.23919/ACC45564.2020.9147286
 
@@ -9,10 +9,11 @@ Software that uses polynomials to approximately solve the nonlinear (NL) balanci
 
 [4] B. Kramer, S. Gugercin, J. Borggaard, and L. Balicki, “Nonlinear balanced truncation: Part 1—computing energy functions,” arXiv, Dec. 2022. doi: 10.48550/ARXIV.2209.07645
 
-[5] N. A. Corbin and B. Kramer, “Scalable computation of 𝓗_∞ energy functions for polynomial drift nonlinear systems,” 2023.
+[5] N. A. Corbin and B. Kramer, “Scalable computation of 𝓗_∞ energy functions for polynomial drift nonlinear systems,” ACC 2024.
 
-[6] N. A. Corbin and B. Kramer, “Scalable computation of 𝓗_∞ energy functions for polynomial control-affine systems,” 2023.
+[6] N. A. Corbin and B. Kramer, “Computing Solutions to the Polynomial-Polynomial Regulator Problem,” CDC 2024.
 
+[7] N. A. Corbin and B. Kramer, “Scalable computation of 𝓗_∞ energy functions for polynomial control-affine systems,” IEEE TAC, May 2025.
 
 ## Installation Notes
 Clone these repository: 
@@ -20,19 +21,14 @@ Clone these repository:
   git clone https://www.github.com/cnick1/PPR.git
   git clone https://www.github.com/cnick1/KroneckerTools.git
   git clone https://www.github.com/cnick1/NLbalancing.git
-  git clone https://gitlab.com/tensors/tensor_toolbox.git
 ```
 then modify the path in **setKroneckerToolsPath.m**
 
-The installation can be tested in Matlab (we used R2020b) by typing
+The installation can be tested in Matlab by typing
 ```
->> examplesForPaper1
+>> examplesForPaper3
 ```
-and
-```
->> examplesForPaper2
-```
-that provide the numerical results for our nonlinear balanced truncation papers.
+which produces the results for [7]. 
 
 The details of some of our functions and test examples are provided below.  
 
@@ -63,7 +59,7 @@ For a given set of polynomial dynamics defined by the cell arrays `f,g,h` and a 
 >>  [w] = approxFutureEnergy(f,g,h,eta,degree);
 >>  [v] = approxPastEnergy(f,g,h,eta,degree);
 ```
-`approxFutureEnergy()` and `approxPastEnergy()` correspond to Algorithm 1 in reference [1].
+`approxFutureEnergy()` and `approxPastEnergy()` correspond to Algorithm 1 in reference [1] or [6].
 The variables `f,g,h` are cell arrays containing the polynomial coefficients for the dynamics, i.e. 
 ``` 
 >>   f = {A, F2,...};
@@ -73,7 +69,7 @@ The variables `f,g,h` are cell arrays containing the polynomial coefficients for
 To aid in computing these polynomial coefficients, we provide the function `utils/approxPolynomialDynamics.m`; given symbolic expressions for $\mathbf{f}(\mathbf{x}),\mathbf{g}(\mathbf{x}),\mathbf{h}(\mathbf{x})$, the function will return the polynomial coefficients to degree $d$ in Kronecker product form using multivariate Taylor series expansions.
 
 The returned variables `v` and `w` are cell arrays with `v{2}` being a vector of dimension $n^2 \times 1$, up to `v{degree+1}` which is a vector of dimension $n^{d+1} \times 1$. 
-These can be though of as vectorized tensors; for example `v{2}=V2(:)`. 
+These can be thought of as vectorized tensors; for example `v{2}=V2(:)`. 
 Alternatively, `v{k}` are often reshaped as $n \times n^{k}$ matrices for efficient computations. 
 
 From an initial `x0`, we can compute the approximation to the energy function as
@@ -82,7 +78,7 @@ From an initial `x0`, we can compute the approximation to the energy function as
 ```
 or, using the utility function,
 ```
->>  E = (1/2)*kronPolyEval(v(1:degree),x0,degree);
+>>  E = (1/2)*kronPolyEval(v,x0,degree);
 ```
 TODO: Document input-normal and output-diagonal transformations.
 
@@ -93,7 +89,7 @@ TODO: Document input-normal and output-diagonal transformations.
 Defines the path to the KroneckerTools directory containing functions for working with Kronecker product expressions.
 KroneckerTools can be downloaded from github.com/cnick1/KroneckerTools.
 The default assumes that NLbalancing and KroneckerTools lie in the same directory and uses relative pathnames.
-This should be changed if you use different locations.  (setKroneckerToolsPath also lies in the tests directory, so should be changed there as well if you plan to run functions from those directories.)
+This should be changed if you use different locations. 
 
 #### LyapProduct
 
