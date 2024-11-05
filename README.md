@@ -21,8 +21,11 @@ Clone these repository:
   git clone https://www.github.com/cnick1/PPR.git
   git clone https://www.github.com/cnick1/KroneckerTools.git
   git clone https://www.github.com/cnick1/NLbalancing.git
+  git clone https://gitlab.com/tensors/tensor_toolbox.git
 ```
 then modify the path in **setKroneckerToolsPath.m**
+
+Then either download the tensor_recursive package from https://www.epfl.ch/labs/anchp/index-html/software/misc/ to use the more efficient solver, or change the solver from `solver = 'chen-kressner'` to `solver = 'bartels-stewart'` in `KroneckerSumSolver.m` in the `KroneckerTools` repository. 
 
 The installation can be tested in Matlab by typing
 ```
