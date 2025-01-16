@@ -106,6 +106,14 @@ fprintf("                             ->  Example 3 results match.\n\n")
 
 ourFullTransformation = Tod;
 
+[ft, gt, ht] = transformDynamics(f, g, h, Tod);
+
+for i=1:length(ft); ft{i}(abs(ft{i}) < 1e-14) = 0; end
+disp(vpa(kronPolyEval(ft, sym('z', [1, 2]).',5), 2))
+
+for i=1:length(Tod); ourFullTransformation{i}(abs(Tod{i}) < 1e-14) = 0; end
+vpa(kronPolyDerivEval(ourFullTransformation, sym('z', [1, 2]).',1), 2)
+
 %% Compare with Fujimoto 2010
 fprintf("\n ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
 fprintf(" ~~~~~~~~~~~~~~ Beginning comparisons with Fujimoto/Scherpen 2010: ~~~~~~~~~~~~~~ \n")
@@ -196,10 +204,18 @@ disp(vpa(kronPolyEval(vhat, sym('x', [1, 2]).'), 2))
 fprintf("    Observability energy: \n        Lo = 1/2 *(")
 disp(vpa(kronPolyEval(what, sym('x', [1, 2]).'), 8))
 
+
+[ft, gt, ht] = transformDynamics(f, g, h, Tod);
+
+for i=1:length(ft); ft{i}(abs(ft{i}) < 1e-14) = 0; end
+disp(vpa(kronPolyEval(ft, sym('z', [1, 2]).',5), 2))
+
 return
 
 %% Compute transformed dynamics
 [fin, gin, hin] = transformDynamics(f, g, h, Tin);
 [fod, god, hod] = transformDynamics(fin, gin, hin, Tod);
+
+
 
 end
