@@ -1,13 +1,45 @@
 function [f, g, h] = getSystem23(linear)
-%getSystem23  Returns the 3D model from Clancy Rowley's talk. Need to find original sources.
+%getSystem23  Returns the 3D nonlinear model from [1,2]. 
 %
-%   Usage:  [f,g,h] = getSystem23(linear)
+%   Usage:  [f,g,h] = getSystem23()
 %
-%   Inputs:
-%       linear - boolean, whether to use the linear model or nonlinear
-%                model from the talk
+%   The dynamics correspond to the input-output system
 %
-%   References: [1]
+%       xdot_1 = −x1 + 20 x1 x3 + u,
+%       xdot_2 = −2 x2 + 20 x2 x3 + u,
+%       xdot_3 = −5 x3 + u,
+%            y = x1 + x2 + x3,
+%
+%   If the option linear is enabled, the model from [3, Section 5.6.1] is 
+%   returned instead. This model replaces the nonlinear interaction between 
+%   x3 and x1 & x2 with a linear interaction. The model from [3] inspired 
+%   the model in [1,2]. 
+% 
+%       xdot_1 = −x1 + 100 x3 + u,
+%       xdot_2 = −2 x2 + 100 x3 + u,
+%       xdot_3 = −5 x3 + u,
+%            y = x1 + x2 + x3,
+%
+%   Inputs:     linear - boolean, whether to use the linear model from [3]  
+%                        or nonlinear model from [1,2]
+% 
+%   Outputs:     f,g,h - Cell arrays containing the polynomial coefficients
+%                        for the drift, input, and output 
+%
+%   References: [1] S. E. Otto, A. Padovan, and C. W. Rowley, "Optimizing
+%                   oblique projections for nonlinear systems using
+%                   trajectories," SIAM Journal on Scientific Computing,
+%                   vol. 44, no. 3, pp. A1681–A1702, Jun. 2022, doi:
+%                   10.1137/21m1425815.
+%               [2] S. E. Otto, A. Padovan, and C. W. Rowley, "Model
+%                   reduction for nonlinear systems by balanced truncation
+%                   of state and gradient covariance,” SIAM Journal on
+%                   Scientific Computing, vol. 45, no. 5, pp. A2325–A2355,
+%                   Sep. 2023, doi: 10.1137/22m1513228.
+%               [3] P. Holmes, J. L. Lumley, G. Berkooz, and C. W. Rowley,
+%                   Turbulence, coherent structures, dynamical systems and
+%                   symmetry. Cambridge University Press, 2012. doi:
+%                   10.1017/cbo9780511919701.
 %
 %%
 
