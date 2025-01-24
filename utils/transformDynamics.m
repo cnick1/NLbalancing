@@ -51,7 +51,7 @@ for i = 1:lf
     % See Lemma 1 in my SCL paper: Ptilde_i = sum_j^i Pj cT_j,i
     % Note: index backwards so that if you only have e.g. T1 you can move on
     for j=flip(1:i) 
-        if (i-j)-ld==0; break; end
+        if (i-j)-ld>=0; break; end
         ft{i} = ft{i} + calTTv(T, j, i, f{j}.').';
     end
 end
@@ -65,7 +65,7 @@ for k = 1:m
     for i = 1:lg-1 % This internal code block is just above for f(x)
         gttemp{i+1,k} = zeros(n,n^i);
         for j=flip(1:i)  % See Lemma 1 in my SCL paper: Ptilde_i = sum_j^i Pj cT_j,i
-            if (i-j)-ld==0; break; end
+            if (i-j)-ld>=0; break; end
             gttemp{i+1,k} = gttemp{i+1,k} + calTTv(T, j, i, g{j+1}(:,k:m:end).').'; % k:m:end needed for converting from g(x)u to sum g_i(x) u_i
         end
     end
@@ -84,7 +84,7 @@ end
 for i = 1:lh
     ht{i} = zeros(p,n^i);
     for j=flip(1:i)  % See Lemma 1 in my SCL paper: Ptilde_i = sum_j^i Pj cT_j,i
-        if (i-j)-ld==0; break; end
+        if (i-j)-ld>=0; break; end
         ht{i} = ht{i} + calTTv(T, j, i, h{j}.').';
     end
 end
