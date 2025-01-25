@@ -1,5 +1,7 @@
 function [ft, gt, ht] = transformDynamics(f, g, h, T)
 %transformDynamics Transform the model given by f, g, h by transformation T.
+%   This function returns the expansions for the transformed dynamics in
+%   the form \dot{z} = ftilde(z) + gtilde(z) u,    y = htilde(z)
 %
 %   Usage: [ft, gt, ht] = transformDynamics(f, g, h, T, Tinv)
 %
@@ -13,27 +15,26 @@ function [ft, gt, ht] = transformDynamics(f, g, h, T)
 %       ft,gt,ht - cell arrays containing the polynomial coefficients
 %                  for the transformed drift, input, and output.
 %
-%   Background: Given a transformation T, compute the transformed dynamics.
-%   We apply a smooth transformation x = Φ(z) to the control-affine system
-%       \dot{x} = f(x) + g(x) u 
-%             y = h(x)
-%   This yields 
-%       ∂Φ(z)/∂z \dot{z} = f(Φ(z)) + g(Φ(z)) u 
-%                      y = h(Φ(z))
-%    We are seeking the dynamics in the z coordinates, namely 
-%       \dot{z} = ftilde(z) + gtilde(z) u 
-%    so we expand ftilde(z) and gtilde(z). Inserting these expansions, we
-%    then proceed to collect terms of the same degree, leading to the
-%    formulas for the coefficients for ftilde(z) & gtilde(z). 
-%
-%    Half of the challenge is evaluating the transformations f(Φ(z)),
-%    g(Φ(z)), and h(Φ(z)). But then we need to "invert the Jacobian", but
-%    rather than doing that directly we use the matching of coefficients to
-%    directly compute the transformed coefficients. (This is akin to the 
-%    projection step where we multiply V' A V). So in practice, the term
-%    from inverting the linear transformation coefficient T1 and
-%    multiplying by the "transformed" f(Φ(z)), g(Φ(z)) is just the first
-%    term we need to consider, but in general there are more. 
+%   Background: Given a transformation x = Φ(z), we seek to represent the
+%    dynamics for the control-affine system 
+%        \dot{x} = f(x) + g(x) u 
+%              y = h(x)
+%    in the new coordinates as 
+%        \dot{z} = ftilde(z) + gtilde(z) u 
+%              y = htilde(z)
+%    In general, it is not possible to do this explicitly. Applying the
+%    transformation yields 
+%        ∂Φ(z)/∂z \dot{z} = f(Φ(z)) + g(Φ(z)) u 
+%                       y = h(Φ(z))
+%    and we do not in general have an explicit way to write [∂Φ(z)/∂z]^{-1}.
+%    In this function, we will approximate the functions ftilde(z),
+%    gtilde(z), htilde(z) by computing their Taylor expansions. This can be
+%    done exactly for linear transformations but for polynomial
+%    approximations involves a truncation of the expansions. 
+% 
+%    Inserting the expansions for ftilde(z) and gtilde(z), we can proceed
+%    to collect terms of the same degree, leading to the formulas for the
+%    coefficients for ftilde(z) & gtilde(z).
 %
 %   Authors: Nick Corbin, UCSD
 %
