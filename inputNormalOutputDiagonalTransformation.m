@@ -64,8 +64,8 @@ vec = @(X) X(:);
 
 validateattributes(v, {'cell'}, {})
 validateattributes(w, {'cell'}, {})
-dv = length(v);
-dw = length(w);
+dv = length(v); %#ok<NASGU>
+dw = length(w); %#ok<NASGU>
 n = sqrt(length(v{2}));
 
 method = 3; % 3 is best
