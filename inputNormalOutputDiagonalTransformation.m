@@ -184,13 +184,13 @@ switch method
             tic
             Tod{k - 1} = zeros(n, n ^ (k - 1));
             %     if k > 4
-%             spparms('spumoni',2)
+            %             spparms('spumoni',2)
             Tod{k - 1}(indices) = CoeffMatrix \ RHS; % Method 1: matlab uses sparse QR from SuiteSparseQR
-                % Tod{k - 1}(indices) = lsqminnorm(CoeffMatrix, RHS);      % Method 2
+            % Tod{k - 1}(indices) = lsqminnorm(CoeffMatrix, RHS);      % Method 2
             
             %% Optional: adjust transformation by a random element from the null-space
-%             nullDir = rand(diff(size(CoeffMatrix)),1); 
-%             Tod{k - 1}(indices) = Tod{k - 1}(indices).' + null(full(CoeffMatrix)) * nullDir;
+            %             nullDir = rand(diff(size(CoeffMatrix)),1);
+            %             Tod{k - 1}(indices) = Tod{k - 1}(indices).' + null(full(CoeffMatrix)) * nullDir;
             
             fprintf("completed in %f seconds. \n", toc)
         end
@@ -229,6 +229,18 @@ for k = 2:degree + 1
         %         sigmaSquared{k - 1} = wbar{k}(indexSet);
         sigmaSquared(:, k - 1) = wbar{k}(indexSet);
     end
+end
+
+if verbose
+    % Plot the squared singular value functions
+    z = linspace(- 1, 1, 101);
+    figure; hold on; title("Singular value functions")
+    for i = 1:n
+        plot(z, real(sqrt(polyval(flip(sigmaSquared(i, :)), z))))
+        % plot(z, polyval(flip(sigmaSquared(i, :)), z)) % plot squared singular value functions
+    end
+    set(gca,'yscale','log')
+    xlabel('z_i','Interpreter','TeX'); ylabel('\sigma_i','Interpreter','TeX'); legend('\sigma_1','\sigma_2','Interpreter','TeX')
 end
 
 end
