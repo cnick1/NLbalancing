@@ -1,7 +1,7 @@
-function x = jcbn(T, z)
+function J = jcbn(T, z)
 %jcbn Return the Jacobian of the transformation given by the T coefficients at z.
 %
-%   Usage:  x = jcbn(T, z)
+%   Usage:  J = jcbn(T, z)
 %
 %   Inputs: T - cell array containing transformation coefficients
 %           z - point at which to evaluate the Jacobian
@@ -16,7 +16,7 @@ function x = jcbn(T, z)
 %   where the rows of the transformation coefficients are symmetrized. Then,
 %   the Jacobian is given by
 % 
-%       ∂Φ(z)/∂z = T{1} + 2*T{2}*(I⊗z) + ... + d*T{d}*(I...⊗z)
+%       J(z) = ∂Φ(z)/∂z = T{1} + 2*T{2}*(I⊗z) + ... + d*T{d}*(I...⊗z)
 % 
 %   Evaluating this explicitly is expensive, so this function uses the
 %   Kronecker-vec identity to do this recursively and in a more efficient
@@ -29,9 +29,9 @@ function x = jcbn(T, z)
 
 n = size(z, 1);
 if isempty(T{1})
-    x = 0;
+    J = 0;
 else
-    x = T{1};
+    J = T{1};
 end
 
 zkm1 = 1;
@@ -40,7 +40,7 @@ for k = 2:length(T)
     zkm1 = kron(zkm1, z);
     % Need to iterate over n rows to apply kron-vec identity
     for j = 1:n
-        x(j,:) = x(j,:) + k * zkm1.' * reshape(T{k}(j,:),n^(k-1),[]); %#ok<AGROW>
+        J(j,:) = J(j,:) + k * zkm1.' * reshape(T{k}(j,:),n^(k-1),[]); %#ok<AGROW>
     end
 end
 end

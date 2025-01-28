@@ -9,7 +9,7 @@ function [ns,energyTimings,transformationTimings] = runExample17_timings(degree)
 %%
 fprintf('Running Example 17\n')
 
-if nargin < 1 
+if nargin < 1
     degree = 3;
 end
 
@@ -32,13 +32,13 @@ i = 0;
 if degree == 6
     ns = [4,8,16];
     % ns = [4*ones(1,10),8*ones(1,10),16*ones(1,3)];
-elseif degree == 5 
+elseif degree == 5
     ns = [4,8,16,32];
     % ns = [4*ones(1,10),8*ones(1,10),16*ones(1,3),32];
 elseif degree == 4
     ns = [4,8,16,32,64,128];
     % ns = [4*ones(1,10),8*ones(1,10),16*ones(1,10),32*ones(1,3),64*ones(1,3),128];
-elseif degree == 3   
+elseif degree == 3
     ns = [4,8,16,32,64,128, 256, 512];
     % ns = [4*ones(1,10),8*ones(1,10),16*ones(1,10),32*ones(1,3),64*ones(1,3),128, 256, 512];
 end
@@ -56,7 +56,7 @@ for n=ns
     clear f g h % save some ram
     %% Compute the input-normal/output-diagonal transformation approximation, also giving the squared singular value functions
     tic
-    [sigmaSquared, Tod] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);
+    [sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);
     transformationTimings = [transformationTimings, toc];
     fprintf("\n    -> Transformation computed in %f seconds. \n\n", transformationTimings(end))
     

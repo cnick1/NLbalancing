@@ -1,8 +1,8 @@
 function [ft, gt, ht] = transformDynamicsDontInvert(f, g, h, T)
 %transformDynamicsDontInvert Transform the model given by f, g, h by transformation T.
 %   This function returns the expansions for the transformed dynamics in
-%   the form 
-%             ∂Φ(z)/∂z \dot{z} = ft(z) + gt(z) u,    y = ht(z). 
+%   the form
+%             ∂Φ(z)/∂z \dot{z} = ft(z) + gt(z) u,    y = ht(z).
 %          NOTE, THE JACOBIAN IS THEN NEEDED ON THE LEFT-HAND-SIDE.
 %
 %   Usage: [ft, gt, ht] = transformDynamicsDontInvert(f, g, h, T)
@@ -18,22 +18,22 @@ function [ft, gt, ht] = transformDynamicsDontInvert(f, g, h, T)
 %                  for the transformed drift, input, and output.
 %
 %   Background: Given a transformation x = Φ(z), we seek to represent the
-%    dynamics for the control-affine system 
-%        \dot{x} = f(x) + g(x) u 
+%    dynamics for the control-affine system
+%        \dot{x} = f(x) + g(x) u
 %              y = h(x)
-%    in the new coordinates as 
-%        \dot{z} = ftilde(z) + gtilde(z) u 
+%    in the new coordinates as
+%        \dot{z} = ftilde(z) + gtilde(z) u
 %              y = htilde(z)
 %    In general, it is not possible to do this explicitly. Applying the
-%    transformation yields 
-%        ∂Φ(z)/∂z \dot{z} = f(Φ(z)) + g(Φ(z)) u 
+%    transformation yields
+%        ∂Φ(z)/∂z \dot{z} = f(Φ(z)) + g(Φ(z)) u
 %                       y = h(Φ(z))
 %    and we do not in general have an explicit way to write [∂Φ(z)/∂z]^{-1}.
 %    In this function, we will simply return ft(z) = f(Φ(z)), gt(z) =
 %    g(Φ(z)), and ht(z) = h(Φ(z)). This can be done exactly for polynomial
 %    transformations, though the degree of the dynamics increases, e.g. a
 %    cubic function transformed by a quadratic transformation becomes
-%    degree 6. 
+%    degree 6.
 %
 %    Note that to simulate the transformed dynamics will require then
 %    "inverting the Jacobian" [∂Φ(z)/∂z]^{-1}. The Jacobian matrix can be
@@ -54,7 +54,7 @@ for i = 1:lf*ld
     ft{i} = zeros(n,n^i);
     % See Lemma 1 in my SCL paper: Ptilde_i = sum_j^i Pj cT_j,i
     % Note: index backwards so that if you only have e.g. T1 you can move on
-    for j=flip(1:i) 
+    for j=flip(1:i)
         if j > lf; continue; end % skip if requesting fj that doesn't exist
         if (i-j)-ld>=0; break; end % skip if requesting T that doesn't exist
         ft{i} = ft{i} + calTTv(T, j, i, f{j}.').';
@@ -62,7 +62,7 @@ for i = 1:lf*ld
 end
 
 %% Transform input map g(x)
-% Instead of dealing with g(x) matrix directly, deal with g_i(x) vectors so 
+% Instead of dealing with g(x) matrix directly, deal with g_i(x) vectors so
 % I can use the same code as for f(x). So loop over m input channels, use gttemp,
 % and convert to gt after
 gttemp = cell(length(g),m);

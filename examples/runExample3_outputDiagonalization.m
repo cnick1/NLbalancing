@@ -39,7 +39,7 @@ degree = 4;
 
 %% Compute the input-normal/output-diagonal transformation approximation, also giving the squared singular value functions
 tic
-[sigmaSquared, Tod] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);
+[sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);
 fprintf("Input-normal/output-diagonal transformation took %f seconds. \n", toc)
 
 %% Plot the squared singular value functions

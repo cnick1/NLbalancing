@@ -38,7 +38,7 @@ fprintf("                             ->  Energy functions match.\n\n")
 
 %% Compute the input-normal/output-diagonal transformation approximation, also giving the squared singular value functions
 tic
-[sigmaSquared, Tod] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);
+[sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);
 fprintf("Input-normal/output-diagonal transformation took %f seconds. \n", toc)
 
 fprintf("\n  - Comparing our singular value functions with Gray/Scherpen 2001 Example 2.1:\n\n")
@@ -56,7 +56,7 @@ fprintf("\n                             ->  Squared singular value functions mat
 %% Compare transformation
 fprintf("\n  - Comparing our transformation with Gray/Scherpen 2001 Example 2.1:\n")
 
-ourFullTransformation = Tod;
+ourFullTransformation = TinOd;
 
 for i = 2:length(ourFullTransformation)
     ourFullTransformation{i}(abs(ourFullTransformation{i}) < 1e-14) = 0;
@@ -68,11 +68,11 @@ disp(vpa(kronPolyEval(ourFullTransformation, sym('z', [1, 2]).'), 2))
 %% Gray transformation
 z = sym('z', [1, 2]).'; syms(z);
 % Tsym = [(-1 + sqrt(1+4*z1))/2; z2];
-% [Tod2,~,~] = approxPolynomialDynamics(Tsym,[1;1],z1,z,3);
+% [TinOd2,~,~] = approxPolynomialDynamics(Tsym,[1;1],z1,z,3);
 Tin2 = {[1 0; 0 1], [0 0 0 -1; 0 0 0 0], zeros(2, 2 ^ 3)};
-Tod2 = {[1, -1; 1, 1] ./ sqrt(2), zeros(2, 2 ^ 2), zeros(2, 2 ^ 3)};
+TinOd2 = {[1, -1; 1, 1] ./ sqrt(2), zeros(2, 2 ^ 2), zeros(2, 2 ^ 3)};
 
-TGray = composeTransformations(Tin2, Tod2);
+TGray = composeTransformations(Tin2, TinOd2);
 
 fprintf("    > The transformation supposed to be in Gray/Scherpen 2001 is: \n\n         𝚽(z) = ")
 % fprintf('%s \n', char(Tsym))

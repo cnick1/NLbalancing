@@ -1,7 +1,7 @@
-function runExample24(degree)
-%runExample24 Runs the 2D example to visualize the nonlinear balancing transformations.
+function runExample14_balancingTransformation(degree,lim)
+%runExample14_balancingTransformation Runs the 2D example to visualize the nonlinear balancing transformations.
 %
-%   Usage:  runExample24(degree)
+%   Usage:  runExample14_balancingTransformation(degree)
 %
 %   Inputs:
 %       degree - desired degree of the energy function approximation
@@ -24,19 +24,21 @@ function runExample24(degree)
 % close all;
 set(groot,'defaultLineLineWidth',1,'defaultTextInterpreter','TeX')
 
-fprintf('Running Example 24\n')
+fprintf('Running Example 14\n')
 
-if nargin < 1
-    degree = 4;
+if nargin < 2
+    lim = .5;
+    if nargin < 1
+        degree = 4;
+    end
 end
 
-lim=.1;
-
-[f, g, h] = getSystem24(false); eta = 0; n = 2;
-% f{2} = 0.1*f{2}; lim=1; % For testing scaling f2
+%% Get system dynamics
+[f, g, h] = getSystem14(degree - 1, 1);
 
 %%  Compute the energy functions
 fprintf(" ~~~~~~~~~~~~~~~~~~~~~~~~~ Computing energy functions:  ~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
+eta = 0;
 [v] = approxPastEnergy(f, g, h, eta, degree, false);
 [w] = approxFutureEnergy(f, g, h, eta, degree, false);
 
@@ -44,19 +46,9 @@ fprintf(" ~~~~~~~~~~~~~~~~~~~~~~~~~ Computing energy functions:  ~~~~~~~~~~~~~~~
 fprintf(" ~~~~~~~~~~~ Computing transformation and singular value functions:  ~~~~~~~~~~~~ \n")
 [sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);
 
-% Plot the squared singular value functions
-z = linspace(- 1, 1, 51);
-figure; hold on; title("Singular value functions")
-for i = 1:2
-    plot(z, real(sqrt(polyval(flip(sigmaSquared(i, :)), z))))
-    % plot(z, polyval(flip(sigmaSquared(i, :)), z)) % plot squared singular value functions
-end
-set(gca,'yscale','log')
-xlabel('z_i'); ylabel('\sigma_i'); legend('\sigma_1','\sigma_2')
-
 %% Plot grid transformations
 % Parameters
-numLines = 15; numPoints = 201;
+numLines = 41; numPoints = 201;
 
 % Generate original z coordinates
 [xH, yH] = meshgrid(linspace(-lim, lim, numLines), linspace(-lim, lim, numPoints)); % Horizontal lines
@@ -98,14 +90,14 @@ end
 F = @(x) kronPolyEval(f, x);
 Ft = @(z) PhiBarJacobian(z,TinOd,sigmaSquared)\kronPolyEval(f, PhiBar(z,TinOd,sigmaSquared));
 
-x0 = [1 1].'*(0.7*lim);
+x0 = [1 1].'*(0.5*lim);
 
 % Solve for z0 initial condition with a Newton type iteration
 z0 = newtonIteration(x0, @(z) PhiBar(z,TinOd,sigmaSquared), @(z) PhiBarJacobian(z,TinOd,sigmaSquared));
 
 
 % Simulate both systems
-[t1, X1] = ode45(@(t, x) F(x), [0, 5], x0);
+[~, X1] = ode45(@(t, x) F(x), [0, 5], x0);
 [~, Z] = ode45(@(t, z) Ft(z), [0, 5], z0);
 
 subplot(1,2,1)

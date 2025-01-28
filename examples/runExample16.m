@@ -7,7 +7,7 @@ function runExample16()
 %               control systems,” in Analysis and Design of Nonlinear
 %               Control Systems, Springer Berlin Heidelberg, 2008, pp.
 %               41–62. doi: 10.1007/978-3-540-74358-3_4
-% 
+%
 %   Part of the NLbalancing repository.
 %%
 fprintf('Running Example 16\n')
@@ -24,7 +24,7 @@ fprintf("Beginning comparisons with Krener 2008:\n")
 
 %% Compute the input-normal/output-diagonal transformation approximation, also giving the squared singular value functions
 tic
-[sigmaSquared, Tod] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);
+[sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);
 fprintf("Input-normal/output-diagonal transformation took %f seconds. \n", toc)
 
 fprintf("\n  - Comparing our Hankel singular values with Krener 2008:\n\n    ")
@@ -51,6 +51,6 @@ end
 return
 %% Compare transformation
 fprintf("\n  - Comparing our transformation with Krener 2008:\n")
-disp(vpa(kronPolyEval(Tod, sym('x', [1, 6]).'), 2))
+disp(vpa(kronPolyEval(TinOd, sym('x', [1, 6]).'), 2))
 
 end

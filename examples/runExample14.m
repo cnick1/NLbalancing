@@ -67,7 +67,7 @@ fprintf("\n                             ->  Energy functions match.\n\n")
 fprintf("\n  - Comparing our squared singular value functions with Fujimoto/Scherpen 2005:\n")
 
 tic
-[sigmaSquared, Tod] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);
+[sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);
 fprintf("Input-normal/output-diagonal transformation took %f seconds. \n", toc)
 
 fprintf("\n  - Squared singular value functions:\n\n")

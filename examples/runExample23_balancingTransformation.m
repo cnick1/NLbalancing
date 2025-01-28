@@ -1,7 +1,7 @@
-function runExample23(degree,linear,reduction,scaling)
-%runExample23 Runs the 3D example from [1,2].
+function runExample23_balancingTransformation(degree,linear,reduction,scaling)
+%runExample23_balancingTransformation Runs the 3D example to visualize the nonlinear balancing transformations.
 %
-%   Usage:  runExample23(degree)
+%   Usage:  runExample23_balancingTransformation(degree,linear,reduction,scaling)
 %
 %   Inputs:
 %       degree    - desired degree of the energy function approximation
@@ -81,67 +81,55 @@ if nargin < 4
     end
 end
 
-[f, g, h] = getSystem23(linear);
+%% Get system dynamics
+[f, g, h] = getSystem23(linear); n=3;
+f{2} = 0.01*f{2}; % For testing scaling f2
 
 %%  Compute the energy functions
 fprintf(" ~~~~~~~~~~~~~~~~~~~~~~~~~ Computing energy functions:  ~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
-
 eta = 0;
 [v] = approxPastEnergy(f, g, h, eta, degree, false);
 [w] = approxFutureEnergy(f, g, h, eta, degree, false);
-
-% Print energy functions
-n = 3; x = sym('x', [1, n]).'; syms(x);
 
 %% Compute the input-normal/output-diagonal transformation approximation, also giving the squared singular value functions
 fprintf(" ~~~~~~~~~~~ Computing transformation and singular value functions:  ~~~~~~~~~~~~ \n")
 [sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree - 1);
 
-%% Plot the squared singular value functions
-fprintf("    Singular value functions (squared): \n")
-figure('Position', [266 220 560 420]); hold on; syms z
-for i=1:n
-    fprintf("         𝜎_%i^2(z) = tau_%i(z,0) = ",i,i)
-    fprintf(string(vpa(poly2sym(flip(sigmaSquared(i, :)), z), 4)));fprintf("\n")
-    fplot(vpa(poly2sym(flip(sigmaSquared(i, :)), z), 4),[-1 1],'LineWidth',1.5)
-end
-
-title('Singular value functions (squared)')
-xlabel('$z_i$'); ylabel('$\sigma_i^2$'); set(gca, 'YScale', 'log')
-legend('\sigma_1^2','\sigma_2^2','\sigma_3^2')
-
-%% Apply reduction by eliminating all appearances of z3 from the transformation???
-% TinOd{1} = TinOd{1}(:,1:2);
-
-%% Compute transformed dynamics
-[ft, gt, ht] = transformDynamics(f, g, h, TinOd);
-
+%% Simulate dynamics
 % Compare original dynamics with transformed dynamics
-z = sym('z', [1, n]).'; syms(z); syms u;
-F = @(x) kronPolyEval(f, x); G = @(x) (g{1} + kronPolyEval(g(2:end), x));
-Ft = @(z) kronPolyEval(ft, z); Gt = @(z) (gt{1} + kronPolyEval(gt(2:end), z));
+F = @(x) kronPolyEval(f, x);
+Ft = @(z) PhiBarJacobian(z,TinOd,sigmaSquared)\kronPolyEval(f, PhiBar(z,TinOd,sigmaSquared));
 
 %% Simulate original and transformed systems; same input should give same output
 x0 = [1 1 1].'*scaling;
 
 % Solve for z0 initial condition with a Newton type iteration
-z0 = newtonIteration(x0, @(z) kronPolyEval(TinOd, z), @(z) jcbn(TinOd, z));
+z0 = newtonIteration(x0, @(z) PhiBar(z,TinOd,sigmaSquared), @(z) PhiBarJacobian(z,TinOd,sigmaSquared));
+
+
+%% Apply reduction by eliminating z3 (set it and its derivative to zero)
+if reduction
+    z0(3) = 0;
+    Fttemp = @(z) PhiBarJacobian(z,TinOd,sigmaSquared)\kronPolyEval(f, PhiBar(z,TinOd,sigmaSquared));
+    Ir = eye(3); Ir(end) = 0;
+    Ft = @(z) Ir*Fttemp(z);
+end
 
 % Simulate both systems
-[t2, X2] = ode45(@(t, x) F(x), [0, 5], x0);
-[t22, Z2] = ode45(@(t, x) Ft(x), [0, 5], z0);
+[t1, X1] = ode45(@(t, x) F(x), [0, 5], x0);
+[t2, Z2] = ode45(@(t, z) Ft(z), [0, 5], z0);
 
 % Convert z trajectories to x coordinates
-X22 = zeros(size(Z2));
-for i=1:length(t22)
-    X22(i,:) = kronPolyEval(TinOd, Z2(i,:).');
+X2 = zeros(size(Z2));
+for i=1:length(t2)
+    X2(i,:) = PhiBar(Z2(i,:).',TinOd,sigmaSquared);
 end
 
 % Plot state trajectories
 figure('Position', [827 220 560 420]);
 subplot(2,1,1); hold on;
-plot(t2,X2)
-plot(t22,X22,'--')
+plot(t1,X1)
+plot(t2,X2,'--')
 
 title('Reconstructed state trajectories'); xlabel('Time $t$')
 ylim(max(x0)*[-1.5 1.5]); ylabel('$x_i(t)$')
@@ -149,24 +137,12 @@ legend('FOM x_1','FOM x_2','FOM x_3','ROM x_1','ROM x_2','ROM x_3')
 
 % Plot outputs
 subplot(2,1,2); hold on;
-plot(t2,sum(X2,2))
-plot(t22,sum(X22,2),'--')
+plot(t1,sum(X1,2))
+plot(t2,sum(X2,2),'--')
 
 title('Model output'); xlabel('Time $t$')
 ylim(max(x0)*[-3.5 3.5]); ylabel('$y(t)$')
 legend('FOM output','ROM output')
-
-%% Truncate last state to obtain a reduced-order model
-% for i=1:length(ft)
-%     fr{i} = ft{i}(1:2,:);
-% end
-%
-% for i=1:length(gt)
-%     fr{i} = ft{i}(1:2,:);
-% end
-%
-% Fr = @(x) kronPolyEval(fr, x); Gr = @(x) (gr{1} + kronPolyEval(gr(2:end), x));
-
 
 
 end

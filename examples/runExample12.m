@@ -73,7 +73,7 @@ fprintf("                             ->  Example 1 results match.\n\n")
 
 %% Compute the input-normal/output-diagonal transformation approximation, also giving the squared singular value functions
 tic
-[sigmaSquared, Tod] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);
+[sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);
 fprintf("Input-normal/output-diagonal transformation took %f seconds. \n", toc)
 
 fprintf("\n  - Comparing our singular value functions with Fujimoto/Scherpen 2001/2005 Example 3:\n")
@@ -101,17 +101,17 @@ fprintf("                             ->  Example 3 results match.\n\n")
 %% Save transformation to compare later
 % fprintf("    > The full input-normal/output-diagonal transformation is: \n\n         𝚽(z) = ")
 %
-% Tod{3}(abs(Tod{3}) < 1e-14) = 0;Tod{5}(abs(Tod{5}) < 1e-14) = 0;
-% disp(vpa(kronPolyEval(Tod(1:5),sym('z', [1, 2]).'),4))
+% TinOd{3}(abs(TinOd{3}) < 1e-14) = 0;TinOd{5}(abs(TinOd{5}) < 1e-14) = 0;
+% disp(vpa(kronPolyEval(TinOd(1:5),sym('z', [1, 2]).'),4))
 
-ourFullTransformation = Tod;
+ourFullTransformation = TinOd;
 
-[ft, gt, ht] = transformDynamics(f, g, h, Tod);
+[ft, gt, ht] = transformDynamics(f, g, h, TinOd);
 
 for i=1:length(ft); ft{i}(abs(ft{i}) < 1e-14) = 0; end
 disp(vpa(kronPolyEval(ft, sym('z', [1, 2]).',5), 2))
 
-for i=1:length(Tod); ourFullTransformation{i}(abs(Tod{i}) < 1e-14) = 0; end
+for i=1:length(TinOd); ourFullTransformation{i}(abs(TinOd{i}) < 1e-14) = 0; end
 vpa(kronPolyDerivEval(ourFullTransformation, sym('z', [1, 2]).',1), 2)
 
 %% Compare with Fujimoto 2010
@@ -127,7 +127,7 @@ fprintf("     Note: in this paper, they start from an intermediate transformed s
 
 %% Compute the input-normal/output-diagonal transformation approximation, also giving the squared singular value functions
 tic
-[sigmaSquared, Tod] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);
+[sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);
 fprintf("Input-normal/output-diagonal transformation took %f seconds. \n", toc)
 
 fprintf("\n  - Comparing our singular value functions with Fujimoto/Scherpen 2010 Example 5:\n\n")
@@ -143,10 +143,10 @@ fprintf("                     ->  Squared singular value functions match.\n\n")
 %% Compare transformation
 fprintf("\n  - Comparing our partial transformation with Fujimoto/Scherpen 2010 Example 5:\n")
 
-Tod{3}(abs(Tod{3}) < 1e-14) = 0; Tod{5}(abs(Tod{5}) < 1e-14) = 0;
+TinOd{3}(abs(TinOd{3}) < 1e-14) = 0; TinOd{5}(abs(TinOd{5}) < 1e-14) = 0;
 
 fprintf("    > The input-normal/output-diagonal transformation is: \n\n         𝚽(y) = ")
-disp(vpa(kronPolyEval(Tod(1:5), sym('y', [1, 2]).'), 4))
+disp(vpa(kronPolyEval(TinOd(1:5), sym('y', [1, 2]).'), 4))
 
 fprintf("                     ->  Partial transformation matches.\n\n")
 
@@ -165,9 +165,9 @@ fprintf(" ~~~~~~~~~~~~~~~~~~~~ Now compare the entire transformation: ~~~~~~~~~~
 z = sym('z', [1, 2]).'; syms(z);
 % The transformation provided in Fujimoto 2005; the one in 2001 has a typo
 Tsym = [3 / sqrt(9 + (z1 ^ 2 + z2 ^ 2) ^ 2) * z1 - z2 * (z1 ^ 2 + z2 ^ 2) / sqrt(9 + (z1 ^ 2 + z2 ^ 2) ^ 2);
-        (z1 ^ 2 + z2 ^ 2) / sqrt(9 + (z1 ^ 2 + z2 ^ 2) ^ 2) * z1 + z2 * 3 / sqrt(9 + (z1 ^ 2 + z2 ^ 2) ^ 2)];
+    (z1 ^ 2 + z2 ^ 2) / sqrt(9 + (z1 ^ 2 + z2 ^ 2) ^ 2) * z1 + z2 * 3 / sqrt(9 + (z1 ^ 2 + z2 ^ 2) ^ 2)];
 [T1, ~, ~] = approxPolynomialDynamics(Tsym, [1; 1], z1, z, 5);
-T2 = Tod;
+T2 = TinOd;
 
 fujimotoFullTransformation = composeTransformations(T1, T2);
 
@@ -205,7 +205,7 @@ fprintf("    Observability energy: \n        Lo = 1/2 *(")
 disp(vpa(kronPolyEval(what, sym('x', [1, 2]).'), 8))
 
 
-[ft, gt, ht] = transformDynamics(f, g, h, Tod);
+[ft, gt, ht] = transformDynamics(f, g, h, TinOd);
 
 for i=1:length(ft); ft{i}(abs(ft{i}) < 1e-14) = 0; end
 disp(vpa(kronPolyEval(ft, sym('z', [1, 2]).',5), 2))
@@ -214,7 +214,7 @@ return
 
 %% Compute transformed dynamics
 [fin, gin, hin] = transformDynamics(f, g, h, Tin);
-[fod, god, hod] = transformDynamics(fin, gin, hin, Tod);
+[fod, god, hod] = transformDynamics(fin, gin, hin, TinOd);
 
 
 
