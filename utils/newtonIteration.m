@@ -1,4 +1,4 @@
-function z = newtonIteration(x, f, J, verbose)
+function z = newtonIteration(x, f, J, maxIter, verbose)
 %newtonIteration Solve ƒ(z) = x for z using Newton iteration
 %
 %   Usage:  z = newtonIteration(x, f, J)
@@ -6,6 +6,8 @@ function z = newtonIteration(x, f, J, verbose)
 %   Inputs:     x - point at which to evaluate the transformation
 %               f - function handle for the function ƒ(z)
 %               J - function handle for the Jacobian J(z) = ∂ƒ(z)/∂z
+%         maxIter - maximum number of iterations
+%         verbose - boolean, whether to print runtime info
 %
 %   Outputs:    z - the value of z = ƒ⁻¹(x)
 %
@@ -56,17 +58,19 @@ function z = newtonIteration(x, f, J, verbose)
 %
 %   Part of the NLbalancing repository.
 %%
-if nargin < 4 
+if nargin < 5
     verbose = false;
-    if nargin < 3
-        error("Must supply x, f, and J")
+    if nargin < 4
+        maxIter = 10;
+        if nargin < 3
+            error("Must supply x, f, and J")
+        end
     end
 end
 
 % Solve for z0 initial condition with a Newton type iteration
 if verbose; fprintf("    Using Newton iteration to find transformed initial condition ... "); end
 
-maxIter = 10; % can change max iterations
 z = x.*0; % Default initial guess of z=0
 tol = 1e-14; % can edit tolerance
 
