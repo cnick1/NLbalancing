@@ -12,7 +12,7 @@ function runExample24_balancingTransformation(degree)
 %   drives interactions that cannot directly be eliminated. The model is:
 %           ẋ₁ = −2 x₁ + 20 x₁ x₂ + u,
 %           ẋ₂ = −5 x₂ + u,
-%                y = x₁ + x₂.
+%            y = x₁ + x₂.
 %   Despite being so simple, this is a challenging problem because the
 %   nonlinear interaction is strong: those terms are much larger than the
 %   linear terms!
