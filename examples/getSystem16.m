@@ -22,7 +22,7 @@ function [f, g, h] = getSystem16(degree)
 %           - m3 rotational kinetic energy
 %           - m3 translational kinetic energy
 %           (see the code for the specific formulas; essentially one needs
-%           to use vector differentiation/geometry, along with Ig=m l^2/12)
+%           to use vector differentiation/geometry, along with Ig=m l²/12)
 %       The potential energy is composed of
 %           - m1 potential energy (gravity)
 %           - k1 potential energy (spring)
@@ -32,7 +32,7 @@ function [f, g, h] = getSystem16(degree)
 %           - k3 potential energy (spring)
 %           (see the code for the specific formulas; essentially one needs
 %           to use geometry to find the position of each center of gravity,
-%           and for the springs E = 1/2 k Δx^2)
+%           and for the springs E = 1/2 k Δx²)
 %
 %       With the kinetic energy T and potential energy V, we can either use
 %       Lagrange's equations or a port-Hamiltonian approach
@@ -99,51 +99,51 @@ switch conversionMethod
         % Derive a mass matrix such that the momentum is p = M*qdot
         % Hard coded!
         M = [28/3, 6 * cos(x1 - x2), 2 * cos(x1 - x3);
-             6 * cos(x1 - x2), 16/3, 2 * cos(x2 - x3);
-             2 * cos(x1 - x3), 2 * cos(x2 - x3), 4/3];
+            6 * cos(x1 - x2), 16/3, 2 * cos(x2 - x3);
+            2 * cos(x1 - x3), 2 * cos(x2 - x3), 4/3];
         %         simplify(p - M*qdot) % Check that M satisfies p = M*qdot
         %                 Minv = inv(M); % yikes lol
         Mdot =- [0, 6 * sin(x1 - x2) * (x4 - x5), 2 * sin(x1 - x3) * (x4 - x6);
-                 6 * sin(x1 - x2) * (x4 - x5), 0, 2 * sin(x2 - x3) * (x5 - x6);
-                 2 * sin(x1 - x3) * (x4 - x6), 2 * sin(x2 - x3) * (x5 - x6), 0];
-
+            6 * sin(x1 - x2) * (x4 - x5), 0, 2 * sin(x2 - x3) * (x5 - x6);
+            2 * sin(x1 - x3) * (x4 - x6), 2 * sin(x2 - x3) * (x5 - x6), 0];
+        
         fsym = [qdot;
-                M \ (gradient(L, q) - Mdot * qdot - [(mu1 + mu2) * x4 - mu2 * x5; -mu2 * x4 + (mu2 + mu3) * x5 - mu3 * x6; - mu3 * x5 + mu3 * x6])];
+            M \ (gradient(L, q) - Mdot * qdot - [(mu1 + mu2) * x4 - mu2 * x5; -mu2 * x4 + (mu2 + mu3) * x5 - mu3 * x6; - mu3 * x5 + mu3 * x6])];
         gsym = [0; 0; 0; M \ [1; 0; 0]];
         hsym = (l1 * sin(x1) + l2 * sin(x2) + l3 * sin(x3));
-
+        
         [f, g, h] = approxPolynomialDynamics(fsym, gsym, hsym, x, degree);
-
+        
     case 2
         %% Port-Hamiltonian approach to deriving equations of motion
         % redefine Hamiltonian state
         clear x4 x5 x6
         syms p1 p2 p3
         y = [q; p1; p2; p3];
-
+        
         M = [28/3, 6 * cos(x1 - x2), 2 * cos(x1 - x3);
-             6 * cos(x1 - x2), 16/3, 2 * cos(x2 - x3);
-             2 * cos(x1 - x3), 2 * cos(x2 - x3), 4/3];
+            6 * cos(x1 - x2), 16/3, 2 * cos(x2 - x3);
+            2 * cos(x1 - x3), 2 * cos(x2 - x3), 4/3];
         %         simplify(p - M*qdot) % Check that M satisfies p = M*qdot
         Minv = inv(M); % yikes lol
-
+        
         T = 1/2 * [p1; p2; p3].' * Minv * [p1; p2; p3];
         H = T + V;
-
+        
         D = [mu1 + mu2, -mu2, 0;
-             -mu2, mu2 + mu3, -mu3;
-             0, -mu3, mu3];
-
+            -mu2, mu2 + mu3, -mu3;
+            0, -mu3, mu3];
+        
         J = [zeros(n / 2), eye(n / 2);
-             -eye(n / 2), zeros(n / 2)];
+            -eye(n / 2), zeros(n / 2)];
         R = [zeros(n / 2), zeros(n / 2);
-             zeros(n / 2), D];
-
+            zeros(n / 2), D];
+        
         fsym = (J - R) * gradient(H, y);
         gsym = [0; 0; 0; 1; 0; 0];
         %                 hsym = (l1 * sin(x1) + l2 * sin(x2) + l3/2 * sin(x3));
         hsym = (l1 * sin(x1) + l2 * sin(x2) + l3 * sin(x3));
-
+        
         [f, g, h] = approxPolynomialDynamics(fsym, gsym, hsym, y, degree);
 end
 

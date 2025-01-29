@@ -36,14 +36,16 @@ function [f, g, h, zInit, M] = getSystem4(n, m, p, epsilon)
 %
 %  Author: Jeff Borggaard, Virginia Tech
 %
-%  Licence: MIT
+%  License: MIT
 %
-%   Reference: [1] B. Kramer, S. Gugercin, J. Borggaard, and L. Balicki, “Nonlinear
-%               balanced truncation: Part 1—computing energy functions,” arXiv,
-%               Dec. 2022. doi: 10.48550/ARXIV.2209.07645
+%   Reference: [1] B. Kramer, S. Gugercin, J. Borggaard, and L. Balicki,
+%               “Scalable computation of energy functions for nonlinear
+%               balanced truncation,” Computer Methods in Applied Mechanics
+%               and Engineering, vol. 427, p. 117011, Jul. 2024, doi:
+%               10.1016/j.cma.2024.117011
 %              [2] B. Kramer, S. Gugercin, and J. Borggaard, “Nonlinear balanced
 %               truncation: Part 2—model reduction on manifolds,” arXiv, Feb. 2023.
-%               doi: 10.48550/ARXIV.2302.02036
+%               doi: 10.48550/arXiv.2302.02036
 %
 %  Part of the NLbalancing and QQR repositories.
 %%
@@ -114,12 +116,12 @@ for n_el = 1:n_elements
     x_local = x(nodes_local, :);
     [x_g, wt_g, phi0, phi1, p0_x, p1_x, p0_xx, p1_xx] = ...
         oned_shapeherm(x_local, r, wt);
-
+    
     M00_loc = oned_bilinear(one, phi0, phi0, wt_g);
     M01_loc = oned_bilinear(one, phi0, phi1, wt_g);
     M10_loc = M01_loc.';
     M11_loc = oned_bilinear(one, phi1, phi1, wt_g);
-
+    
     A00_loc = oned_bilinear(eps_g, p0_x, p0_x, wt_g) ...
         -oned_bilinear(eps2_g, p0_xx, p0_xx, wt_g);
     A01_loc = oned_bilinear(eps_g, p0_x, p1_x, wt_g) ...
@@ -127,74 +129,74 @@ for n_el = 1:n_elements
     A10_loc = A01_loc.';
     A11_loc = oned_bilinear(eps_g, p1_x, p1_x, wt_g) ...
         -oned_bilinear(eps2_g, p1_xx, p1_xx, wt_g);
-
+    
     for mm = 1:m
         b_loc = chi(x_g, mm, m);
-
+        
         B0_loc(:, mm) = oned_f_int(b_loc, phi0, wt_g);
         B1_loc(:, mm) = oned_f_int(b_loc, phi1, wt_g);
     end
-
+    
     for pp = 1:p
         c_loc = chi(x_g, pp, p);
-
+        
         C0_loc(pp, :) = oned_f_int(c_loc, phi0, wt_g).';
         C1_loc(pp, :) = oned_f_int(c_loc, phi1, wt_g).';
     end
-
+    
     [z_loc, ~] = zZero(x_g, L);
     z0_loc = oned_f_int(z_loc, phi0, wt_g);
     z1_loc = oned_f_int(z_loc, phi1, wt_g);
-
+    
     %---------------------------------------------------------------------------
     % Assemble contributions into the system matrices
     %---------------------------------------------------------------------------
     for n_t = 1:nel_dof
         n_test0 = ide(nodes_local(n_t), 1);
         n_test1 = ide(nodes_local(n_t), 2);
-
+        
         for n_u = 1:nel_dof
             n_unk0 = ide(nodes_local(n_u), 1);
             n_unk1 = ide(nodes_local(n_u), 2);
-
+            
             n_triplets = n_triplets + 1;
             II(n_triplets) = n_unk0;
             JJ(n_triplets) = n_test0;
             AA(n_triplets) = A00_loc(n_t, n_u);
             MM(n_triplets) = M00_loc(n_t, n_u);
-
+            
             n_triplets = n_triplets + 1;
             II(n_triplets) = n_unk0;
             JJ(n_triplets) = n_test1;
             AA(n_triplets) = A01_loc(n_t, n_u);
             MM(n_triplets) = M01_loc(n_t, n_u);
-
+            
             n_triplets = n_triplets + 1;
             II(n_triplets) = n_unk1;
             JJ(n_triplets) = n_test0;
             AA(n_triplets) = A10_loc(n_t, n_u);
             MM(n_triplets) = M10_loc(n_t, n_u);
-
+            
             n_triplets = n_triplets + 1;
             II(n_triplets) = n_unk1;
             JJ(n_triplets) = n_test1;
             AA(n_triplets) = A11_loc(n_t, n_u);
             MM(n_triplets) = M11_loc(n_t, n_u);
         end
-
+        
         for mm = 1:m
             B(n_test0, mm) = B(n_test0, mm) + B0_loc(n_t, mm);
             B(n_test1, mm) = B(n_test1, mm) + B1_loc(n_t, mm);
         end
-
+        
         for pp = 1:p
             C(pp, n_test0) = C(pp, n_test0) + C0_loc(pp, n_t);
             C(pp, n_test1) = C(pp, n_test1) + C1_loc(pp, n_t);
         end
-
+        
         z0(n_test0) = z0(n_test0) + z0_loc(n_t);
         z0(n_test1) = z0(n_test1) + z1_loc(n_t);
-
+        
         %  assemble the 2zz_x term with symmetries
         for nj = 1:nel_dof
             j0 = ide(nodes_local(nj), 1);
@@ -202,96 +204,96 @@ for n_el = 1:n_elements
             for nk = nj:nel_dof
                 k0 = ide(nodes_local(nk), 1);
                 k1 = ide(nodes_local(nk), 2);
-
+                
                 tmp00 = sum(p0_x(:, n_t) .* phi0(:, nj) .* phi0(:, nk) .* wt_g(:)) / 2;
                 n_tripletsn = n_tripletsn + 1;
                 IIn(n_tripletsn) = n_test0;
                 JJn(n_tripletsn) = idx2(j0, k0);
                 NN(n_tripletsn) = tmp00;
-
+                
                 n_tripletsn = n_tripletsn + 1;
                 IIn(n_tripletsn) = n_test0;
                 JJn(n_tripletsn) = idx2(k0, j0);
                 NN(n_tripletsn) = tmp00;
-
+                
                 tmp01 = sum(p0_x(:, n_t) .* phi0(:, nj) .* phi1(:, nk) .* wt_g(:)) / 2;
                 n_tripletsn = n_tripletsn + 1;
                 IIn(n_tripletsn) = n_test0;
                 JJn(n_tripletsn) = idx2(j0, k1);
                 NN(n_tripletsn) = tmp01;
-
+                
                 n_tripletsn = n_tripletsn + 1;
                 IIn(n_tripletsn) = n_test0;
                 JJn(n_tripletsn) = idx2(k1, j0);
                 NN(n_tripletsn) = tmp01;
-
+                
                 tmp10 = sum(p0_x(:, n_t) .* phi1(:, nj) .* phi0(:, nk) .* wt_g(:)) / 2;
                 n_tripletsn = n_tripletsn + 1;
                 IIn(n_tripletsn) = n_test0;
                 JJn(n_tripletsn) = idx2(j1, k0);
                 NN(n_tripletsn) = tmp10;
-
+                
                 n_tripletsn = n_tripletsn + 1;
                 IIn(n_tripletsn) = n_test0;
                 JJn(n_tripletsn) = idx2(k0, j1);
                 NN(n_tripletsn) = tmp10;
-
+                
                 tmp11 = sum(p0_x(:, n_t) .* phi1(:, nj) .* phi1(:, nk) .* wt_g(:)) / 2;
                 n_tripletsn = n_tripletsn + 1;
                 IIn(n_tripletsn) = n_test0;
                 JJn(n_tripletsn) = idx2(j1, k1);
                 NN(n_tripletsn) = tmp11;
-
+                
                 n_tripletsn = n_tripletsn + 1;
                 IIn(n_tripletsn) = n_test0;
                 JJn(n_tripletsn) = idx2(k1, j1);
                 NN(n_tripletsn) = tmp11;
-
+                
                 %  for p1_x
                 tmp00 = sum(p1_x(:, n_t) .* phi0(:, nj) .* phi0(:, nk) .* wt_g(:)) / 2;
                 n_tripletsn = n_tripletsn + 1;
                 IIn(n_tripletsn) = n_test1;
                 JJn(n_tripletsn) = idx2(j0, k0);
                 NN(n_tripletsn) = tmp00;
-
+                
                 n_tripletsn = n_tripletsn + 1;
                 IIn(n_tripletsn) = n_test1;
                 JJn(n_tripletsn) = idx2(k0, j0);
                 NN(n_tripletsn) = tmp00;
-
+                
                 tmp01 = sum(p1_x(:, n_t) .* phi0(:, nj) .* phi1(:, nk) .* wt_g(:)) / 2;
                 n_tripletsn = n_tripletsn + 1;
                 IIn(n_tripletsn) = n_test1;
                 JJn(n_tripletsn) = idx2(j0, k1);
                 NN(n_tripletsn) = tmp01;
-
+                
                 n_tripletsn = n_tripletsn + 1;
                 IIn(n_tripletsn) = n_test1;
                 JJn(n_tripletsn) = idx2(k1, j0);
                 NN(n_tripletsn) = tmp01;
-
+                
                 tmp10 = sum(p1_x(:, n_t) .* phi1(:, nj) .* phi0(:, nk) .* wt_g(:)) / 2;
                 n_tripletsn = n_tripletsn + 1;
                 IIn(n_tripletsn) = n_test1;
                 JJn(n_tripletsn) = idx2(j1, k0);
                 NN(n_tripletsn) = tmp10;
-
+                
                 n_tripletsn = n_tripletsn + 1;
                 IIn(n_tripletsn) = n_test1;
                 JJn(n_tripletsn) = idx2(k0, j1);
                 NN(n_tripletsn) = tmp10;
-
+                
                 tmp11 = sum(p1_x(:, n_t) .* phi1(:, nj) .* phi1(:, nk) .* wt_g(:)) / 2;
                 n_tripletsn = n_tripletsn + 1;
                 IIn(n_tripletsn) = n_test1;
                 JJn(n_tripletsn) = idx2(j1, k1);
                 NN(n_tripletsn) = tmp11;
-
+                
                 n_tripletsn = n_tripletsn + 1;
                 IIn(n_tripletsn) = n_test1;
                 JJn(n_tripletsn) = idx2(k1, j1);
                 NN(n_tripletsn) = tmp11;
-
+                
             end
         end
     end
@@ -314,7 +316,7 @@ zInit = M \ z0;
 %  Perform a change of variables to eliminate the positive definite
 %  mass matrix.  Let M^(1/2)z -> x
 %
-%    \dot{x} = Ax+Bu+N*kron(x,x),
+%    ẋ = Ax+Bu+N*kron(x,x),
 %
 %  This is required until we extend our formulation to handle "mass matrices"
 
@@ -468,23 +470,23 @@ for k = 1:new_elem
     elseif (dim == 3)
         e_conn(k, :) = [3 * k - 2, 3 * k - 1, 3 * k, 3 * k + 1];
     end
-
+    
     while (int_rho < 1 - sqrt(eps))
         bg_elem = bg_elem + 1;
         eint_rho = (xb(e_connb(bg_elem, end), 1) - xb(e_connb(bg_elem, 1), 1)) * ...
             rho(bg_elem);
         int_rho = int_rho + eint_rho;
     end
-
+    
     % the new endpoint is in the current background element
     x_t = max(x_front, xb(e_connb(bg_elem, 1)));
     int_rho = int_rho - 1;
-
+    
     x_right = x_t + min(1, eint_rho - int_rho) / eint_rho * ...
         (xb(e_connb(bg_elem, end), 1) - xb(e_connb(bg_elem, 1), 1));
     x_nodes = linspace(x_front, x_right, dim + 1);
     x(e_conn(k, :), 1) = x_nodes';
-
+    
     % advance the front
     x_front = x_right;
 end
@@ -517,13 +519,13 @@ w = zeros(rule, 1);
 if (rule == 1) % up to order 1 polynomials exact
     r(1) = 0;
     w(1) = 2;
-
+    
 elseif (rule == 2) % up to order 3 polynomials exact
     r(1) = -1.0d0 / sqrt(3.0d0);
     r(2) = -r(1);
     w(1) = 1.0;
     w(2) = 1.0;
-
+    
 elseif (rule == 3) % up to order 5 polynomials exact
     r(1) = -sqrt(3.0d0 / 5.0d0);
     r(2) = 0.0;
@@ -531,7 +533,7 @@ elseif (rule == 3) % up to order 5 polynomials exact
     w(1) = 5.0d0 / 9.0d0;
     w(2) = 8.0d0 / 9.0d0;
     w(3) = w(1);
-
+    
 elseif (rule == 4) % up to order 7 polynomials exact
     r(1) = -sqrt((3.0d0 + 2.0 * sqrt(6.0d0 / 5.0d0)) / 7.0d0);
     r(2) = -sqrt((3.0d0 - 2.0 * sqrt(6.0d0 / 5.0d0)) / 7.0d0);
@@ -541,7 +543,7 @@ elseif (rule == 4) % up to order 7 polynomials exact
     w(2) = 0.5d0 + 1.0d0 / (6.0d0 * sqrt(6.0d0 / 5.0d0));
     w(3) = w(2);
     w(4) = w(1);
-
+    
 elseif (rule == 5) % up to order 9 polynomials exact
     r(1) = -sqrt(5.0d0 + 4.0d0 * sqrt(5.0d0 / 14.0d0)) / 3.0d0;
     r(2) = -sqrt(5.0d0 - 4.0d0 * sqrt(5.0d0 / 14.0d0)) / 3.0d0;
@@ -553,7 +555,7 @@ elseif (rule == 5) % up to order 9 polynomials exact
     w(3) = 128.0d0 / 225.0d0;
     w(4) = w(2);
     w(5) = w(1);
-
+    
 elseif (rule == 6)
     r(1) = -0.2386191860831969;
     r(2) = -0.6612093864662645;
@@ -567,7 +569,7 @@ elseif (rule == 6)
     w(4) = w(1);
     w(5) = w(2);
     w(6) = w(3);
-
+    
 elseif (rule == 7)
     r(1) = -0.9491079123427585;
     r(2) = -0.7415311855993945;
@@ -583,7 +585,7 @@ elseif (rule == 7)
     w(5) = w(3);
     w(6) = w(2);
     w(7) = w(1);
-
+    
 elseif (rule == 8)
     r(1) = -0.9602898564975363;
     r(2) = -0.7966664774136267;
@@ -601,7 +603,7 @@ elseif (rule == 8)
     w(6) = w(3);
     w(7) = w(2);
     w(8) = w(1);
-
+    
 elseif (rule == 9)
     r(1) = -0.9681602395076261;
     r(2) = -0.8360311073266358;
@@ -621,7 +623,7 @@ elseif (rule == 9)
     w(7) = w(3);
     w(8) = w(2);
     w(9) = w(1);
-
+    
 elseif (rule == 10)
     r(1) = -0.9739065285171717;
     r(2) = -0.8650633666889845;
@@ -643,7 +645,7 @@ elseif (rule == 10)
     w(8) = w(3);
     w(9) = w(2);
     w(10) = w(1);
-
+    
 elseif (rule == 11)
     r(1) = -0.9782286581460570;
     r(2) = -0.8870625997680953;
@@ -667,7 +669,7 @@ elseif (rule == 11)
     w(9) = w(3);
     w(10) = w(2);
     w(11) = w(1);
-
+    
 else
     error('Quadrature rule not supported')
     keyboard

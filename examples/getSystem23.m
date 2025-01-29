@@ -1,30 +1,30 @@
 function [f, g, h] = getSystem23(linear)
-%getSystem23  Returns the 3D nonlinear model from [1,2]. 
+%getSystem23  Returns the 3D nonlinear model from [1,2].
 %
 %   Usage:  [f,g,h] = getSystem23()
 %
 %   The dynamics correspond to the input-output system
 %
-%       xdot_1 = −x1 + 20 x1 x3 + u,
-%       xdot_2 = −2 x2 + 20 x2 x3 + u,
-%       xdot_3 = −5 x3 + u,
-%            y = x1 + x2 + x3,
+%       ẋ₁ = −x₁ + 20 x₁ x₃ + u,
+%       ẋ₂ = −2 x₂ + 20 x₂ x₃ + u,
+%       ẋ₃ = −5 x₃ + u,
+%        y = x₁ + x₂ + x₃,
 %
-%   If the option linear is enabled, the model from [3, Section 5.6.1] is 
-%   returned instead. This model replaces the nonlinear interaction between 
-%   x3 and x1 & x2 with a linear interaction. The model from [3] inspired 
-%   the model in [1,2]. 
-% 
-%       xdot_1 = −x1 + 100 x3 + u,
-%       xdot_2 = −2 x2 + 100 x3 + u,
-%       xdot_3 = −5 x3 + u,
-%            y = x1 + x2 + x3,
+%   If the option linear is enabled, the model from [3, Section 5.6.1] is
+%   returned instead. This model replaces the nonlinear interaction between
+%   x₃ and x₁ & x₂ with a linear interaction. The model from [3] inspired
+%   the model in [1,2].
 %
-%   Inputs:     linear - boolean, whether to use the linear model from [3]  
+%       ẋ₁ = −x₁ + 100 x₃ + u,
+%       ẋ₂ = −2 x₂ + 100 x₃ + u,
+%       ẋ₃ = −5 x₃ + u,
+%        y = x₁ + x₂ + x₃,
+%
+%   Inputs:     linear - boolean, whether to use the linear model from [3]
 %                        or nonlinear model from [1,2]
-% 
+%
 %   Outputs:     f,g,h - Cell arrays containing the polynomial coefficients
-%                        for the drift, input, and output 
+%                        for the drift, input, and output
 %
 %   References: [1] S. E. Otto, A. Padovan, and C. W. Rowley, "Optimizing
 %                   oblique projections for nonlinear systems using
@@ -43,12 +43,12 @@ function [f, g, h] = getSystem23(linear)
 %
 %%
 
-if nargin < 1 
+if nargin < 1
     linear = false;
 end
 
 
-n = 3; 
+n = 3;
 x = sym('x', [1, n]).'; syms(x);
 
 if linear

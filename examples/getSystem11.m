@@ -4,13 +4,13 @@ function [f, g, h] = getSystem11(degree, m, L)
 %
 %   Usage:  [f,g,h] = getSystem11(degree, m, L)
 %
-%              \dot{x}_1 & = x_2                                                                                                                     \\
-%              \dot{x}_2 & = \frac{3T}{m\L^2} + \frac{3g}{2\L} (x_1-\frac{x_1^3}{6}+\frac{x_1^5}{120}-\frac{x_1^7}{5040} + \frac{x_1^9}{362880})
-%                   y    & = x_1
+%              ẋ₁ = x₂                                                                                                                     \\
+%              ẋ₂ = 3T/(mL²) + 3g/(2L) ( x₁ - x₁³/6 + x₁⁵/120 - x₁⁷/5040 + x₁⁹/362880 )
+%               y = x₁
 %
-%   Reference: [1] N. A. Corbin and B. Kramer, “The polynomial-polynomial regulator:
-%              computing feedback for polynomially nonlinear systems with polynomial
-%              performance indexes,” 2023.
+%   Reference: [1] N. A. Corbin and B. Kramer, “Computing solutions to the
+%               polynomial-polynomial regulator problem,” in 2024 63rd IEEE
+%               Conference on Decision and Control, Dec. 2024
 %
 %%
 

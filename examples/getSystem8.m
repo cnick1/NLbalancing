@@ -35,8 +35,10 @@ function [f, g, h] = getSystem8(numElements, elementOrder)
 %       = B₀ u + B₁ (x ⊗ u) + B₂ (x ⊗ x ⊗ u) + ...,
 %     y = C x.
 %
-%   Reference: [1] N. A. Corbin and B. Kramer, “Scalable computation of 𝓗_∞
-%               energy functions for polynomial drift nonlinear systems,” 2023.
+%   Reference: [1] N. A. Corbin and B. Kramer, “Scalable computation of
+%               𝓗∞ energy functions for polynomial drift nonlinear
+%               systems,” in 2024 American Control Conference (ACC), Jul.
+%               2024, pp. 2506–2511. doi: 10.23919/acc60939.2024.10644363
 %              [2] M. Embree, “Unstable modes in projection-based
 %               reduced-order models: how many can there be, and what do they
 %               tell you?,” Systems & Control Letters, vol. 124, pp. 49–59,
@@ -86,28 +88,28 @@ TotalDOFs = numNodes * DOFsPerNode;
 if elementOrder == 1
     M1E = elementLength / 6 * ...
         [2, 1;
-     1, 2];
-
+        1, 2];
+    
     % Define stiffness matrix for one element
     K1E = 1 / elementLength * [1, -1;
-                               -1, 1] ...
+        -1, 1] ...
         + alpha * elementLength / 6 * [2, 1;
-                                   1, 2] ...
+        1, 2] ...
         +1/2 * [-1 1;
-            -1 1];
+        -1 1];
 elseif elementOrder == 2
     M1E = elementLength / 30 * ...
         [4, 2, -1;
-     2, 16, 2;
-     -1, 2, 4];
-
+        2, 16, 2;
+        -1, 2, 4];
+    
     % Define stiffness matrix for one element
     K1E = 1 / (3 * elementLength) * [7, -8, 1;
-                                     -8, 16, -8;
-                                     1, -8, 7] ...
+        -8, 16, -8;
+        1, -8, 7] ...
         - elementLength / 240 * [4, 2, -1;
-                             2, 16, 2;
-                             -1, 2, 4];
+        2, 16, 2;
+        -1, 2, 4];
 end
 % Initialize and stack/assemble global matrix
 M1G = sparse(TotalDOFs, TotalDOFs);
@@ -134,12 +136,12 @@ K2G = sparse(TotalDOFs, TotalDOFs ^ 2);
 % Define stiffness matrix for one element
 if elementOrder == 1
     K3E = -elementLength / 20 * [4, 3, 0, 2, 0, 0, 0, 1;
-                                 1, 2, 0, 3, 0, 0, 0, 4];
+        1, 2, 0, 3, 0, 0, 0, 4];
 elseif elementOrder == 2
     K3E = -elementLength / 1260 * ...
         [92, 96, -21, 0, 96, -24, 0, 0, 6, 0, 0, 0, 0, 32, -48, 0, 0, -12, 0, 0, 0, 0, 0, 0, 0, 0, -7;
-     32, 96, -12, 0, 96, -96, 0, 0, -12, 0, 0, 0, 0, 512, 96, 0, 0, 96, 0, 0, 0, 0, 0, 0, 0, 0, 32;
-     -7, -12, 6, 0, -48, -24, 0, 0, -21, 0, 0, 0, 0, 32, 96, 0, 0, 96, 0, 0, 0, 0, 0, 0, 0, 0, 92];
+        32, 96, -12, 0, 96, -96, 0, 0, -12, 0, 0, 0, 0, 512, 96, 0, 0, 96, 0, 0, 0, 0, 0, 0, 0, 0, 32;
+        -7, -12, 6, 0, -48, -24, 0, 0, -21, 0, 0, 0, 0, 32, 96, 0, 0, 96, 0, 0, 0, 0, 0, 0, 0, 0, 92];
 end
 
 % Initialize and stack/assemble global matrix
@@ -152,8 +154,8 @@ if elementOrder == 1
             + vec(( ...
             vec(([1:DOFsPerElement] + [0:TotalDOFs:TotalDOFs * (DOFsPerElement - 1)]')')' ... % (basically the quadratic indices)
             + [0:TotalDOFs ^ 2:TotalDOFs ^ 2 * (DOFsPerElement - 1)]' ... % Add secondary skips into sequence (add row to column and then vec)
-        )')';
-
+            )')';
+        
         % "stack" element matrices into global matrix
         K3G(ii:(ii + DOFsPerElement - 1), idxs) = K3G(ii:(ii + DOFsPerElement - 1), idxs) + K3E;
     end
@@ -164,8 +166,8 @@ elseif elementOrder == 2
             + vec(( ...
             vec(([1:DOFsPerElement] + [0:TotalDOFs:TotalDOFs * (DOFsPerElement - 1)]')')' ... % (basically the quadratic indices)
             + [0:TotalDOFs ^ 2:TotalDOFs ^ 2 * (DOFsPerElement - 1)]' ... % Add secondary skips into sequence (add row to column and then vec)
-        )')';
-
+            )')';
+        
         % "stack" element matrices into global matrix
         K3G(ii:(ii + DOFsPerElement - 1), idxs) = K3G(ii:(ii + DOFsPerElement - 1), idxs) + K3E;
     end

@@ -6,9 +6,11 @@ function [f, g, h] = getSystem7()
 %
 %   The "matrices" correspond to the input-output system
 %
-%         \dot{x}_1 & = x_3 - x_1^2 x_3 - 0.088 x_1 x_3 - 0.877 x_1 + 0.47 x_1^2 + 3.846 x_1^3 - 0.215 u + 0.28 u x_1^2 + 0.47 u^2 x_1 +  0.63 u^3 - 0.019 x_2^2 \\
-%         \dot{x}_2 & = x_3                                                                                                                                      \\
-%         \dot{x}_3 & = -0.396 x_3 - 4.208 x_1 - 0.47 x_1^2 - 3.564 x_1^3 - 20.967 u + 6.265 ux_1^2 + 46 u^2 + 61.4 u^3
+%         ẋ₁ = x₃ - x₁² x₃ - 0.088 x₁ x₃ - 0.877 x₁ + 0.47 x₁² + 3.846 x₁³
+%              - 0.215 u + 0.28 u x₁² + 0.47 u² x₁ +  0.63 u³ - 0.019 x₂²
+%         ẋ₂ = x₃
+%         ẋ₃ = -0.396 x₃ - 4.208 x₁ - 0.47 x₁² - 3.564 x₁³ - 20.967 u +
+%              6.265 ux₁² + 46 u² + 61.4 u³
 %
 %   Reference: [1] W. L. Garrard and J. M. Jordan, “Design of nonlinear
 %               automatic flight control systems,” Automatica, vol. 13,

@@ -6,7 +6,7 @@ function [f, g, h] = getSystem10()
 %
 %   The "matrices" correspond to the input-output system
 %
-%       \dot{x} = 1/10 x - 2 x^2 + x^3 + u
+%       ẋ = 1/10 x - 2 x² + x³ + u
 %             y = x
 %
 %   for which there is an analytic solution to the past and future energy functions.

@@ -22,21 +22,21 @@ function [f, g, h] = getSystem14(degree, model)
 %       when method were more limited.
 %
 %       Let the 2 x 2 mass matrix be given by the entries
-%           m11       = m1 l1^2 + m2 l1^2 + m2 l2^2 + 2 m2 l1 l2 cos x2
-%           m12 = m21 = m2 l2^2 + m2 l1 l2 cos x2
-%           m22       = m2 l2^2
+%           m₁₁       = m₁ l₁² + m₂ l₁² + m₂ l₂² + 2 m₂ l₁ l₂ cos x₂
+%           m₁₂ = m₂₁ = m₂ l₂² + m₂ l₁ l₂ cos x₂
+%           m₂₂       = m₂ l₂²
 %       The mass matrix and its inverse are then
-%           M(x) = [m11, m12;    M^(-1)(x) = _______1̲_______  [m22, -m21;
-%                   m21, m22]               (m11m22 - m12m21) -m12,  m11]
+%           M(x) = [m₁₁, m₁₂;    M⁻¹(x) = _______1̲_______   [m₂₂, -m₂₁;
+%                   m₂₁, m₂₂]            (m₁₁m₂₂ - m₁₂m₂₁)  -m₁₂,  m₁₁]
 %
 %       The potential energy of the system is
-%           V(x) = - m1 g l1 cos x1 - m2 g (l1 cos x1 + l2 cos(x1 + x2))
+%           V(x) = - m₁ g l₁ cos x₁ - m₂ g (l₁ cos x₁ + l₂ cos(x₁ + x₂))
 %
 %       The full dynamics are 4 dimensional and are not asymptotically
 %       stable. However, the gradient system dynamics are 2D and
 %       asymptotically stable. The gradient system dynamics are
-%           xdot = -M^{-1}(x) 𝜕V(x)/𝜕x + M^{-1}(x)[1;0] u
-%           y    = x1
+%           ẋ = -M⁻¹(x) 𝜕V(x)/𝜕x + M⁻¹(x)[1;0] u
+%           y = x₁
 %
 %   References: [1] J. M. A. Scherpen, “Balancing for nonlinear systems,”
 %               PhD Dissertation, University of Twente, 1994.
@@ -86,9 +86,9 @@ m12 = m2 * l2 ^ 2 + m2 * l1 * l2 * cos(x2);
 m22 = m2 * l2 ^ 2;
 
 M = [m11, m12;
-     m12, m22];
+    m12, m22];
 Minv = 1 / (m11 * m22 - m12 ^ 2) * [m22, -m12;
-                                     -m12, m11];
+    -m12, m11];
 
 fsym = -Minv * gradient(V, x);
 gsym = Minv * [1; 0];

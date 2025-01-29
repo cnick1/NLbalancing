@@ -29,14 +29,16 @@ function [f, g, h, zInit, M] = getSystem3(n, m, p, epsilon, alpha)
 %
 %  Author: Jeff Borggaard, Virginia Tech
 %
-%  Licence: MIT
+%  License: MIT
 %
-%   Reference: [1] B. Kramer, S. Gugercin, J. Borggaard, and L. Balicki, “Nonlinear
-%               balanced truncation: Part 1—computing energy functions,” arXiv,
-%               Dec. 2022. doi: 10.48550/ARXIV.2209.07645
+%   Reference: [1] B. Kramer, S. Gugercin, J. Borggaard, and L. Balicki,
+%               “Scalable computation of energy functions for nonlinear
+%               balanced truncation,” Computer Methods in Applied Mechanics
+%               and Engineering, vol. 427, p. 117011, Jul. 2024, doi:
+%               10.1016/j.cma.2024.117011
 %              [2] B. Kramer, S. Gugercin, and J. Borggaard, “Nonlinear balanced
 %               truncation: Part 2—model reduction on manifolds,” arXiv, Feb. 2023.
-%               doi: 10.48550/ARXIV.2302.02036
+%               doi: 10.48550/arXiv.2302.02036
 %              [3] J. Borggaard and L. Zietsman, “On approximating polynomial-
 %               -quadratic regulator problems,” IFAC-PapersOnLine, vol. 54, no. 9,
 %               pp. 329–334, 2021, doi: 10.1016/j.ifacol.2021.06.090
@@ -66,7 +68,7 @@ Q = M;
 %  Perform a change of variables to eliminate the positive definite
 %  mass matrix.  Let M^(1/2)z -> x
 %
-%    \dot{x} = Ax+Bu+N*kron(x,x),
+%    ẋ = Ax+Bu+N*kron(x,x),
 %
 %  This is required until we extend our formulation to handle "mass matrices"
 sqM = sqrtm(full(M));
@@ -122,21 +124,21 @@ for n_el = 1:n_elements
     nodes_local = e_conn(n_el, :);
     x_local = x(nodes_local, :);
     [x_g, wt_g, phi, p_x] = oned_shape(x_local, r, wt);
-
+    
     A_loc = -oned_bilinear(one, p_x, p_x, wt_g);
     M_loc = oned_bilinear(one, phi, phi, wt_g);
     for k = 1:nel_dof
         NN_loc(:, :, k) = -oned_bilinear(phi(:, k), phi, p_x, wt_g);
     end
-
+    
     for mm = 1:m
         b_loc(:, mm) = oned_f_int(chi(x_g, mm, m), phi, wt_g);
     end
-
+    
     for pp = 1:p
         c_loc(pp, :) = oned_f_int(chi(x_g, pp, p), phi, wt_g);
     end
-
+    
     z_loc = zZero(x_g);
     z0_loc = oned_f_int(z_loc, phi, wt_g);
     %---------------------------------------------------------------------------
@@ -144,10 +146,10 @@ for n_el = 1:n_elements
     %---------------------------------------------------------------------------
     for n_t = 1:nel_dof
         n_test = ide(nodes_local(n_t));
-
+        
         for n_u = 1:nel_dof
             n_unk = ide(nodes_local(n_u));
-
+            
             % A(n_unk,n_test) = A(n_unk,n_test) + A_loc(n_u);
             n_triplets = n_triplets + 1;
             II(n_triplets) = n_unk;
@@ -159,15 +161,15 @@ for n_el = 1:n_elements
                 NN(n_unk, n_test, n_nn) = NN(n_unk, n_test, n_nn) + NN_loc(n_t, n_u, k);
             end
         end
-
+        
         for mm = 1:m
             B(n_test, mm) = B(n_test, mm) + b_loc(n_t, mm);
         end
-
+        
         for pp = 1:p
             C(pp, n_test) = C(pp, n_test) + c_loc(pp, n_t);
         end
-
+        
         z0(n_test) = z0(n_test) + z0_loc(n_t);
     end
 end
@@ -374,23 +376,23 @@ for k = 1:new_elem
     elseif (dim == 3)
         e_conn(k, :) = [3 * k - 2, 3 * k - 1, 3 * k, 3 * k + 1];
     end
-
+    
     while (int_rho < 1 - sqrt(eps))
         bg_elem = bg_elem + 1;
         eint_rho = (xb(e_connb(bg_elem, end), 1) - xb(e_connb(bg_elem, 1), 1)) * ...
             rho(bg_elem);
         int_rho = int_rho + eint_rho;
     end
-
+    
     % the new endpoint is in the current background element
     x_t = max(x_front, xb(e_connb(bg_elem, 1)));
     int_rho = int_rho - 1;
-
+    
     x_right = x_t + min(1, eint_rho - int_rho) / eint_rho * ...
         (xb(e_connb(bg_elem, end), 1) - xb(e_connb(bg_elem, 1), 1));
     x_nodes = linspace(x_front, x_right, dim + 1);
     x(e_conn(k, :), 1) = x_nodes';
-
+    
     % advance the front
     x_front = x_right;
 end
@@ -424,13 +426,13 @@ w = zeros(rule, 1);
 if (rule == 1) % up to order 1 polynomials exact
     r(1) = 0;
     w(1) = 2;
-
+    
 elseif (rule == 2) % up to order 3 polynomials exact
     r(1) = -1.0d0 / sqrt(3.0d0);
     r(2) = -r(1);
     w(1) = 1.0;
     w(2) = 1.0;
-
+    
 elseif (rule == 3) % up to order 5 polynomials exact
     r(1) = -sqrt(3.0d0 / 5.0d0);
     r(2) = 0.0;
@@ -438,7 +440,7 @@ elseif (rule == 3) % up to order 5 polynomials exact
     w(1) = 5.0d0 / 9.0d0;
     w(2) = 8.0d0 / 9.0d0;
     w(3) = w(1);
-
+    
 elseif (rule == 4) % up to order 7 polynomials exact
     r(1) = -sqrt((3.0d0 + 2.0 * sqrt(6.0d0 / 5.0d0)) / 7.0d0);
     r(2) = -sqrt((3.0d0 - 2.0 * sqrt(6.0d0 / 5.0d0)) / 7.0d0);
@@ -448,7 +450,7 @@ elseif (rule == 4) % up to order 7 polynomials exact
     w(2) = 0.5d0 + 1.0d0 / (6.0d0 * sqrt(6.0d0 / 5.0d0));
     w(3) = w(2);
     w(4) = w(1);
-
+    
 elseif (rule == 5) % up to order 9 polynomials exact
     r(1) = -sqrt(5.0d0 + 4.0d0 * sqrt(5.0d0 / 14.0d0)) / 3.0d0;
     r(2) = -sqrt(5.0d0 - 4.0d0 * sqrt(5.0d0 / 14.0d0)) / 3.0d0;
@@ -460,7 +462,7 @@ elseif (rule == 5) % up to order 9 polynomials exact
     w(3) = 128.0d0 / 225.0d0;
     w(4) = w(2);
     w(5) = w(1);
-
+    
 elseif (rule == 6)
     r(1) = -0.2386191860831969;
     r(2) = -0.6612093864662645;
@@ -474,7 +476,7 @@ elseif (rule == 6)
     w(4) = w(1);
     w(5) = w(2);
     w(6) = w(3);
-
+    
 elseif (rule == 7)
     r(1) = -0.9491079123427585;
     r(2) = -0.7415311855993945;
@@ -490,7 +492,7 @@ elseif (rule == 7)
     w(5) = w(3);
     w(6) = w(2);
     w(7) = w(1);
-
+    
 elseif (rule == 8)
     r(1) = -0.9602898564975363;
     r(2) = -0.7966664774136267;
@@ -508,7 +510,7 @@ elseif (rule == 8)
     w(6) = w(3);
     w(7) = w(2);
     w(8) = w(1);
-
+    
 elseif (rule == 9)
     r(1) = -0.9681602395076261;
     r(2) = -0.8360311073266358;
@@ -528,7 +530,7 @@ elseif (rule == 9)
     w(7) = w(3);
     w(8) = w(2);
     w(9) = w(1);
-
+    
 elseif (rule == 10)
     r(1) = -0.9739065285171717;
     r(2) = -0.8650633666889845;
@@ -550,7 +552,7 @@ elseif (rule == 10)
     w(8) = w(3);
     w(9) = w(2);
     w(10) = w(1);
-
+    
 elseif (rule == 11)
     r(1) = -0.9782286581460570;
     r(2) = -0.8870625997680953;
@@ -574,7 +576,7 @@ elseif (rule == 11)
     w(9) = w(3);
     w(10) = w(2);
     w(11) = w(1);
-
+    
 else
     error('Quadrature rule not supported')
     keyboard
@@ -617,80 +619,80 @@ if (n == 2)
     % Transform coordinates for linear elements
     c0 = (x(n, 1) - x(1, 1)) / 2;
     c1 = (x(n, 1) + x(1, 1)) / 2;
-
+    
     x_g = c0 * r + c1;
-
+    
     % defined backwards to help Matlab create the proper sized array
     phi(:, 2) = (1 + r) / 2;
     phi(:, 1) = (1 - r) / 2;
-
+    
     p_x(:, 2) = .5 * ones(size(r)) / c0;
     p_x(:, 1) = -p_x(:, 2);
-
+    
     djac = c0;
-
+    
     w_g = djac * w;
-
+    
     if (nargout == 5)
         p_xx = zeros(length(r), 2);
     end
-
+    
 elseif (n == 3)
     % Transform coordinates for quadratic elements
     c0 = (x(n, 1) - x(1, 1)) / 2;
     c1 = (x(n, 1) + x(1, 1)) / 2;
-
+    
     x_g = c0 * r + c1;
-
+    
     % defined backwards to help Matlab create the proper sized array
     phi(:, 3) = .5 * r .* (r + 1);
     phi(:, 2) =- (r + 1) .* (r - 1);
     phi(:, 1) = .5 * r .* (r - 1);
-
+    
     p_x(:, 3) = (r + .5) / c0;
     p_x(:, 2) = -2 * r / c0;
     p_x(:, 1) = (r - .5) / c0;
-
+    
     djac = c0;
-
+    
     w_g = djac * w;
-
+    
     if (nargout == 5)
         p_xx(:, 3) = ones(size(r)) / c0 ^ 2;
         p_xx(:, 2) = -2 * p_xx(:, 3);
         p_xx(:, 1) = p_xx(:, 3);
     end
-
+    
 elseif (n == 4)
     % Transform coordinates for (nonconforming) cubic elements
     c0 = (x(n, 1) - x(1, 1)) / 2;
     c1 = (x(n, 1) + x(1, 1)) / 2;
-
+    
     x_g = c0 * r + c1;
-
+    
     r2 = r .* r;
     r3 = r .* r2;
-
+    
     % defined backwards to help Matlab create the proper sized array
     phi(:, 4) = 9 * (r3 + r2 - r / 9 -1/9) / 16;
     phi(:, 3) = -27 * (r3 + r2 / 3 - r -1/3) / 16;
     phi(:, 2) = 27 * (r3 - r2 / 3 - r +1/3) / 16;
     phi(:, 1) =- 9 * (r3 - r2 - r / 9 +1/9) / 16;
-
+    
     p_r(:, 4) = 9 * (3 * r2 + 2 * r -1/9) / 16;
     p_r(:, 3) = -27 * (3 * r2 + 2 * r / 3 - 1) / 16;
     p_r(:, 2) = 27 * (3 * r2 - 2 * r / 3 - 1) / 16;
     p_r(:, 1) =- 9 * (3 * r2 - 2 * r -1/9) / 16;
-
+    
     p_rr(:, 4) = 9 * (6 * r + 2) / 16;
     p_rr(:, 3) = -27 * (6 * r +2/3) / 16;
     p_rr(:, 2) = 27 * (6 * r -2/3) / 16;
     p_rr(:, 1) =- 9 * (6 * r - 2) / 16;
-
+    
     dxdr = p_r * x(:, 1);
     djac = dxdr;
     drdx = 1 ./ djac;
-
+    
     p_x(:, 4) = p_r(:, 4) .* drdx;
     p_x(:, 3) = p_r(:, 3) .* drdx;
     p_x(:, 2) = p_r(:, 2) .* drdx;
