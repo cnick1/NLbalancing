@@ -10,13 +10,15 @@ function [f, g, h] = getSystem12(degree, transformedModel)
 %   Outputs:     f,g,h - Cell arrays containing the polynomial coefficients
 %                        for the drift, input, and output
 %
-%   Description: The model is
+%   Description: The model from [1-3] is
 %       f(x) = [-9x₁ + 6x₁² x₂ + 6x₂³ - x₁⁵ - 2x₁³ x₂² - x₁ x₂⁴
 %               -9x₂ - 6x₁³ - 6x₁x₂² - x₁⁴ x₂ - 2x₁² x₂³ - x₂⁵]
-%       g(x) = [\frac{3√2(9-6x₁x₂+x₁⁴-x₂⁴)}{9+x₁⁴+2x₁²x₂²+x₂⁴},                      \frac{√2(-9x₁² - 27 x₂² + 6 x₁³ x₂ + 6 x₁ x₂³ - (x₁² + x₂²)³)}{9+x₁⁴+2x₁²x₂²+x₂⁴}
-%               \frac{√2(27x₁²+9x₂²+6x₁³x₂+6x₁x₂³+(x₁²+x₂²)³}{9+x₁⁴+2x₁²x₂²+x₂⁴},    \frac{3√2(9 + 6 x₁ x₂  - x₁⁴ + x₂⁴)}{9+x₁⁴+2x₁²x₂²+x₂⁴}]
-%       h(x) = [\frac{2√2(3x₁ + x₁ x₂² + x₂³)(3 - x₁⁴ - 2x₁² x₂² - x₂⁴)}{1 + x₁⁴ + 2 x₁² x₂² + x₂⁴}
-%       \frac{√2(3x₂ - x₁³ - x₁ x₂²)(3 - x₁⁴ - 2 x₁² x₂² - x₂⁴)}{1 + x₁⁴ + 2 x₁² x₂² + x₂⁴}]
+%       g(x) = [\frac{3√2(9-6x₁x₂+x₁⁴-x₂⁴)}{9+x₁⁴+2x₁²x₂²+x₂⁴},
+%                 \frac{√2(-9x₁² - 27 x₂² + 6 x₁³ x₂ + 6 x₁ x₂³ - (x₁² + x₂²)³)}{9+x₁⁴+2x₁²x₂²+x₂⁴};
+%               \frac{√2(27x₁²+9x₂²+6x₁³x₂+6x₁x₂³+(x₁²+x₂²)³}{9+x₁⁴+2x₁²x₂²+x₂⁴},
+%                 \frac{3√2(9 + 6 x₁ x₂  - x₁⁴ + x₂⁴)}{9+x₁⁴+2x₁²x₂²+x₂⁴}]
+%       h(x) = [\frac{2√2(3x₁ + x₁ x₂² + x₂³)(3 - x₁⁴ - 2x₁² x₂² - x₂⁴)}{1 + x₁⁴ + 2 x₁² x₂² + x₂⁴};
+%                 \frac{√2(3x₂ - x₁³ - x₁ x₂²)(3 - x₁⁴ - 2 x₁² x₂² - x₂⁴)}{1 + x₁⁴ + 2 x₁² x₂² + x₂⁴}]
 %
 %   References: [1] K. Fujimoto and J. M. A. Scherpen, “Model reduction
 %                for nonlinear systems based on the differential

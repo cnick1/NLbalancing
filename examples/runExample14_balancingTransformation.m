@@ -1,23 +1,47 @@
 function runExample14_balancingTransformation(degree,lim)
-%runExample14_balancingTransformation Runs the 2D example to visualize the nonlinear balancing transformations.
+%runExample14_balancingTransformation Runs the 2D gradient double pendulum [1-3] example to visualize the nonlinear balancing transformations.
 %
-%   Usage:  runExample14_balancingTransformation(degree)
+%   Usage:  runExample14_balancingTransformation(degree,lim)
 %
-%   Inputs:
-%       degree - desired degree of the energy function approximation
+%   Inputs:    degree - desired degree of the energy function approximation
+%                 lim - the size of the grid in the z coordinates
 %
-%   Description: This simple 2D example aims to capture the key idea in the
-%   model reduction problem: the presence of a subsystem that in some sense
-%   contributes little (perhaps is decoupled) to the overall dynamics, yet
-%   drives interactions that cannot directly be eliminated. The model is:
-%           xdot_1 = −2 x1 + 20 x1 x2 + u,
-%           xdot_2 = −5 x2 + u,
-%                y = x1 + x2.
-%   Despite being so simple, this is a challenging problem because the
-%   nonlinear interaction is strong: those terms are much larger than the
-%   linear terms!
+%   Description: This model has been used several times in the literature [1-3].
+%   The system describes a set of dynamics related to the double pendulum;
+%   however, where the double pendulum would have 4D dynamics and only
+%   marginal stability, the associated 2D gradient system is asymptotically
+%   stable, and hence the model was more approachable when method were more
+%   limited. The gradient system dynamics are
+%       ẋ = -M⁻¹(x) 𝜕V(x)/𝜕x + M⁻¹(x)[1;0] u
+%       y = x₁
+%   The mass matrix and its inverse are then
+%       M(x) = [m₁₁, m₁₂;    M⁻¹(x) = _______1̲_______   [m₂₂, -m₂₁;
+%               m₂₁, m₂₂]            (m₁₁m₂₂ - m₁₂m₂₁)  -m₁₂,  m₁₁]
+%   where the entries are
+%       m₁₁       = m₁ l₁² + m₂ l₁² + m₂ l₂² + 2 m₂ l₁ l₂ cos x₂
+%       m₁₂ = m₂₁ = m₂ l₂² + m₂ l₁ l₂ cos x₂
+%       m₂₂       = m₂ l₂²
+%   The potential energy of the system is
+%       V(x) = - m₁ g l₁ cos x₁ - m₂ g (l₁ cos x₁ + l₂ cos(x₁ + x₂))
 %
-%   References: [1]
+%   We compute the energy functions, the input-normal/output-diagonal
+%   transformation, and then the true balancing transformation, given by the
+%   composition x = Φbar(z̄) = Φ(𝝋(z̄)). We visualize this mapping
+%   from the z̄ coordinates to the x coordinates by forming a grid in the
+%   z̄ coordinates and mapping that grid to the x coordinates.
+%
+%   References: [1] J. M. A. Scherpen, “Balancing for nonlinear systems,”
+%               PhD Dissertation, University of Twente, 1994.
+%               [2] W. S. Gray and J. M. A. Scherpen, “Minimality and local
+%               state decompositions of a nonlinear state space realization
+%               using energy functions,” IEEE Transactions on Automatic
+%               Control, vol. 45, no. 11, pp. 2079–2086, 2000, doi:
+%               10.1109/9.887630
+%               [3] K. Fujimoto and J. M. A. Scherpen, “Nonlinear
+%               input-normal realizations based on the differential
+%               eigenstructure of Hankel operators,” IEEE Transactions on
+%               Automatic Control, vol. 50, no. 1, pp. 2–18, Jan. 2005,
+%               doi: 10.1109/tac.2004.840476
 %
 %   Part of the NLbalancing repository.
 %%

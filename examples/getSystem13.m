@@ -13,7 +13,7 @@ function [f, g, h] = getSystem13()
 %                        1    ]
 %           h(x) = 1/√3 [3 α (x₁ + x₂²) + (α - 2√2)x₂]
 %
-%           where α = (√3 + √2)(√3 + 2)
+%    where α = (√3 + √2)(√3 + 2)
 %
 %   References: [1] W. S. Gray and J. M. A. Scherpen, “On the nonuniqueness
 %               of singular value functions and balanced nonlinear

@@ -15,28 +15,28 @@ function [f, g, h] = getSystem14(degree, model)
 %                drift, input, and output (generalizations containing A,B,C)
 %
 %   Description: This model has been used several times in the literature [1-3].
-%       The system describes a set of dynamics related to the double
-%       pendulum; however, where the double pendulum would have 4D dynamics
-%       and only marginal stability, the associated 2D gradient system is
-%       asymptotically stable, and hence the model was more approachable
-%       when method were more limited.
+%   The system describes a set of dynamics related to the double pendulum;
+%   however, where the double pendulum would have 4D dynamics and only
+%   marginal stability, the associated 2D gradient system is asymptotically
+%   stable, and hence the model was more approachable when method were more
+%   limited.
 %
-%       Let the 2 x 2 mass matrix be given by the entries
-%           m₁₁       = m₁ l₁² + m₂ l₁² + m₂ l₂² + 2 m₂ l₁ l₂ cos x₂
-%           m₁₂ = m₂₁ = m₂ l₂² + m₂ l₁ l₂ cos x₂
-%           m₂₂       = m₂ l₂²
-%       The mass matrix and its inverse are then
-%           M(x) = [m₁₁, m₁₂;    M⁻¹(x) = _______1̲_______   [m₂₂, -m₂₁;
-%                   m₂₁, m₂₂]            (m₁₁m₂₂ - m₁₂m₂₁)  -m₁₂,  m₁₁]
+%   Let the 2 x 2 mass matrix be given by the entries
+%       m₁₁       = m₁ l₁² + m₂ l₁² + m₂ l₂² + 2 m₂ l₁ l₂ cos x₂
+%       m₁₂ = m₂₁ = m₂ l₂² + m₂ l₁ l₂ cos x₂
+%       m₂₂       = m₂ l₂²
+%   The mass matrix and its inverse are then
+%       M(x) = [m₁₁, m₁₂;    M⁻¹(x) = _______1̲_______   [m₂₂, -m₂₁;
+%               m₂₁, m₂₂]            (m₁₁m₂₂ - m₁₂m₂₁)  -m₁₂,  m₁₁]
 %
-%       The potential energy of the system is
-%           V(x) = - m₁ g l₁ cos x₁ - m₂ g (l₁ cos x₁ + l₂ cos(x₁ + x₂))
+%   The potential energy of the system is
+%       V(x) = - m₁ g l₁ cos x₁ - m₂ g (l₁ cos x₁ + l₂ cos(x₁ + x₂))
 %
-%       The full dynamics are 4 dimensional and are not asymptotically
-%       stable. However, the gradient system dynamics are 2D and
-%       asymptotically stable. The gradient system dynamics are
-%           ẋ = -M⁻¹(x) 𝜕V(x)/𝜕x + M⁻¹(x)[1;0] u
-%           y = x₁
+%   The full dynamics are 4 dimensional and are not asymptotically
+%   stable. However, the gradient system dynamics are 2D and
+%   asymptotically stable. The gradient system dynamics are
+%       ẋ = -M⁻¹(x) 𝜕V(x)/𝜕x + M⁻¹(x)[1;0] u
+%       y = x₁
 %
 %   References: [1] J. M. A. Scherpen, “Balancing for nonlinear systems,”
 %               PhD Dissertation, University of Twente, 1994.

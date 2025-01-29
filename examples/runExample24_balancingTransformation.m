@@ -1,53 +1,42 @@
-function runExample2_balancingTransformation(degree,lim)
-%runExample2_balancingTransformation Runs the 2D quadratic-bilinear example
-%   from [1,2] to visualize the nonlinear balancing transformations.
+function runExample24_balancingTransformation(degree)
+%runExample24_balancingTransformation Runs the 2D example to visualize the nonlinear balancing transformations.
 %
-%   Usage:  runExample2_balancingTransformation(degree,lim)
+%   Usage:  runExample24_balancingTransformation(degree)
 %
-%   Inputs:    degree - desired degree of the energy function approximation
-%                 lim - the size of the grid in the z coordinates
+%   Inputs:
+%       degree - desired degree of the energy function approximation
 %
-%   Description: The 2D quadratic-bilinear model is
-%        ẋ₁ = -x₁ + x₂ - x₂² + u₁ + 2 x₂ u₁ - 0.05 x₁ x₂ u₁
-%        ẋ₂ =     - x₂       + u₁           - 0.05 x₂² u₁
-%         y =  x₁
+%   Description: This simple 2D example aims to capture the key idea in the
+%   model reduction problem: the presence of a subsystem that in some sense
+%   contributes little (perhaps is decoupled) to the overall dynamics, yet
+%   drives interactions that cannot directly be eliminated. The model is:
+%           ẋ₁ = −2 x₁ + 20 x₁ x₂ + u,
+%           ẋ₂ = −5 x₂ + u,
+%                y = x₁ + x₂.
+%   Despite being so simple, this is a challenging problem because the
+%   nonlinear interaction is strong: those terms are much larger than the
+%   linear terms!
 %
-%   We compute the energy functions, the input-normal/output-diagonal
-%   transformation, and then the true balancing transformation, given by the
-%   composition x = Φbar(z̄) = Φ(𝝋(z̄)). We visualize this mapping
-%   from the z̄ coordinates to the x coordinates by forming a grid in the
-%   z̄ coordinates and mapping that grid to the x coordinates.
-%
-%   Reference: [1] B. Kramer, S. Gugercin, J. Borggaard, and L. Balicki,
-%               “Scalable computation of energy functions for nonlinear
-%               balanced truncation,” Computer Methods in Applied Mechanics
-%               and Engineering, vol. 427, p. 117011, Jul. 2024, doi:
-%               10.1016/j.cma.2024.117011
-%              [2] Y. Kawano and J. M. A. Scherpen, “Model reduction by
-%               differential balancing based on nonlinear hankel operators,”
-%               IEEE Transactions on Automatic Control, vol. 62, no. 7,
-%               pp. 3293–3308, Jul. 2017, doi: 10.1109/tac.2016.2628201
+%   References: [1]
 %
 %   Part of the NLbalancing repository.
 %%
 % close all;
 set(groot,'defaultLineLineWidth',1,'defaultTextInterpreter','TeX')
 
-fprintf('Running Example 2\n')
+fprintf('Running Example 24\n')
 
-if nargin < 2
-    lim = 1;
-    if nargin < 1
-        degree = 4;
-    end
+if nargin < 1
+    degree = 4;
 end
 
-%% Get system dynamics
-[f, g, h] = getSystem2(true);  % Kawano model
+lim=.1;
+
+[f, g, h] = getSystem24(false); eta = 0; n = 2;
+% f{2} = 0.1*f{2}; lim=1; % For testing scaling f2
 
 %%  Compute the energy functions
 fprintf(" ~~~~~~~~~~~~~~~~~~~~~~~~~ Computing energy functions:  ~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
-eta = 0;
 [v] = approxPastEnergy(f, g, h, eta, degree, false);
 [w] = approxFutureEnergy(f, g, h, eta, degree, false);
 
@@ -55,9 +44,19 @@ eta = 0;
 fprintf(" ~~~~~~~~~~~ Computing transformation and singular value functions:  ~~~~~~~~~~~~ \n")
 [sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);
 
+% Plot the squared singular value functions
+z = linspace(- 1, 1, 51);
+figure; hold on; title("Singular value functions")
+for i = 1:2
+    plot(z, real(sqrt(polyval(flip(sigmaSquared(i, :)), z))))
+    % plot(z, polyval(flip(sigmaSquared(i, :)), z)) % plot squared singular value functions
+end
+set(gca,'yscale','log')
+xlabel('z_i'); ylabel('\sigma_i'); legend('\sigma_1','\sigma_2')
+
 %% Plot grid transformations
 % Parameters
-numLines = 41; numPoints = 201;
+numLines = 15; numPoints = 201;
 
 % Generate original z coordinates
 [xH, yH] = meshgrid(linspace(-lim, lim, numLines), linspace(-lim, lim, numPoints)); % Horizontal lines
@@ -99,13 +98,14 @@ end
 F = @(x) kronPolyEval(f, x);
 Ft = @(z) PhiBarJacobian(z,TinOd,sigmaSquared)\kronPolyEval(f, PhiBar(z,TinOd,sigmaSquared));
 
-x0 = [1 1].'*(0.5*lim);
+x0 = [1 1].'*(0.7*lim);
 
 % Solve for z0 initial condition with a Newton type iteration
 z0 = newtonIteration(x0, @(z) PhiBar(z,TinOd,sigmaSquared), @(z) PhiBarJacobian(z,TinOd,sigmaSquared));
 
+
 % Simulate both systems
-[~, X1] = ode45(@(t, x) F(x), [0, 5], x0);
+[t1, X1] = ode45(@(t, x) F(x), [0, 5], x0);
 [~, Z] = ode45(@(t, z) Ft(z), [0, 5], z0);
 
 subplot(1,2,1)

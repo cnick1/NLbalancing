@@ -11,46 +11,40 @@ function [f, g, h] = getSystem15(degree)
 %                drift, input, and output (generalizations containing A,B,C)
 %
 %   Description: This model has been used several times in the literature.
-%       Let the 2 x 2 mass matrix be given by the entries
-%           m₁₁       = m₁ l₁² + m₂ l₁² + m₂ l₂² + 2 m₂ l₁ l₂ cos x₂
-%           m₁₂ = m₂₁ = m₂ l₂² + m₂ l₁ l₂ cos x₂
-%           m₂₂       = m₂ l₂²
-%       The mass matrix and its inverse are then
-%           M(x) = [m₁₁, m₁₂;    M⁻¹(x) = _______1_______  [m₂₂, -m₂₁;
-%                   m₂₁, m₂₂]            (m₁₁m₂₂ - m₁₂m₂₁) -m₁₂,  m₁₁]
+%   Let the 2 x 2 mass matrix be given by the entries
+%       m₁₁       = m₁ l₁² + m₂ l₁² + m₂ l₂² + 2 m₂ l₁ l₂ cos x₂
+%       m₁₂ = m₂₁ = m₂ l₂² + m₂ l₁ l₂ cos x₂
+%       m₂₂       = m₂ l₂²
+%   The mass matrix and its inverse are then
+%       M(x) = [m₁₁, m₁₂;    M⁻¹(x) = _______1_______  [m₂₂, -m₂₁;
+%               m₂₁, m₂₂]            (m₁₁m₂₂ - m₁₂m₂₁) -m₁₂,  m₁₁]
 %
-%       The potential energy of the system is
-%           V(x) = - m₁ g l₁ cos x₁ - m₂ g (l₁ cos x₁ + l₂ cos(x₁ + x₂))
+%   The potential energy of the system is
+%       V(x) = - m₁ g l₁ cos x₁ - m₂ g (l₁ cos x₁ + l₂ cos(x₁ + x₂))
 %
-%       and the kinetic energy is (in [1,2], they have a typo missing the 1/2)
-%           T(ẋ) = 1/2 ẋ.' * M * ẋ
+%   and the kinetic energy is (in [1,2], they have a typo missing the 1/2)
+%       T(ẋ) = 1/2 ẋ.' * M * ẋ
 %
-%       The Lagrangian is L(x,ẋ) = T(ẋ) - V(x). The Euler-Lagrange equations
-%       are
-%           d/dt(∂L/∂ẋ) - ∂L/∂x = Q
-
-%       Here, our generalized forces are the control input and damping, given
-%       by Q = [u - μ₁ẋ₁; - μ₂ẋ₂]. For our problem, ∂L/∂ẋ = ∂T/∂ẋ = Mẋ, so
-%       d/dt(∂L/∂ẋ) = d/dt(Mẋ); since the mass matrix is state dependent, this
-%       is d/dt(Mẋ) = Mẍ + Ṁẋ. So the Euler-Lagrange equations become
-%           Mẍ + Ṁ ẋ - ∂L/∂x = Q
+%   The Lagrangian is L(x,ẋ) = T(ẋ) - V(x). The Euler-Lagrange equations are
+%       d/dt(∂L/∂ẋ) - ∂L/∂x = Q
 %
-%       Converting the second order system to first order, we define our state
-%       as x = [x₁ x₂ ẋ₁ ẋ₂], so ẋ = [ẋ₁ ẋ₂ ẍ₁ ẍ2]. Thus the governing
-%       equations are
-%           ẋ = [                  x₃;
-%                                  x₄;
-%                  M⁻¹( ∂L/∂(x₁x₂) - Ṁ [x₃; x₄] + Q)]
+%   Here, our generalized forces are the control input and damping, given
+%   by Q = [u - μ₁ẋ₁; - μ₂ẋ₂]. For our problem, ∂L/∂ẋ = ∂T/∂ẋ = Mẋ, so
+%   d/dt(∂L/∂ẋ) = d/dt(Mẋ); since the mass matrix is state dependent, this
+%   is d/dt(Mẋ) = Mẍ + Ṁẋ. So the Euler-Lagrange equations become
+%       Mẍ + Ṁ ẋ - ∂L/∂x = Q
 %
-%       The output is taken as the horizontal and vertical positions of the
-%       second mass. These are
-%           y = [l₁ * sin(x₁) + l₂ * sin(x₁ + x₂);
-%                l₁ * cos(x₁) + l₂ * cos(x₁ + x₂)];
+%   Converting the second order system to first order, we define our state
+%   as x = [x₁ x₂ ẋ₁ ẋ₂], so ẋ = [ẋ₁ ẋ₂ ẍ₁ ẍ2]. Thus the governing
+%   equations are
+%       ẋ = [                  x₃;
+%                              x₄;
+%              M⁻¹( ∂L/∂(x₁x₂) - Ṁ [x₃; x₄] + Q) ]
 %
-%       NOTE: This is the model as presented in [1,2]. However, the damping here
-%       is not physically correct, because it neglects to apply the appropriate
-%       damping resistance to both bars (equal and opposite). Note how μ₁ only
-%       enters the first equation, and μ₂ only enters the second equation.
+%   The output is taken as the horizontal and vertical positions of the
+%   second mass. These are
+%       y = [l₁ * sin(x₁) + l₂ * sin(x₁ + x₂);
+%            l₁ * cos(x₁) + l₂ * cos(x₁ + x₂)]
 %
 %   References: [1] K. Fujimoto and D. Tsubakino, “On computation of
 %               nonlinear balanced realization and model reduction,” in

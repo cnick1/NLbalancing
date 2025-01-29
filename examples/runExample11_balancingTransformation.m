@@ -1,21 +1,22 @@
 function runExample11_balancingTransformation(degree,lim)
-%runExample11_balancingTransformation Runs the 2D example to visualize the nonlinear balancing transformations.
+%runExample11_balancingTransformation Runs the 2D inverted pendulum example to
+%   visualize the nonlinear balancing transformations.
 %
-%   Usage:  runExample11_balancingTransformation(degree)
+%   Usage:  runExample11_balancingTransformation(degree,lim)
 %
-%   Inputs:
-%       degree - desired degree of the energy function approximation
+%   Inputs:    degree - desired degree of the energy function approximation
+%                 lim - the size of the grid in the z coordinates
 %
-%   Description: This simple 2D example aims to capture the key idea in the
-%   model reduction problem: the presence of a subsystem that in some sense
-%   contributes little (perhaps is decoupled) to the overall dynamics, yet
-%   drives interactions that cannot directly be eliminated. The model is:
-%           xdot_1 = −2 x1 + 20 x1 x2 + u,
-%           xdot_2 = −5 x2 + u,
-%                y = x1 + x2.
-%   Despite being so simple, this is a challenging problem because the
-%   nonlinear interaction is strong: those terms are much larger than the
-%   linear terms!
+%   Description: The polynomial approximation to the pendulum is
+%           ẋ₁ = x₂
+%           ẋ₂ = 3u/(mL²) + 3g/(2L) ( x₁ - x₁³/6 + x₁⁵/120 - x₁⁷/5040 + x₁⁹/362880 + ... )
+%            y = x₁
+%
+%   We compute the energy functions, the input-normal/output-diagonal
+%   transformation, and then the true balancing transformation, given by the
+%   composition x = Φbar(z̄) = Φ(𝝋(z̄)). We visualize this mapping
+%   from the z̄ coordinates to the x coordinates by forming a grid in the
+%   z̄ coordinates and mapping that grid to the x coordinates.
 %
 %   References: [1]
 %
