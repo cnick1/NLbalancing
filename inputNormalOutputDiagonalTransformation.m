@@ -1,5 +1,5 @@
 function [sigmaSquared, TinOd, vbar, wbar] = inputNormalOutputDiagonalTransformation(v, w, degree, verbose)
-%inputNormalOutputDiagonalTransformation Compute the input-normal/output-diagonal transformation for a polynomial control-affine dynamical system.
+%inputNormalOutputDiagonalTransformation Compute the input-normal/output-diagonal transformation x = Φ(z) for a polynomial control-affine dynamical system.
 %
 %   Usage: [sigmaSquared,Tbar] = outputDiagonalTransformation(v, w, Tin, Sigma, degree)
 %
@@ -26,21 +26,32 @@ function [sigmaSquared, TinOd, vbar, wbar] = inputNormalOutputDiagonalTransforma
 %       TinOd        - cell array containing the output-diagonal
 %                      transformation coefficients.
 %
-%   Description: Since the inputs should be in input normal form, v{2} should
-%   be identity and v{3} and on should be zero. Terms out to v{degree+1} and
-%   w{degree+1} must be defined in the input.  Thus,
+%   Description: We compute the transformation x = Φ(z) that gives the
+%   energy functions the structure of the input-normal
+%           𝓔⁻(Φ(z)) = 1/2 zᵀz
+%   and output-diagonal
+%           𝓔⁺(Φ(z)) = 1/2 zᵀ Σ²(z) z
+%   where Σ²(z) is the diagonal matrix of squared singular value functions
+%   σᵢ²(zᵢ). In our case, the energy functions are computed as polynomials
+%           𝓔⁻(x) = 1/2 ( v₂ᵀ(z⊗z) + v₃ᵀ(z⊗z⊗z) + ... )
+%           𝓔⁺(x) = 1/2 ( w₂ᵀ(z⊗z) + w₃ᵀ(z⊗z⊗z) + ... )
+%   In the transformed coordinates, the coefficients will be
+%           𝓔⁻(z) = 1/2 ( ṽ₂ᵀ(z⊗z) + ṽ₃ᵀ(z⊗z⊗z) + ... )
+%           𝓔⁺(z) = 1/2 ( w̃₂ᵀ(z⊗z) + w̃₃ᵀ(z⊗z⊗z) + ... )
+%   Input-normal corresponds to ṽ₂ being identity and ṽ₃ and above being
+%   zero. Terms out to v{degree+1} and w{degree+1} must be defined in the
+%   input. Output-diagonal corresponds to w̃₂ being a diagonal matrix and
+%   w̃₃ and above being diagonal tensors. We compute the transformation by
+%   representing it as
+%            x = Φ(z)
+%              = T₁z + T₂(z⊗z) + ... + Td(z...⊗z)
+%   and deriving the conditions on T₁, T₂, etc. to ensure the desired
+%   structure in the transformed coefficients. The details can be found in [1]
 %
-%      E_past(x) = 1/2 (kron(x,x))
-%                = 0.5*kronPolyEval(v,x,degree+1)
-%      and E_future(x) = 1/2 ( w{2}kron(x,x) + ... + w{degree+1}kron(kron...,x),x) )
-%                      = 0.5*kronPolyEval(w,x,degree+1)
-%
-%  The output-diagonal transformation then has the form
-%
-%      x = T{1}z + T{2}kron(z,z) + ... + T{degree}kron(kron...,z),z)
-%
-%  where E_past(x) = 1/2 ( z.'z ) and E_future(x) = 1/2 ( z.'diag(sigma²)z )
-%  in the z coordinates.  The singular value functions are sigma.
+%   References: [1] N. A. Corbin, A. Sarkar, J. M. A. Scherpen, and B. Kramer,
+%                “Scalable computation of input-normal/output-diagonal balanced
+%                realization for control-affine polynomial systems,” Oct. 2024,
+%                doi: 10.48550/arXiv.2410.22435
 %
 %  Author: Nick Corbin, UCSD
 %

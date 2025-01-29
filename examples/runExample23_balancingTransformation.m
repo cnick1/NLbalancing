@@ -19,7 +19,7 @@ function runExample23_balancingTransformation(degree,linear,reduction,scaling)
 %           ẋ₁ = −x₁ + 100 x₃ + u,
 %           ẋ₂ = −2 x₂ + 100 x₃ + u,
 %           ẋ₃ = −5 x₃ + u,
-%                y = x₁ + x₂ + x₃,
+%            y = x₁ + x₂ + x₃,
 %   The third state component is decoupled and decays quickly, so we
 %   intuitively expect that we should be able to approximate this model
 %   with a 2D model. However, x₃ strongly drives the states x₁ and x₂. This
@@ -32,7 +32,7 @@ function runExample23_balancingTransformation(degree,linear,reduction,scaling)
 %           ẋ₁ = −x₁ + 20 x₁ x₃ + u,
 %           ẋ₂ = −2 x₂ + 20 x₂ x₃ + u,
 %           ẋ₃ = −5 x₃ + u,
-%                y = x₁ + x₂ + x₃,
+%            y = x₁ + x₂ + x₃,
 %   Despite being so simple, this is a challenging problem because the
 %   nonlinear interaction is strong: those terms are much larger than the
 %   linear terms!

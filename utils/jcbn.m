@@ -1,23 +1,23 @@
 function J = jcbn(T, z)
-%jcbn Return the Jacobian of the transformation given by the T coefficients at z.
+%jcbn Return the Jacobian J(z) of the transformation x = Φ(z) given by the T coefficients at z.
 %
 %   Usage:  J = jcbn(T, z)
 %
 %   Inputs: T - cell array containing transformation coefficients
 %           z - point at which to evaluate the Jacobian
 %
-%   Description: The Jacobian is the matrix giving the partial derivatives
+%   Description: The Jacobian J(z) is the matrix giving the partial derivatives
 %   ∂Φ(z)/∂z of the transformation Φ(z). We approximate the transformation
 %   as a polynomial, so
-% 
+%
 %              x = Φ(z)
-%                = T{1}*z + T{2}*(z⊗z) + ... + T{d}*(z...⊗z)
-% 
+%                = T₁z + T₂(z⊗z) + ... + Td(z...⊗z)
+%
 %   where the rows of the transformation coefficients are symmetrized. Then,
 %   the Jacobian is given by
-% 
-%       J(z) = ∂Φ(z)/∂z = T{1} + 2*T{2}*(I⊗z) + ... + d*T{d}*(I...⊗z)
-% 
+%
+%       J(z) = ∂Φ(z)/∂z = T₁ + 2T₂(I⊗z) + ... + d Td(I...⊗z)
+%
 %   Evaluating this explicitly is expensive, so this function uses the
 %   Kronecker-vec identity to do this recursively and in a more efficient
 %   manner.
