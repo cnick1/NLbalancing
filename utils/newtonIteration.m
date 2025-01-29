@@ -1,4 +1,4 @@
-function z = newtonIteration(x, f, J)
+function z = newtonIteration(x, f, J, verbose)
 %newtonIteration Solve ƒ(z) = x for z using Newton iteration
 %
 %   Usage:  z = newtonIteration(x, f, J)
@@ -56,9 +56,15 @@ function z = newtonIteration(x, f, J)
 %
 %   Part of the NLbalancing repository.
 %%
+if nargin < 4 
+    verbose = false;
+    if nargin < 3
+        error("Must supply x, f, and J")
+    end
+end
 
 % Solve for z0 initial condition with a Newton type iteration
-fprintf("    Using Newton iteration to find transformed initial condition ... ")
+if verbose; fprintf("    Using Newton iteration to find transformed initial condition ... "); end
 
 maxIter = 10; % can change max iterations
 z = x.*0; % Default initial guess of z=0
@@ -70,12 +76,12 @@ for iter = 1:maxIter
     
     % Break upon convergence within tolerance
     if norm(f(z)-x) < tol
-        fprintf("converged in %i iterations. ",iter)
+        if verbose; fprintf("converged in %i iterations. ",iter); end
         break;
     end
 end
 
-fprintf(['\n         -> Initial condition: z0 = [', repmat('%2.2e ', 1, numel(z)), '], '], z);
-fprintf('       error: %2.2e \n', norm(f(z)-x))
+if verbose; fprintf(['\n         -> Initial condition: z0 = [', repmat('%2.2e ', 1, numel(z)), '], '], z); end
+if verbose; fprintf('       error: %2.2e \n', norm(f(z)-x)); end
 
 end
