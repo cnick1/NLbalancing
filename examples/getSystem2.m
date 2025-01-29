@@ -4,20 +4,21 @@ function [f, g, h] = getSystem2(kawanoModel)
 %
 %   Usage:  [f,g,h] = getSystem2()
 %
-%        ẋ₁ = -x₁ + x₂ - x₂² + u₁ + 2 x₂ u₁ - 0.05 x₁ x₂ u₁
-%        ẋ₂ =     - x₂       + u₁           - 0.05 x₂² u₁
-%         y =  x₁ + x₂
+%   Inputs:
+%         kawanoModel - whether to use the model from [2] (true)
+%                ẋ₁ = -x₁ + x₂ - x₂² + u₁ + 2 x₂ u₁ - 0.05 x₁ x₂ u₁
+%                ẋ₂ =     - x₂       + u₁           - 0.05 x₂² u₁
+%                 y =  x₁
+%         or the approximation used in [1]
+%                ẋ₁ = -x₁ + x₂ - x₂² + u₁ + 2 x₂ u₁ - 0.05 x₁ x₂ u₁
+%                ẋ₂ =     - x₂       + u₁           - 0.05 x₂² u₁
+%                 y =  x₁ + x₂
 %
-%        or, if kawanoModel is set to 1 or true,
+%   Outputs:     f,g,h - Cell arrays containing the polynomial coefficients
+%                        for the drift, input, and output
 %
-%        ẋ₁ = -x₁ + x₂ - x₂² + u₁ + 2 x₂ u₁ - 0.05 x₁ x₂ u₁
-%        ẋ₂ =     - x₂       + u₁           - 0.05 x₂² u₁
-%         y =  x₁
-%
-%   Excluding the higher order g terms gives the same system as in [1]. If
-%   kawanoModel is set to true, this function returns the 2D polynomial
-%   system proposed by Kawano and Scherpen [2], otherwise the modified model
-%   from Kramer et. al. is returned [1]. The kawanoModel version is used in [3].
+%   Note: In [1], the higher-order g terms are neglected. [3] uses
+%   the true model from [2].
 %
 %   Reference: [1] B. Kramer, S. Gugercin, J. Borggaard, and L. Balicki,
 %               “Scalable computation of energy functions for nonlinear

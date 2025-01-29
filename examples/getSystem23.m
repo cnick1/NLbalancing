@@ -3,7 +3,13 @@ function [f, g, h] = getSystem23(linear)
 %
 %   Usage:  [f,g,h] = getSystem23()
 %
-%   The dynamics correspond to the input-output system
+%   Inputs:     linear - boolean, whether to use the linear model from [3]
+%                        or nonlinear model from [1,2]
+%
+%   Outputs:     f,g,h - Cell arrays containing the polynomial coefficients
+%                        for the drift, input, and output
+%
+%   Description: The dynamics correspond to the input-output system
 %
 %       ẋ₁ = −x₁ + 20 x₁ x₃ + u,
 %       ẋ₂ = −2 x₂ + 20 x₂ x₃ + u,
@@ -18,13 +24,7 @@ function [f, g, h] = getSystem23(linear)
 %       ẋ₁ = −x₁ + 100 x₃ + u,
 %       ẋ₂ = −2 x₂ + 100 x₃ + u,
 %       ẋ₃ = −5 x₃ + u,
-%        y = x₁ + x₂ + x₃,
-%
-%   Inputs:     linear - boolean, whether to use the linear model from [3]
-%                        or nonlinear model from [1,2]
-%
-%   Outputs:     f,g,h - Cell arrays containing the polynomial coefficients
-%                        for the drift, input, and output
+%        y = x₁ + x₂ + x₃.
 %
 %   References: [1] S. E. Otto, A. Padovan, and C. W. Rowley, "Optimizing
 %                   oblique projections for nonlinear systems using

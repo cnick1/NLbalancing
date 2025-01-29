@@ -7,12 +7,10 @@ function [f, g, h] = getSystem5(eps, degree)
 %       eps     -  coefficient on the stabilizing 'wind' in the left-right direction
 %       degree  -  degree d taylor approximation to the polynomial input g(x)
 %
-%   Outputs:
-%       f,g,h   - cell arrays containing the polynomial coefficients
-%                 for the drift, input, and output.
+%   Outputs:     f,g,h - Cell arrays containing the polynomial coefficients
+%                        for the drift, input, and output
 %
-%   Background: The outputs correspond to f(x), g(x), and h(x) for the input-output system
-%
+%   Description: The outputs correspond to f(x), g(x), and h(x) for the input-output system
 %       ẋ₁ = u₁ cos x₃
 %       ẋ₂ = u₁ sin x₃  - eps*x₂
 %       ẋ₃ = u₂

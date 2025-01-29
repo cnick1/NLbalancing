@@ -21,12 +21,10 @@ function [f, g, h, IC] = getSystem6(numElements, actuatorConfig, rotaryInertia)
 %                        is included in the mass matrix; note this breaks
 %                        the symmetry of the mass matrix.
 %
-%   Outputs:
-%       f,g,h          - Cell arrays containing the polynomial coefficients
-%                        for the drift, input, and output (generalizations
-%                        containing A,B,C, and N)
+%   Outputs:     f,g,h - Cell arrays containing the polynomial coefficients
+%                        for the drift, input, and output
 %
-%   Background: after finite element discretization, the finite element
+%   Description: after finite element discretization, the finite element
 %   equations for the beam can be written as
 %
 %     M q̈ + D q̇ + K(q) q = B(q) u,

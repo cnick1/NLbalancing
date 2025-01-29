@@ -1,8 +1,16 @@
 function [f, g, h] = getSystem12(degree, transformedModel)
 %getSystem12  Generates a polynomial approximation to the 2D model from Fujimoto and Scherpen 2001, 2005, 2010 [1-3]
 %
-%   Usage:  [f,g,h] = getSystem12(degree)
+%   Usage:  [f,g,h] = getSystem12(degree, transformedModel)
 %
+%   Inputs:
+%                  degree  -  degree d taylor approximation
+%        transformedModel  -  coefficient on the stabilizing 'wind' in the left-right direction
+%
+%   Outputs:     f,g,h - Cell arrays containing the polynomial coefficients
+%                        for the drift, input, and output
+%
+%   Description: The model is
 %       f(x) = [-9x₁ + 6x₁² x₂ + 6x₂³ - x₁⁵ - 2x₁³ x₂² - x₁ x₂⁴
 %               -9x₂ - 6x₁³ - 6x₁x₂² - x₁⁴ x₂ - 2x₁² x₂³ - x₂⁵]
 %       g(x) = [\frac{3√2(9-6x₁x₂+x₁⁴-x₂⁴)}{9+x₁⁴+2x₁²x₂²+x₂⁴},                      \frac{√2(-9x₁² - 27 x₂² + 6 x₁³ x₂ + 6 x₁ x₂³ - (x₁² + x₂²)³)}{9+x₁⁴+2x₁²x₂²+x₂⁴}

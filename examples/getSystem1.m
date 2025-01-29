@@ -6,7 +6,7 @@ function [f, g, h] = getSystem1()
 %   Outputs:    f,g,h  - Cell arrays containing the polynomial coefficients
 %                        for the drift, input, and output
 %
-%   Background: The dynamics correspond to the input-output system
+%   Description: The dynamics correspond to the input-output system
 %
 %       ẋ = -2x + x² + 2u - 0.2xu + x²u
 %       y = 2x

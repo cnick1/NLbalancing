@@ -4,9 +4,17 @@ function [f, g, h] = getSystem11(degree, m, L)
 %
 %   Usage:  [f,g,h] = getSystem11(degree, m, L)
 %
-%              ẋ₁ = x₂                                                                                                                     \\
-%              ẋ₂ = 3T/(mL²) + 3g/(2L) ( x₁ - x₁³/6 + x₁⁵/120 - x₁⁷/5040 + x₁⁹/362880 )
-%               y = x₁
+%   Inputs:    degree - desired degree of the polynomial approximation
+%                   m - mass
+%                   L - pendulum length
+%
+%   Outputs:    f,g,h  - Cell arrays containing the polynomial coefficients
+%                        for the drift, input, and output
+%
+% Description: The polynomial approximation to the pendulum is
+%           ẋ₁ = x₂
+%           ẋ₂ = 3u/(mL²) + 3g/(2L) ( x₁ - x₁³/6 + x₁⁵/120 - x₁⁷/5040 + x₁⁹/362880 + ... )
+%            y = x₁
 %
 %   Reference: [1] N. A. Corbin and B. Kramer, “Computing solutions to the
 %               polynomial-polynomial regulator problem,” in 2024 63rd IEEE

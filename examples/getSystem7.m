@@ -4,8 +4,10 @@ function [f, g, h] = getSystem7()
 %
 %   Usage:  [f,g,h] = getSystem7()
 %
-%   The "matrices" correspond to the input-output system
+%   Outputs:     f,g,h - Cell arrays containing the polynomial coefficients
+%                        for the drift, input, and output
 %
+%   Description: The dynamics correspond to the input-output system from [1]
 %         ẋ₁ = x₃ - x₁² x₃ - 0.088 x₁ x₃ - 0.877 x₁ + 0.47 x₁² + 3.846 x₁³
 %              - 0.215 u + 0.28 u x₁² + 0.47 u² x₁ +  0.63 u³ - 0.019 x₂²
 %         ẋ₂ = x₃

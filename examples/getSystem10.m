@@ -4,8 +4,10 @@ function [f, g, h] = getSystem10()
 %
 %   Usage:  [f,g,h] = getSystem10()
 %
-%   The "matrices" correspond to the input-output system
+%   Outputs:    f,g,h  - Cell arrays containing the polynomial coefficients
+%                        for the drift, input, and output
 %
+%   Description: The dynamics correspond to the input-output system
 %       ẋ = 1/10 x - 2 x² + x³ + u
 %             y = x
 %

@@ -10,7 +10,7 @@ function [f, g, h] = getSystem16(degree)
 %       f,g,h  - Cell arrays containing the polynomial coefficients for the
 %                drift, input, and output (generalizations containing A,B,C)
 %
-%   Background: We consider a triple pendulum with rigid uniform slender
+%   Description: We consider a triple pendulum with rigid uniform slender
 %       links. Each joint also has an associated spring stiffness and
 %       damping. We derive the equations of motion using either a
 %       Lagrangian or Hamiltonian approach. We begin by defining the

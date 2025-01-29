@@ -26,7 +26,7 @@ function [sigmaSquared, TinOd, vbar, wbar] = inputNormalOutputDiagonalTransforma
 %       TinOd        - cell array containing the output-diagonal
 %                      transformation coefficients.
 %
-%   Background: Since the inputs should be in input normal form, v{2} should
+%   Description: Since the inputs should be in input normal form, v{2} should
 %   be identity and v{3} and on should be zero. Terms out to v{degree+1} and
 %   w{degree+1} must be defined in the input.  Thus,
 %
@@ -39,7 +39,7 @@ function [sigmaSquared, TinOd, vbar, wbar] = inputNormalOutputDiagonalTransforma
 %
 %      x = T{1}z + T{2}kron(z,z) + ... + T{degree}kron(kron...,z),z)
 %
-%  where E_past(x) = 1/2 ( z.'z ) and E_future(x) = 1/2 ( z.'diag(sigma^2)z )
+%  where E_past(x) = 1/2 ( z.'z ) and E_future(x) = 1/2 ( z.'diag(sigma²)z )
 %  in the z coordinates.  The singular value functions are sigma.
 %
 %  Author: Nick Corbin, UCSD
@@ -306,7 +306,7 @@ function [vtilde, wtilde] = transformEnergyFunctionsLinear(v, w, T)
 %       v,w   - cell arrays containing the transformed polynomial energy function
 %               coefficients
 %
-%   Background: Given a linear transformation x=Tz, compute the transformed energy functions
+%   Description: Given a linear transformation x=Tz, compute the transformed energy functions
 %   given by the coefficients vtilde, wtilde. TODO: Add more details here.
 %
 %   Authors: Nick Corbin, UCSD

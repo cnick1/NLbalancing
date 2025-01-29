@@ -10,7 +10,7 @@ function [f, g, h] = getSystem15(degree)
 %       f,g,h  - Cell arrays containing the polynomial coefficients for the
 %                drift, input, and output (generalizations containing A,B,C)
 %
-%   Background: This model has been used several times in the literature.
+%   Description: This model has been used several times in the literature.
 %       Let the 2 x 2 mass matrix be given by the entries
 %           m₁₁       = m₁ l₁² + m₂ l₁² + m₂ l₂² + 2 m₂ l₁ l₂ cos x₂
 %           m₁₂ = m₂₁ = m₂ l₂² + m₂ l₁ l₂ cos x₂

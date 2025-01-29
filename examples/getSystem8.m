@@ -18,11 +18,10 @@ function [f, g, h] = getSystem8(numElements, elementOrder)
 %                          • 1 = linear elements (default)
 %                          • 2 = quadratic elements (not fully implemented)
 %
-%   Outputs: f,g,h     - Cell arrays containing the polynomial coefficients
-%                        for the drift, input, and output (generalizations
-%                        containing A,B,C, and N)
+%   Outputs:    f,g,h  - Cell arrays containing the polynomial coefficients
+%                        for the drift, input, and output
 %
-%   Background: after finite element discretization, the finite element
+%   Description: after finite element discretization, the finite element
 %   equations for the reaction-diffusion problem can be written as
 %
 %     M ẋ + K(x) x = B(x) u,

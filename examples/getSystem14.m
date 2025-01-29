@@ -14,7 +14,7 @@ function [f, g, h] = getSystem14(degree, model)
 %       f,g,h  - Cell arrays containing the polynomial coefficients for the
 %                drift, input, and output (generalizations containing A,B,C)
 %
-%   Background: This model has been used several times in the literature [1-3].
+%   Description: This model has been used several times in the literature [1-3].
 %       The system describes a set of dynamics related to the double
 %       pendulum; however, where the double pendulum would have 4D dynamics
 %       and only marginal stability, the associated 2D gradient system is
