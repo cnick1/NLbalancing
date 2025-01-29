@@ -46,7 +46,7 @@ set(groot,'defaultLineLineWidth',1,'defaultTextInterpreter','TeX')
 fprintf('Running Example 12\n')
 
 if nargin < 2
-    lim = 5;
+    lim = 2.5;
     if nargin < 1
         degree = 4;
     end
@@ -110,11 +110,10 @@ end
 F = @(x) kronPolyEval(f, x);
 Ft = @(z) PhiBarJacobian(z,TinOd,sigmaSquared)\kronPolyEval(f, PhiBar(z,TinOd,sigmaSquared));
 
-x0 = [1 1].'*(0.5*lim);
+x0 = [1 1].'*(0.2*lim);
 
 % Solve for z0 initial condition with a Newton type iteration
-z0 = newtonIteration(x0, @(z) PhiBar(z,TinOd,sigmaSquared), @(z) PhiBarJacobian(z,TinOd,sigmaSquared));
-
+z0 = newtonIteration(x0, @(z) PhiBar(z,TinOd,sigmaSquared), @(z) PhiBarJacobian(z,TinOd,sigmaSquared),100,true);
 
 % Simulate both systems
 [~, X1] = ode45(@(t, x) F(x), [0, 5], x0);

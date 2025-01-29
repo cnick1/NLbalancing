@@ -65,9 +65,9 @@ set(groot,'defaultLineLineWidth',1.5,'defaultTextInterpreter','LaTeX')
 fprintf('Running Example 23\n')
 
 if nargin < 4
-    scaling = 1/20;
+    scaling = 1/10;
     if nargin < 3
-        reduction = false;
+        reduction = true;
         if nargin < 2
             linear = false;
             if nargin < 1
@@ -83,7 +83,7 @@ end
 
 %% Get system dynamics
 [f, g, h] = getSystem23(linear); n=3;
-f{2} = 0.01*f{2}; % For testing scaling f2
+% f{2} = 0.01*f{2}; % For testing scaling f2
 
 %%  Compute the energy functions
 fprintf(" ~~~~~~~~~~~~~~~~~~~~~~~~~ Computing energy functions:  ~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
@@ -104,7 +104,7 @@ Ft = @(z) PhiBarJacobian(z,TinOd,sigmaSquared)\kronPolyEval(f, PhiBar(z,TinOd,si
 x0 = [1 1 1].'*scaling;
 
 % Solve for z0 initial condition with a Newton type iteration
-z0 = newtonIteration(x0, @(z) PhiBar(z,TinOd,sigmaSquared), @(z) PhiBarJacobian(z,TinOd,sigmaSquared));
+z0 = newtonIteration(x0, @(z) PhiBar(z,TinOd,sigmaSquared), @(z) PhiBarJacobian(z,TinOd,sigmaSquared),100,true);
 
 
 %% Apply reduction by eliminating z3 (set it and its derivative to zero)

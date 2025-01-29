@@ -50,7 +50,7 @@ set(groot,'defaultLineLineWidth',1.5,'defaultTextInterpreter','LaTeX')
 
 fprintf('Running Example 15\n')
 if nargin < 3
-    scaling = 1;
+    scaling = 3;
     if nargin < 2
         reduction = true;
         if nargin < 1
@@ -80,7 +80,7 @@ Ft = @(z) PhiBarJacobian(z,TinOd,sigmaSquared)\kronPolyEval(f, PhiBar(z,TinOd,si
 %% Simulate original and transformed systems; same input should give same output
 x0 = [0 0 1 -2].'*scaling;
 
-z0 = newtonIteration(x0, TinOd, sigmaSquared);
+z0 = newtonIteration(x0, @(z) PhiBar(z,TinOd,sigmaSquared), @(z) PhiBarJacobian(z,TinOd,sigmaSquared),100,true);
 
 
 %% Apply reduction by eliminating z3 (set it and its derivative to zero)
