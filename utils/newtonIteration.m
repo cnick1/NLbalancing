@@ -22,30 +22,30 @@ function z = newtonIteration(x, f, J)
 %   is to find roots of the equation g(z) = 0. Then, given an initial guess
 %   z_0, we can iteratively improve our approximation as
 %
-%       z_(n+1)  =  z_n - g(z_n) / g'(z_n)
+%       zₙ₊₁  =  zₙ - g(zₙ) / g'(zₙ)
 %
-%   where g'(z_n) is the derivative of the function (assuming we can
+%   where g'(zₙ) is the derivative of the function (assuming we can
 %   evaluate it as well). The extension to multivariate polynomials is
 %   straightforward: now z and g(z) are vectors, so g'(z) is the Jacobian
-%   matrix (matrix of partial derivatives ∂g_i(z)/∂z_j), which since the
+%   matrix (matrix of partial derivatives ∂gᵢ(z)/∂zⱼ), which since the
 %   vector x is fixed is the same as the Jacobian of f(z). Defining the
 %   Jacobian as J(z) = ∂g(z)/∂z, the Newton iteration formula then becomes
 %
-%       z_(n+1)  =  z_n - J(z_n) \ g(z_n)
+%       zₙ₊₁  =  zₙ - J(zₙ)⁻¹ g(zₙ)
 %
 %   which is the solution of a linear system of equations at each step.
-%   This is done in line 55. Note that in the code, we do not store z_n,
+%   This is done in line 69. Note that in the code, we do not store zₙ,
 %   we overwrite it at each step.
 %
 %   Specific usage: For usage with input-normal/output-diagonal
-%   transformation x=Φ(z), the function handles would be
+%   transformation x = Φ(z), the function handles would be
 %       f = @(z) kronPolyEval(TinOd, z)
 %       J = @(z) jcbn(TinOd, z)
 %   This can all be done in one line if desired:
 %       z0 = newtonIteration(x0, @(z) kronPolyEval(TinOd, z), @(z) jcbn(TinOd, z));
 %
-%   For usage with balancing transformation x=Φbar(zbar), we need to
-%   compose the transformations as x=Φ(𝝋(zbar))
+%   For usage with balancing transformation x = Φbar(z̄), we need to
+%   compose the transformations as x = Φ(𝝋(z̄))
 %       f = @(z) PhiBar(z,TinOd,sigmaSquared)
 %       J = @(z) PhiBarJacobian(z,TinOd,sigmaSquared)
 %   This can all be done in one line if desired:
