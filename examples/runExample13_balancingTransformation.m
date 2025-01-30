@@ -15,7 +15,7 @@ function runExample13_balancingTransformation(degree,lim)
 %
 %   where α = (√3 + √2)(√3 + 2). We compute the energy functions, the
 %   input-normal/output-diagonal transformation, and then the true balancing
-%   transformation, given by the composition x = Φbar(z̄) = Φ(𝝋(z̄)). We visualize
+%   transformation, given by the composition x = ̅Φ(z̄(z̄) = Φ(𝝋(z̄)). We visualize
 %   this mapping from the z̄ coordinates to the x coordinates by forming a grid
 %   in the z̄ coordinates and mapping that grid to the x coordinates.
 %

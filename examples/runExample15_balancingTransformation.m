@@ -30,7 +30,7 @@ function runExample15_balancingTransformation(degree,reduction,scaling)
 %
 %   We compute the energy functions, the input-normal/output-diagonal
 %   transformation, and then the true balancing transformation, given by the
-%   composition x = Φbar(z̄) = Φ(𝝋(z̄)). We then simulate the transformed and
+%   composition x = ̅Φ(z̄(z̄) = Φ(𝝋(z̄)). We then simulate the transformed and
 %   optionally reduced system and compare with the original (full-order) model.
 %
 %   References: [1]  K. Fujimoto and D. Tsubakino, “On computation of
