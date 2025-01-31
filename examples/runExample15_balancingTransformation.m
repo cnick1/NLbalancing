@@ -50,11 +50,11 @@ set(groot,'defaultLineLineWidth',1.5,'defaultTextInterpreter','LaTeX')
 
 fprintf('Running Example 15\n')
 if nargin < 3
-    scaling = 3;
+    scaling = .75;
     if nargin < 2
         reduction = true;
         if nargin < 1
-            degree = 6;
+            degree = 4;
         end
     end
 end

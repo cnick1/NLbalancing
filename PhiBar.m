@@ -58,7 +58,7 @@ sigma = @(z) arrayfun(@(i) real(polyval(sigmaSquared(i,:), z(i))^(1/2)), 1:n).';
 
 % Define function and Jacobian for Newton iteration
 f = @(z) z .* sqrt(sigma(z)); % 𝝋⁻¹(z)
-J = @(z) diag(sqrt(sigma(z)) + z .* dsigma(z) ./ (2 * sqrt(sigma(z))));
+J = @(z) diag(sqrt(sigma(z)) + z .* dsigma(z) ./ (2 * sqrt(sigma(z)))); % [∂𝝋⁻¹(z)/∂z]
 
 % Solve for z using Newton iteration
 z = newtonIteration(zbar, f, J);
