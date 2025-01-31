@@ -30,26 +30,21 @@ function J = PhiBarJacobian(zbar,TinOd,sigmaSquared)
 %   function, two main things need to be computed:
 %       1) Given z̄, we need to compute z. We can do this via Newton
 %          iteration, the same as in the function PhiBar().
-%       2) We need the Jacobian [∂𝝋(z̄)/∂z̄] *** Is the inverse of the Jacobian the same as the Jacobian of the inverse?
+%       2) We need the Jacobian [∂𝝋(z̄)/∂z̄] .
 %   The function 𝝋(z̄) is given by
 %           𝝋ᵢ(̄zᵢ) = z̄ᵢ / √ ̅σᵢ(z̄ᵢ)       ( = zᵢ )
 %   and its Jacobian is the diagonal matrix
-%           [∂𝝋(z)/∂z]ᵢⱼ = ( √ ̅σᵢ(z̄ᵢ) - z̄ᵢσᵢ'(z̄ᵢ)/(2√ ̅σᵢ(z̄ᵢ)) ) / ̅σᵢ(z̄ᵢ) for i=j, 0 else
-%   We can leverage the relations ̅σᵢ(z̄ᵢ) = σᵢ(zᵢ) and zᵢ = z̄ᵢ / √ ̅σᵢ(z̄ᵢ)
-%   to compute this as
-%           [∂𝝋(z)/∂z]ᵢⱼ = ( √ σᵢ(zᵢ) - zᵢσᵢ'(zᵢ)/2 ) / σᵢ(zᵢ) for i=j, 0 else
-%
-%
-%       zᵢ = z̄ᵢ / √ ̅σᵢ(z̄ᵢ)
-%               or
-%       z̄ᵢ = zᵢ √σᵢ(zᵢ)
-%   So I need to solve z̄ᵢ = zᵢ √σᵢ(zᵢ) for zᵢ. In other words, given z̄ᵢ,
-%   I need to solve the roots of the scalar equation
-%       gᵢ(zᵢ) = zᵢ √σᵢ(zᵢ) - z̄ᵢ
-%   or the vector equation
-%       g(z) = z ⊙ √σ(z) - z̄
-
-
+%           [∂𝝋(z)/∂z]ᵢⱼ = 
+%            ( √ ̅σᵢ(z̄ᵢ) - z̄ᵢ ̅σᵢ'(z̄ᵢ)/(2√ ̅σᵢ(z̄ᵢ)) ) / ̅σᵢ(z̄ᵢ) for i=j, 0 else
+%   However, we can't compute  ̅σᵢ(z̄ᵢ), only σᵢ(zᵢ). No problem; instead
+%   of computing the diagonal matrix [∂𝝋(z)/∂z], we will compute its
+%   inverse and then invert it, because the inverse of the Jacobian the
+%   same as the Jacobian of the inverse! Fortunately, we already know how
+%   to compute [∂𝝋⁻¹(z)/∂z], which was done in the function PhiBar(). Then
+%   we simply use the fact that [∂𝝋(z)/∂z] = [∂𝝋⁻¹(z)/∂z]⁻¹. In fact,
+%   [∂𝝋⁻¹(z)/∂z] will already be defined in the process of computing z
+%   given z̄, and since it is a diagonal matrix, inversion is not expensive.
+% 
 %   References: [1]
 %
 %   Part of the NLbalancing repository.
@@ -63,7 +58,7 @@ for i=1:n
     dsigmaSquared(i,:) = polyder(sigmaSquared(i,:));
 end
 
-%% Compute z given z̄
+%% Compute z given z̄ via Newton iteration
 % Define functions for σ(z) and its derivative σ'(z); sigma can be defined
 % as an anonymous function, but dsigma requires evaluating sigma(z) and
 % indexing the components, which can't be done in one line as an anonymous
@@ -75,16 +70,16 @@ sigma = @(z) arrayfun(@(i) real(polyval(sigmaSquared(i,:), z(i))^(1/2)), 1:n).';
     end
 
 % Define function and Jacobian for Newton iteration
-f = @(z) z .* sqrt(sigma(z));
-J = @(z) diag(sqrt(sigma(z)) + z .* dsigma(z) ./ (2 * sqrt(sigma(z))));
+varphiInv = @(z) z .* sqrt(sigma(z)); % 𝝋⁻¹(z)
+dvarphiInv = @(z) diag(sqrt(sigma(z)) + z .* dsigma(z) ./ (2 * sqrt(sigma(z)))); % [∂𝝋⁻¹(z)/∂z]
 
 % Solve for z using Newton iteration
-z = newtonIteration(zbar, f, J);
-
-%% Compute Jacobian of scaling 𝝋(z̄), Jscal = ∂𝝋(z̄)/∂z̄
-Jscal = diag(   ( sqrt(sigma(z)) - z .* dsigma(z)/2 )./sigma(z)   );
+z = newtonIteration(zbar, varphiInv, dvarphiInv);
 
 %% Evaluate J(z̄) = ∂ ̅Φ(z̄)/∂̄z: composition of Jacobians [∂Φ(z)/∂z]*[∂𝝋(z̄)/∂z̄]
-J = jcbn(TinOd, z)  * Jscal;
+% The key is that the Jacobian of the inverse is the inverse of the Jacobian,
+% so [∂𝝋(z̄)/∂z̄] = [∂𝝋⁻¹(z)/∂z]⁻¹. So instead of multiplying, we divide
+% by the dvarphiInv function which we have already defined!
+J = jcbn(TinOd, z)  / dvarphiInv(z);
 
 end

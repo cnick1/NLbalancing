@@ -46,10 +46,10 @@ for i=1:n
 end
 
 %% Compute z given z̄
-% Define functions for σ(z) and its derivative σ'(z); sigma can be defined 
-% as an anonymous function, but dsigma requires evaluating sigma(z) and 
-% indexing the components, which can't be done in one line as an anonymous 
-% function so I have to do it as a nested function 
+% Define functions for σ(z) and its derivative σ'(z); sigma can be defined
+% as an anonymous function, but dsigma requires evaluating sigma(z) and
+% indexing the components, which can't be done in one line as an anonymous
+% function so I have to do it as a nested function
 sigma = @(z) arrayfun(@(i) real(polyval(sigmaSquared(i,:), z(i))^(1/2)), 1:n).';
     function ds = dsigma(z)
         s = sigma(z);
@@ -57,7 +57,7 @@ sigma = @(z) arrayfun(@(i) real(polyval(sigmaSquared(i,:), z(i))^(1/2)), 1:n).';
     end
 
 % Define function and Jacobian for Newton iteration
-f = @(z) z .* sqrt(sigma(z));
+f = @(z) z .* sqrt(sigma(z)); % 𝝋⁻¹(z)
 J = @(z) diag(sqrt(sigma(z)) + z .* dsigma(z) ./ (2 * sqrt(sigma(z))));
 
 % Solve for z using Newton iteration
