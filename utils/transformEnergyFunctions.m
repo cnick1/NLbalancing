@@ -16,7 +16,7 @@ function [vtilde, wtilde] = transformEnergyFunctions(v, w, T, inputNormal)
 %       v,w   - cell arrays containing the transformed polynomial energy function
 %               coefficients
 %
-%   Background: Given a transformation T, compute the transformed energy functions
+%   Description: Given a transformation T, compute the transformed energy functions
 %   given by the coefficients vtilde, wtilde. TODO: Add more details here.
 %
 %   Authors: Nick Corbin, UCSD

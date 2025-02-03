@@ -14,8 +14,10 @@ function [v, w] = runExample2_energyFunctionPlots(exportPlotData)
 %               differential balancing based on nonlinear hankel operators,”
 %               IEEE Transactions on Automatic Control, vol. 62, no. 7,
 %               pp. 3293–3308, Jul. 2017, doi: 10.1109/tac.2016.2628201.
-%              [2] N. A. Corbin and B. Kramer, “Scalable computation of 𝓗_∞
-%               energy functions for polynomial control-affine systems,” 2023.
+%              [2] N. A. Corbin and B. Kramer, “Scalable computation of 𝓗∞
+%               energy functions for polynomial control-affine systems,"
+%               IEEE Transactions on Automatic Control, pp. 1–13, 2024,
+%               doi: 10.1109/tac.2024.3494472
 %%
 load(fullfile('utils', 'YlGnBuRescaled.mat'))
 

@@ -11,8 +11,10 @@ function runExample8(exportData, x0)
 %
 %   The value of eta is set below.
 %
-%   Reference: [1] N. A. Corbin and B. Kramer, “Scalable computation of 𝓗_∞
-%               energy functions for polynomial drift nonlinear systems,” 2023.
+%   Reference: [1] N. A. Corbin and B. Kramer, “Scalable computation of
+%               𝓗∞ energy functions for polynomial drift nonlinear
+%               systems,” in 2024 American Control Conference (ACC), Jul.
+%               2024, pp. 2506–2511. doi: 10.23919/acc60939.2024.10644363
 %              [2] M. Embree, “Unstable modes in projection-based
 %               reduced-order models: how many can there be, and what do they
 %               tell you?,” Systems & Control Letters, vol. 124, pp. 49–59,
@@ -59,22 +61,22 @@ nd = []; times = []; energies = [];
 numEls = [4, 8, 16, 32, 64, 128];
 for numEl = numEls
     fprintf(fileID, '%5d       &', numEl); fprintf(fileID, '%5d & ', numEl - 1);
-
+    
     [f, g, h] = getSystem8(numEl);
-
+    
     tic; for i = 1:nTest, [w] = approxFutureEnergy(f, g, h, eta, degree); end, tt = toc / nTest;
-
+    
     fprintf(fileID, '%10.4e    & ', length(w{degree}));
     nd = [nd, length(w{degree})];
     fprintf(fileID, '%8.2e  & ', tt);
     times = [times, tt];
-
+    
     % Initial condition from Mark Embree's talk
     L = 30; x = linspace(0, L, numEl + 1).';
     initialCondition = x0 * x .* (x - L) .* (x - L / 2);
-
+    
     initialCondition = initialCondition(2:end - 1);
-
+    
     wzInit = 0.5 * kronPolyEval(w, initialCondition, degree);
     fprintf(fileID, '%12.6e    \n', wzInit);
     energies = [energies, wzInit];
@@ -87,22 +89,22 @@ if exportData
     for numEl = [256, 512, 1024]
         numEls = [numEls, numEl];
         fprintf(fileID, '%5d       &', numEl); fprintf(fileID, '%5d & ', numEl - 1);
-
+        
         [f, g, h] = getSystem8(numEl);
-
+        
         tic; for i = 1:nTest, [w] = approxFutureEnergy(f, g, h, eta, degree); end, tt = toc / nTest;
-
+        
         fprintf(fileID, '%10.4e    & ', length(w{degree}));
         nd = [nd, length(w{degree})];
         fprintf(fileID, '%8.2e  & ', tt);
         times = [times, tt];
-
+        
         % Initial condition from Mark Embree's talk
         L = 30; x = linspace(0, L, numEl + 1).';
         initialCondition = x0 * x .* (x - L) .* (x - L / 2);
-
+        
         initialCondition = initialCondition(2:end - 1);
-
+        
         wzInit = 0.5 * kronPolyEval(w, initialCondition, degree);
         fprintf(fileID, '%12.6e    \n', wzInit);
         energies = [energies, wzInit];
@@ -148,22 +150,22 @@ nd = []; times = []; energies = [];
 numEls = [4, 8, 16, 32];
 for numEl = numEls
     fprintf(fileID, '%5d       &', numEl); fprintf(fileID, '%5d & ', numEl - 1);
-
+    
     [f, g, h] = getSystem8(numEl);
-
+    
     tic; for i = 1:nTest, [w] = approxFutureEnergy(f, g, h, eta, degree); end, tt = toc / nTest;
-
+    
     fprintf(fileID, '%10.4e    & ', length(w{degree}));
     nd = [nd, length(w{degree})];
     fprintf(fileID, '%8.2e  & ', tt);
     times = [times, tt];
-
+    
     % Initial condition from Mark Embree's talk
     L = 30; x = linspace(0, L, numEl + 1).';
     initialCondition = x0 * x .* (x - L) .* (x - L / 2);
-
+    
     initialCondition = initialCondition(2:end - 1);
-
+    
     wzInit = 0.5 * kronPolyEval(w, initialCondition, degree);
     fprintf(fileID, '%12.6e    \n', wzInit);
     energies = [energies, wzInit];
@@ -175,24 +177,24 @@ if exportData
     nTest = 1;
     for numEl = [64, 128]
         numEls = [numEls, numEl];
-
+        
         fprintf(fileID, '%5d       &', numEl); fprintf(fileID, '%5d & ', numEl - 1);
-
+        
         [f, g, h] = getSystem8(numEl);
-
+        
         tic; for i = 1:nTest, [w] = approxFutureEnergy(f, g, h, eta, degree); end, tt = toc / nTest;
-
+        
         fprintf(fileID, '%10.4e    & ', length(w{degree}));
         nd = [nd, length(w{degree})];
         fprintf(fileID, '%8.2e  & ', tt);
         times = [times, tt];
-
+        
         % Initial condition from Mark Embree's talk
         L = 30; x = linspace(0, L, numEl + 1).';
         initialCondition = x0 * x .* (x - L) .* (x - L / 2);
-
+        
         initialCondition = initialCondition(2:end - 1);
-
+        
         wzInit = 0.5 * kronPolyEval(w, initialCondition, degree);
         fprintf(fileID, '%12.6e    \n', wzInit);
         energies = [energies, wzInit];

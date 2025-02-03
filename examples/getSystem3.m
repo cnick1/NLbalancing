@@ -63,7 +63,7 @@ Q = M;
 
 %  We now have a system of the form
 %
-%   M \dot{z} = Az + Bu + N*kron(z,z)
+%   M ż = Az + Bu + N*kron(z,z)
 %
 %  Perform a change of variables to eliminate the positive definite
 %  mass matrix.  Let M^(1/2)z -> x

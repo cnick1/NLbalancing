@@ -9,8 +9,10 @@ function [sigmaSquared] = runExample6_outputDiagonalization()
 %
 %   The value of eta is set below.
 %
-%   Reference: [1] N. A. Corbin and B. Kramer, “Scalable computation of 𝓗_∞
-%               energy functions for polynomial control-affine systems,” 2023.
+%   Reference: [1] N. A. Corbin and B. Kramer, “Scalable computation of 𝓗∞
+%               energy functions for polynomial control-affine systems,"
+%               IEEE Transactions on Automatic Control, pp. 1–13, 2024,
+%               doi: 10.1109/tac.2024.3494472
 %
 %   Part of the NLbalancing repository.
 %%

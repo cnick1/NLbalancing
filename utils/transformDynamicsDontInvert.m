@@ -2,7 +2,7 @@ function [ft, gt, ht] = transformDynamicsDontInvert(f, g, h, T)
 %transformDynamicsDontInvert Transform the model given by f, g, h by transformation T.
 %   This function returns the expansions for the transformed dynamics in
 %   the form
-%             ∂Φ(z)/∂z \dot{z} = ft(z) + gt(z) u,    y = ht(z).
+%             ∂Φ(z)/∂z ż = ft(z) + gt(z) u,    y = ht(z).
 %          NOTE, THE JACOBIAN IS THEN NEEDED ON THE LEFT-HAND-SIDE.
 %
 %   Usage: [ft, gt, ht] = transformDynamicsDontInvert(f, g, h, T)
@@ -17,18 +17,18 @@ function [ft, gt, ht] = transformDynamicsDontInvert(f, g, h, T)
 %       ft,gt,ht - cell arrays containing the polynomial coefficients
 %                  for the transformed drift, input, and output.
 %
-%   Background: Given a transformation x = Φ(z), we seek to represent the
+%   Description: Given a transformation x = Φ(z), we seek to represent the
 %    dynamics for the control-affine system
-%        \dot{x} = f(x) + g(x) u
+%        ẋ = f(x) + g(x) u
 %              y = h(x)
 %    in the new coordinates as
-%        \dot{z} = ftilde(z) + gtilde(z) u
-%              y = htilde(z)
+%        ż = f̃(z) + g̃(z) u
+%              y = h̃(z)
 %    In general, it is not possible to do this explicitly. Applying the
 %    transformation yields
-%        ∂Φ(z)/∂z \dot{z} = f(Φ(z)) + g(Φ(z)) u
+%        ∂Φ(z)/∂z ż = f(Φ(z)) + g(Φ(z)) u
 %                       y = h(Φ(z))
-%    and we do not in general have an explicit way to write [∂Φ(z)/∂z]^{-1}.
+%    and we do not in general have an explicit way to write [∂Φ(z)/∂z]⁻¹.
 %    In this function, we will simply return ft(z) = f(Φ(z)), gt(z) =
 %    g(Φ(z)), and ht(z) = h(Φ(z)). This can be done exactly for polynomial
 %    transformations, though the degree of the dynamics increases, e.g. a
@@ -36,7 +36,7 @@ function [ft, gt, ht] = transformDynamicsDontInvert(f, g, h, T)
 %    degree 6.
 %
 %    Note that to simulate the transformed dynamics will require then
-%    "inverting the Jacobian" [∂Φ(z)/∂z]^{-1}. The Jacobian matrix can be
+%    "inverting the Jacobian" [∂Φ(z)/∂z]⁻¹. The Jacobian matrix can be
 %    evaluated using the utility function jcbn(T,z).
 %
 %   Authors: Nick Corbin, UCSD

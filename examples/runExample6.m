@@ -10,8 +10,10 @@ function runExample6(exportData, x0)
 %
 %   The value of eta is set below.
 %
-%   Reference: [1] N. A. Corbin and B. Kramer, “Scalable computation of 𝓗_∞
-%               energy functions for polynomial control-affine systems,” 2023.
+%   Reference: [1] N. A. Corbin and B. Kramer, “Scalable computation of 𝓗∞
+%               energy functions for polynomial control-affine systems,"
+%               IEEE Transactions on Automatic Control, pp. 1–13, 2024,
+%               doi: 10.1109/tac.2024.3494472
 %
 %   Part of the NLbalancing repository.
 %%
@@ -76,13 +78,13 @@ fprintf('\n# Table II Data\n# finite element beam model, convergence and scalabi
 % compute and print the results
 nTest = [3, 3, 3, 1, 1, 1];
 numEls = [1, 2, 4, 8, 16, 24];
-nd = zeros(size(numEls)); times = zeros(size(numEls)); energies = zeros(size(numEls)); 
+nd = zeros(size(numEls)); times = zeros(size(numEls)); energies = zeros(size(numEls));
 if exportData, numTestCases = 6; else, numTestCases = 3; end
 for i=1:numTestCases
     fprintf(' %5d      &%4d  & ', numEls(i), 6 * numEls(i));
     
     % Compute energy functions and CPU time
-    [f, g, h, IC] = getSystem6(numEls(i), 2); 
+    [f, g, h, IC] = getSystem6(numEls(i), 2);
     tic; for j = 1:nTest(i), [w] = approxFutureEnergy(f, g, h, eta, degree); end, tt = toc / nTest(i);
     
     % Evaluate energy function at x0 corresponding to nodes having linear
@@ -121,14 +123,14 @@ initialCondition = x0 * IC;
 
 degrees = 2:6;
 nTest = [3, 3, 3, 3, 1];
-futureTimes = zeros(size(degrees)); futureEnergies = zeros(size(degrees)); 
+futureTimes = zeros(size(degrees)); futureEnergies = zeros(size(degrees));
 if exportData, numTestCases = 5; else, numTestCases = 3; end
 for i=1:numTestCases
     % Compute Future energy function
     tic; for j = 1:nTest(i), [w] = approxFutureEnergy(f, g, h, eta, degrees(i)); end, tt = toc / nTest(i);
     
     wzInit = 0.5 * kronPolyEval(w, initialCondition, degrees(i));
-
+    
     fprintf('   %d   &   %8.2e   & %12.6e    \n', degrees(i), tt, wzInit);
     futureTimes(i) = tt; futureEnergies(i) = wzInit;
 end
@@ -154,7 +156,7 @@ end
 end
 
 function [a, d] = getExpFit(times, numEls)
-n = find(times~=0,1,'last'); times = times(1:n); numEls = numEls(1:n); 
+n = find(times~=0,1,'last'); times = times(1:n); numEls = numEls(1:n);
 % CPU time scales as O(n^d) for some d; this return d
 logy = log10(times); % take the natural log of y data
 logx = log10(6 * numEls); % take the natural log of x data

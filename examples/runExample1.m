@@ -14,11 +14,15 @@ function [v, w] = runExample1(numGTermsModel, numGTermsApprox, exportPlotData)
 %       v,w             are coefficients of the past and future energy
 %                       function approximations, respectively.
 %
-%   Reference: [1] B. Kramer, S. Gugercin, J. Borggaard, and L. Balicki, “Nonlinear
-%               balanced truncation: Part 1—computing energy functions,” arXiv,
-%               Dec. 2022. doi: 10.48550/ARXIV.2209.07645
-%              [2] N. A. Corbin and B. Kramer, “Scalable computation of 𝓗_∞
-%               energy functions for polynomial control-affine systems,” 2023.
+%   Reference: [1] B. Kramer, S. Gugercin, J. Borggaard, and L. Balicki,
+%               “Scalable computation of energy functions for nonlinear
+%               balanced truncation,” Computer Methods in Applied Mechanics
+%               and Engineering, vol. 427, p. 117011, Jul. 2024, doi:
+%               10.1016/j.cma.2024.117011
+%              [2] N. A. Corbin and B. Kramer, “Scalable computation of 𝓗∞
+%               energy functions for polynomial control-affine systems,"
+%               IEEE Transactions on Automatic Control, pp. 1–13, 2024,
+%               doi: 10.1109/tac.2024.3494472
 %
 %   Part of the NLbalancing repository.
 %%
@@ -90,19 +94,19 @@ if exportPlotData
     fid = fopen('plots/ex1_future_a.txt', 'w');
     fprintf(fid, '%g %g\n', [x; EPlusAnalytic]);
     fclose(fid);
-
+    
     fid = fopen('plots/ex1_future_2.txt', 'w');
     fprintf(fid, '%g %g\n', [x; Ef2]);
     fclose(fid);
-
+    
     fid = fopen('plots/ex1_future_4.txt', 'w');
     fprintf(fid, '%g %g\n', [x; Ef4]);
     fclose(fid);
-
+    
     fid = fopen('plots/ex1_future_6.txt', 'w');
     fprintf(fid, '%g %g\n', [x; Ef6]);
     fclose(fid);
-
+    
     fid = fopen('plots/ex1_future_8.txt', 'w');
     fprintf(fid, '%g %g\n', [x; Ef8]);
     fclose(fid);
@@ -153,19 +157,19 @@ if exportPlotData
     fid = fopen('plots/ex1_past_a.txt', 'w');
     fprintf(fid, '%g %g\n', [x; EMinusAnalytic]);
     fclose(fid);
-
+    
     fid = fopen('plots/ex1_past_2.txt', 'w');
     fprintf(fid, '%g %g\n', [x; Ep2]);
     fclose(fid);
-
+    
     fid = fopen('plots/ex1_past_4.txt', 'w');
     fprintf(fid, '%g %g\n', [x; Ep4]);
     fclose(fid);
-
+    
     fid = fopen('plots/ex1_past_6.txt', 'w');
     fprintf(fid, '%g %g\n', [x; Ep6]);
     fclose(fid);
-
+    
     fid = fopen('plots/ex1_past_8.txt', 'w');
     fprintf(fid, '%g %g\n', [x; Ep8]);
     fclose(fid);

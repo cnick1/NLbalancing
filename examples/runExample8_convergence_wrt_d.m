@@ -16,8 +16,10 @@ function runExample8_convergence_wrt_d(exportData, x0)
 %
 %   The value of eta is set below.
 %
-%   Reference: [1] N. A. Corbin and B. Kramer, “Scalable computation of 𝓗_∞
-%               energy functions for polynomial drift nonlinear systems,” 2023.
+%   Reference: [1] N. A. Corbin and B. Kramer, “Scalable computation of
+%               𝓗∞ energy functions for polynomial drift nonlinear
+%               systems,” in 2024 American Control Conference (ACC), Jul.
+%               2024, pp. 2506–2511. doi: 10.23919/acc60939.2024.10644363
 %              [2] M. Embree, “Unstable modes in projection-based
 %               reduced-order models: how many can there be, and what do they
 %               tell you?,” Systems & Control Letters, vol. 124, pp. 49–59,
@@ -57,23 +59,23 @@ energies = [];
 if exportData
     numEl = 16;
     ds = 2:2:6;
-else 
+else
     numEl = 8;
     ds = 2:2:8;
 end
 for d = ds
-    fprintf('%1d & ', d); 
-
+    fprintf('%1d & ', d);
+    
     [f, g, h] = getSystem8(numEl);
-
+    
     [w] = approxFutureEnergy(f, g, h, eta, d);
-
+    
     % Initial condition from Mark Embree's talk
     L = 30; x = linspace(0, L, numEl + 1).';
     initialCondition = x0 * x .* (x - L) .* (x - L / 2);
-
+    
     initialCondition = initialCondition(2:end - 1);
-
+    
     wzInit = 0.5 * kronPolyEval(w, initialCondition, d);
     fprintf('%12.6e    \n', wzInit);
     energies = [energies, wzInit];

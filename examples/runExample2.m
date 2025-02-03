@@ -27,15 +27,19 @@ function [v, w] = runExample2(degree, plotEnergy, plotBalancing, balancingDegree
 %
 %   The value of eta is set below.
 %
-%   Reference: [1] B. Kramer, S. Gugercin, J. Borggaard, and L. Balicki, “Nonlinear
-%               balanced truncation: Part 1—computing energy functions,” arXiv,
-%               Dec. 2022. doi: 10.48550/ARXIV.2209.07645
+%   Reference: [1] B. Kramer, S. Gugercin, J. Borggaard, and L. Balicki,
+%               “Scalable computation of energy functions for nonlinear
+%               balanced truncation,” Computer Methods in Applied Mechanics
+%               and Engineering, vol. 427, p. 117011, Jul. 2024, doi:
+%               10.1016/j.cma.2024.117011
 %              [2] Y. Kawano and J. M. A. Scherpen, “Model reduction by
 %               differential balancing based on nonlinear hankel operators,”
 %               IEEE Transactions on Automatic Control, vol. 62, no. 7,
-%               pp. 3293–3308, Jul. 2017, doi: 10.1109/tac.2016.2628201.
-%              [3] N. A. Corbin and B. Kramer, “Scalable computation of 𝓗_∞
-%               energy functions for polynomial control-affine systems,” 2023.
+%               pp. 3293–3308, Jul. 2017, doi: 10.1109/tac.2016.2628201
+%              [3] N. A. Corbin and B. Kramer, “Scalable computation of 𝓗∞
+%               energy functions for polynomial control-affine systems,"
+%               IEEE Transactions on Automatic Control, pp. 1–13, 2024,
+%               doi: 10.1109/tac.2024.3494472
 %%
 
 %% Process inputs
@@ -95,7 +99,7 @@ if (plotEnergy || plotBalancing)
     ePast = zeros(nY, nX);
     eFuture = zeros(nY, nX);
     [X, Y] = meshgrid(xPlot, yPlot);
-
+    
     for i = 1:nY
         for j = 1:nX
             x = [X(i, j); Y(i, j)];
@@ -106,7 +110,7 @@ if (plotEnergy || plotBalancing)
     set(groot, 'defaultAxesTickLabelInterpreter', 'latex');
     set(groot, 'defaulttextinterpreter', 'latex');
     set(groot, 'defaultLegendInterpreter', 'latex');
-
+    
     fig1 = figure('Position',[273 287 363.3333 470.6667]);
     contourf(X, Y, ePast, 16, 'w'); hold on;
     load(fullfile('utils', 'YlGnBuRescaled.mat'))
@@ -124,9 +128,9 @@ if (plotEnergy || plotBalancing)
     if kawanoModel
         caxis([0 80])
         set(h, 'ylim', [0 80])
-
+        
     end
-
+    
     fig2 = figure('Position',[673 287 363.3333 470.6667]);
     contourf(X, Y, eFuture, 16, 'w'); hold on;
     logMaxEFuture = log10(max(max(eFuture)));
@@ -144,7 +148,7 @@ if (plotEnergy || plotBalancing)
         load(fullfile('utils', 'YlGnBuRescaled.mat'))
         colormap(flip(YlGnBuRescaled))
     end
-
+    
     % Draw square around middle .2
     %     x1 =- .2;
     %     x2 = .2;
@@ -153,14 +157,14 @@ if (plotEnergy || plotBalancing)
     %     x = [x1, x2, x2, x1, x1];
     %     y = [y1, y1, y2, y2, y1];
     %     plot(x, y, 'w-');
-
+    
     if exportPlotData
         % save('Ex2_RawData.mat', 'v', 'w')
-
+        
         fid = fopen('plots/ex2_past_future.txt', 'w');
         fprintf(fid, '%g %g %g %g\n', [X(:), Y(:), ePast(:), eFuture(:)]);
         fclose(fid);
-
+        
         exportgraphics(fig1, 'plots/PEF_p0_1.pdf', 'ContentType', 'vector');
         exportgraphics(fig2, 'plots/FEF_p0_1.pdf', 'ContentType', 'vector');
     end
@@ -174,12 +178,12 @@ if (plotBalancing)
     nPts = 201;
     s = linspace(-2, 2, nPts);
     lin = T{1}(:, 1) * s;
-
+    
     coord = lin;
     for k = 2:balancingDegree
         coord = coord + T{k}(:, 1) * s .^ k;
     end
-
+    
     idxLin = zeros(1, nPts);
     linCount = 0;
     for i = 1:nPts
@@ -189,7 +193,7 @@ if (plotBalancing)
         end
     end
     idxLin = idxLin(1:linCount);
-
+    
     idxCoord = zeros(1, nPts);
     coordCount = 0;
     for i = 1:nPts
@@ -199,11 +203,11 @@ if (plotBalancing)
         end
     end
     idxCoord = idxCoord(1:coordCount);
-
+    
     figure(1); hold on
     plot(lin(1, idxLin), lin(2, idxLin), 'w+')
     plot(coord(1, idxCoord), coord(2, idxCoord), 'r+')
-
+    
     figure(2); hold on
     plot(lin(1, idxLin), lin(2, idxLin), 'w+')
     plot(coord(1, idxCoord), coord(2, idxCoord), 'r+')

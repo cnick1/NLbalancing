@@ -10,9 +10,9 @@ function runExample24(degree)
 %   model reduction problem: the presence of a subsystem that in some sense
 %   contributes little (perhaps is decoupled) to the overall dynamics, yet
 %   drives interactions that cannot directly be eliminated. The model is:
-%           xdot_1 = −2 x1 + 20 x1 x2 + u,
-%           xdot_2 = −5 x2 + u,
-%                y = x1 + x2.
+%           ẋ₁ = −2 x₁ + 20 x₁ x₂ + u,
+%           ẋ₂ = −5 x₂ + u,
+%                y = x₁ + x₂.
 %   Despite being so simple, this is a challenging problem because the
 %   nonlinear interaction is strong: those terms are much larger than the
 %   linear terms!
@@ -101,7 +101,7 @@ Ft = @(z) PhiBarJacobian(z,TinOd,sigmaSquared)\kronPolyEval(f, PhiBar(z,TinOd,si
 x0 = [1 1].'*(0.7*lim);
 
 % Solve for z0 initial condition with a Newton type iteration
-z0 = newtonIteration(x0, @(z) PhiBar(z,TinOd,sigmaSquared), @(z) PhiBarJacobian(z,TinOd,sigmaSquared));
+z0 = newtonIteration(x0, @(z) PhiBar(z,TinOd,sigmaSquared), @(z) PhiBarJacobian(z,TinOd,sigmaSquared),10,true);
 
 
 % Simulate both systems

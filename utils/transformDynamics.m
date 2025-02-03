@@ -1,7 +1,7 @@
 function [ft, gt, ht] = transformDynamics(f, g, h, T)
 %transformDynamics Transform the model given by f, g, h by transformation T.
 %   This function returns the expansions for the transformed dynamics in
-%   the form \dot{z} = ftilde(z) + gtilde(z) u,    y = htilde(z)
+%   the form ż = f̃(z) + g̃(z) u, y = h̃(z)
 %
 %   Usage: [ft, gt, ht] = transformDynamics(f, g, h, T, Tinv)
 %
@@ -15,26 +15,26 @@ function [ft, gt, ht] = transformDynamics(f, g, h, T)
 %       ft,gt,ht - cell arrays containing the polynomial coefficients
 %                  for the transformed drift, input, and output.
 %
-%   Background: Given a transformation x = Φ(z), we seek to represent the
+%   Description: Given a transformation x = Φ(z), we seek to represent the
 %    dynamics for the control-affine system
-%        \dot{x} = f(x) + g(x) u
-%              y = h(x)
+%        ẋ = f(x) + g(x) u
+%        y = h(x)
 %    in the new coordinates as
-%        \dot{z} = ftilde(z) + gtilde(z) u
-%              y = htilde(z)
+%        ż = f̃(z) + g̃(z) u
+%        y = h̃(z)
 %    In general, it is not possible to do this explicitly. Applying the
 %    transformation yields
-%        ∂Φ(z)/∂z \dot{z} = f(Φ(z)) + g(Φ(z)) u
-%                       y = h(Φ(z))
-%    and we do not in general have an explicit way to write [∂Φ(z)/∂z]^{-1}.
-%    In this function, we will approximate the functions ftilde(z),
-%    gtilde(z), htilde(z) by computing their Taylor expansions. This can be
-%    done exactly for linear transformations but for polynomial
-%    approximations involves a truncation of the expansions.
+%        ∂Φ(z)/∂z ż = f(Φ(z)) + g(Φ(z)) u
+%                 y = h(Φ(z))
+%    and we do not in general have an explicit way to write [∂Φ(z)/∂z]⁻¹.
+%    In this function, we will approximate the functions f̃(z), g̃(z),
+%    h̃(z) by computing their Taylor expansions. This can be done exactly
+%    for linear transformations but for polynomial approximations involves
+%    a truncation of the expansions.
 %
-%    Inserting the expansions for ftilde(z) and gtilde(z), we can proceed
-%    to collect terms of the same degree, leading to the formulas for the
-%    coefficients for ftilde(z) & gtilde(z).
+%    Inserting the expansions for f̃(z) and g̃(z), we can proceed to
+%    collect terms of the same degree, leading to the formulas for the
+%    coefficients for f̃(z) & g̃(z).
 %
 %   Authors: Nick Corbin, UCSD
 %

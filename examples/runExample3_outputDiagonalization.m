@@ -9,14 +9,18 @@ function [sigmaSquared] = runExample3_outputDiagonalization()
 %
 %   The value of eta is set below.
 %
-%   Reference: [0] N. A. Corbin and B. Kramer, “Scalable computation of 𝓗_∞
-%               energy functions for polynomial control-affine systems,” 2023.
-%              [1] B. Kramer, S. Gugercin, J. Borggaard, and L. Balicki, “Nonlinear
-%               balanced truncation: Part 1—computing energy functions,” arXiv,
-%               Dec. 2022. doi: 10.48550/ARXIV.2209.07645
+%   Reference: [0] N. A. Corbin and B. Kramer, “Scalable computation of 𝓗∞
+%               energy functions for polynomial control-affine systems,"
+%               IEEE Transactions on Automatic Control, pp. 1–13, 2024,
+%               doi: 10.1109/tac.2024.3494472
+%              [1] B. Kramer, S. Gugercin, J. Borggaard, and L. Balicki,
+%               “Scalable computation of energy functions for nonlinear
+%               balanced truncation,” Computer Methods in Applied Mechanics
+%               and Engineering, vol. 427, p. 117011, Jul. 2024, doi:
+%               10.1016/j.cma.2024.117011
 %              [2] B. Kramer, S. Gugercin, and J. Borggaard, “Nonlinear balanced
 %               truncation: Part 2—model reduction on manifolds,” arXiv, Feb. 2023.
-%               doi: 10.48550/ARXIV.2302.02036
+%               doi: 10.48550/arXiv.2302.02036
 %              [3] J. Borggaard and L. Zietsman, “On approximating polynomial-
 %               -quadratic regulator problems,” IFAC-PapersOnLine, vol. 54, no. 9,
 %               pp. 329–334, 2021, doi: 10.1016/j.ifacol.2021.06.090

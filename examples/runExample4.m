@@ -3,12 +3,14 @@
 %
 %  These values match those in Section IV.D of the reference
 %
-%   Reference: [1] B. Kramer, S. Gugercin, J. Borggaard, and L. Balicki, “Nonlinear
-%               balanced truncation: Part 1—computing energy functions,” arXiv,
-%               Dec. 2022. doi: 10.48550/ARXIV.2209.07645
+%   Reference: [1] B. Kramer, S. Gugercin, J. Borggaard, and L. Balicki,
+%               “Scalable computation of energy functions for nonlinear
+%               balanced truncation,” Computer Methods in Applied Mechanics
+%               and Engineering, vol. 427, p. 117011, Jul. 2024, doi:
+%               10.1016/j.cma.2024.117011
 %              [2] B. Kramer, S. Gugercin, and J. Borggaard, “Nonlinear balanced
 %               truncation: Part 2—model reduction on manifolds,” arXiv, Feb. 2023.
-%               doi: 10.48550/ARXIV.2302.02036
+%               doi: 10.48550/arXiv.2302.02036
 %
 %  Part of the NLbalancing and QQR repositories.
 %%
@@ -35,11 +37,11 @@ for n = [8, 16, 32] % number of elements, the actual number of states is 2*n
     fprintf('%d & ', 2 * n)
     [f, g, h, zInit] = getSystem4(n, m, p, 1 / L ^ 2);
     zInit = z_factor * zInit;
-
+    
     tic; for i = 1:nTest, [w] = approxFutureEnergyQB(f, f{2}, g, h, eta, degree); end, tt = toc / nTest;
     fprintf('%10.4e & ', length(w{degree}))
     fprintf('%8.2e & ', tt)
-
+    
     for d = 2:degree, w{d} = w{d}.'; end
     wzInit = 0.5 * kronPolyEval(w, zInit, degree);
     fprintf('%12.6e \\\\ \n', wzInit)
@@ -53,11 +55,11 @@ for n = [64, 128, 256, 512]
     fprintf('%d & ', 2 * n)
     [f, g, h, zInit] = getSystem4(n, m, p, 1 / L ^ 2);
     zInit = z_factor * zInit;
-
+    
     tic; for i = 1:nTest, [w] = approxFutureEnergy(f, g, h, eta, degree); end, tt = toc / nTest;
     fprintf('%10.4e & ', length(w{degree}))
     fprintf('%8.2e & ', tt)
-
+    
     for d = 2:degree, w{d} = w{d}.'; end
     wzInit = 0.5 * kronPolyEval(w, zInit, degree);
     fprintf('%12.6e \\\\ \n', wzInit)
@@ -77,7 +79,7 @@ n = 8; % actual system size is double this
 zInit = z_factor * zInit;
 for degree = [2, 3, 4, 5, 6] % only the last one is needed, but use this for timing
     fprintf('%d & ', degree)
-
+    
     tic;
     for kount = 1:2 ^ (8 - degree)
         [v] = approxPastEnergy(f, g, h, eta, degree, false);
@@ -87,7 +89,7 @@ for degree = [2, 3, 4, 5, 6] % only the last one is needed, but use this for tim
     vzInit = 0.5 * kronPolyEval(v, zInit, degree);
     fprintf('%13.7e ', vzInit)
     fprintf('(%8.2e) & ', tt)
-
+    
     tic;
     for kount = 1:2 ^ (8 - degree)
         [w] = approxFutureEnergy(f, g, h, eta, degree, false);

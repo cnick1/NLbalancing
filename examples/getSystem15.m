@@ -1,4 +1,4 @@
-function [f, g, h] = getSystem15(degree)
+function [f, g, h, fsym, gsym, hsym] = getSystem15(degree)
 %getSystem15  Returns a polynomial approximation to the 4D model of a double pendulum.
 %
 %   Usage:  [f,g,h] = getSystem15(degree)
@@ -6,11 +6,18 @@ function [f, g, h] = getSystem15(degree)
 %   Inputs:
 %       degree - desired degree of the computed polynomial dynamics.
 %
-%   Outputs:
-%       f,g,h  - Cell arrays containing the polynomial coefficients for the
-%                drift, input, and output (generalizations containing A,B,C)
+%   Outputs:    f,g,h  - Cell arrays containing the polynomial coefficients
+%                        for the drift, input, and output (generalizations
+%                        containing A,B,C)
+%       fsym,gsym,hsym - symbolic handles for the true dynamics
 %
 %   Description: This model has been used several times in the literature.
+%   The state vairbales are 
+%       x₁ - angular position of mass 1, relative to vertical 
+%       x₂ - angular position of mass 2, relative to the angle of mass 1
+%            (straight in line would be x₂=0)
+%       ẋ₁ - angular velocity of mass 1, relative to vertical 
+%       ẋ₂ - angular velocity of mass 2, relative to the angle of mass 1
 %   Let the 2 x 2 mass matrix be given by the entries
 %       m₁₁       = m₁ l₁² + m₂ l₁² + m₂ l₂² + 2 m₂ l₁ l₂ cos x₂
 %       m₁₂ = m₂₁ = m₂ l₂² + m₂ l₁ l₂ cos x₂
@@ -101,7 +108,6 @@ hsym = [l1 * sin(x1) + l2 * sin(x1 + x2);
     l1 * (1-cos(x1)) + l2 * (1-cos(x1 + x2))];
 
 [f, g, h] = approxPolynomialDynamics(fsym, gsym, hsym, x, degree);
-
 
 if false
     %% port Hamiltonian approach

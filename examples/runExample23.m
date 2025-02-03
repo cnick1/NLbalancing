@@ -16,23 +16,23 @@ function runExample23(degree,linear,reduction,scaling)
 %   contributes little (perhaps is decoupled) to the overall dynamics, yet
 %   drives interactions that cannot directly be eliminated. Consider the
 %   linear system from [3]:
-%           xdot_1 = −x1 + 100 x3 + u,
-%           xdot_2 = −2 x2 + 100 x3 + u,
-%           xdot_3 = −5 x3 + u,
-%                y = x1 + x2 + x3,
+%           ẋ₁ = −x₁ + 100 x₃ + u,
+%           ẋ₂ = −2 x₂ + 100 x₃ + u,
+%           ẋ₃ = −5 x₃ + u,
+%                y = x₁ + x₂ + x₃,
 %   The third state component is decoupled and decays quickly, so we
 %   intuitively expect that we should be able to apprroximate this model
-%   with a 2D model. However, x3 strongly drives the states x1 and x2. This
+%   with a 2D model. However, x₃ strongly drives the states x₁ and x₂. This
 %   in some sense directly demonstrates the need for balancing: the state
 %   contributes little to observability (since it decays quickly and
 %   contributes little to the output) but contributes significantly to
 %   controllability (since it drives the other states).
 %       The model from [1,2] is a nonlinear example exhibiting the same
 %   features. The linear interaction is now replaced with a nonlinear one:
-%           xdot_1 = −x1 + 20 x1 x3 + u,
-%           xdot_2 = −2 x2 + 20 x2 x3 + u,
-%           xdot_3 = −5 x3 + u,
-%                y = x1 + x2 + x3,
+%           ẋ₁ = −x₁ + 20 x₁ x₃ + u,
+%           ẋ₂ = −2 x₂ + 20 x₂ x₃ + u,
+%           ẋ₃ = −5 x₃ + u,
+%                y = x₁ + x₂ + x₃,
 %   Despite being so simple, this is a challenging problem because the
 %   nonlinear interaction is strong: those terms are much larger than the
 %   linear terms!
