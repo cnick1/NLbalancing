@@ -12,11 +12,11 @@ function [f, g, h, fsym, gsym, hsym] = getSystem15(degree)
 %       fsym,gsym,hsym - symbolic handles for the true dynamics
 %
 %   Description: This model has been used several times in the literature.
-%   The state vairbales are 
-%       x₁ - angular position of mass 1, relative to vertical 
+%   The state variables are
+%       x₁ - angular position of mass 1, relative to vertical
 %       x₂ - angular position of mass 2, relative to the angle of mass 1
 %            (straight in line would be x₂=0)
-%       ẋ₁ - angular velocity of mass 1, relative to vertical 
+%       ẋ₁ - angular velocity of mass 1, relative to vertical
 %       ẋ₂ - angular velocity of mass 2, relative to the angle of mass 1
 %   Let the 2 x 2 mass matrix be given by the entries
 %       m₁₁       = m₁ l₁² + m₂ l₁² + m₂ l₂² + 2 m₂ l₁ l₂ cos x₂
