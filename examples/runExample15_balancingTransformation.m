@@ -50,7 +50,7 @@ set(groot,'defaultLineLineWidth',1.5,'defaultTextInterpreter','LaTeX')
 
 fprintf('Running Example 15\n')
 if nargin < 3
-    scaling = .75;
+    scaling = 5;
     if nargin < 2
         reduction = true;
         if nargin < 1
@@ -60,8 +60,17 @@ if nargin < 3
 end
 
 %% Get system dynamics
-[f, g, h] = getSystem15(degree - 1); [p,n] = size(h{1});
+[f, g, h, fsymtemp, ~, hsymtemp] = getSystem15(degree - 1); [p,n] = size(h{1});
 
+% fsym = @(x) double(subs(fsymtemp,sym('x', [1, 4]).',x));
+
+fsym = @(x) [x(3); x(4);
+((cos(x(2)) + 1)*(x(4) + (49*sin(x(2) + x(1)))/5 + x(3)*(x(3)*sin(x(2)) + (x(4)*sin(x(2)))/2) - (x(3)*x(4)*sin(x(2)))/2))/(2*cos(x(2)) - (cos(x(2)) + 1)^2 + 3) - (x(3) + (49*sin(x(2) + x(1)))/5 + (98*sin(x(1)))/5 - x(4)^2*sin(x(2)) - 2*x(3)*x(4)*sin(x(2)))/(2*cos(x(2)) - (cos(x(2)) + 1)^2 + 3);
+((cos(x(2)) + 1)*(x(3) + (49*sin(x(2) + x(1)))/5 + (98*sin(x(1)))/5 - x(4)^2*sin(x(2)) - 2*x(3)*x(4)*sin(x(2))))/(2*cos(x(2)) - (cos(x(2)) + 1)^2 + 3) - ((2*cos(x(2)) + 3)*(x(4) + (49*sin(x(2) + x(1)))/5 + x(3)*(x(3)*sin(x(2)) + (x(4)*sin(x(2)))/2) - (x(3)*x(4)*sin(x(2)))/2))/(2*cos(x(2)) - (cos(x(2)) + 1)^2 + 3)];
+% fsym = @(x) kronPolyEval(f, x);
+
+hsym = @(x) double(subs(hsymtemp,sym('x', [1, 4]).',x));
+% hsym = @(x) kronPolyEval(h, x);
 %%  Compute the energy functions
 fprintf(" ~~~~~~~~~~~~~~~~~~~~~~~~~ Computing energy functions:  ~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
 eta = 0;
@@ -74,19 +83,25 @@ fprintf(" ~~~~~~~~~~~ Computing transformation and singular value functions:  ~~
 
 %% Simulate dynamics
 % Compare original dynamics with transformed dynamics
-F = @(x) kronPolyEval(f, x);
-Ft = @(z) PhiBarJacobian(z,TinOd,sigmaSquared)\kronPolyEval(f, PhiBar(z,TinOd,sigmaSquared));
+% F = @(x) kronPolyEval(f, x);
+F = @(x) fsym(x);
+% Ft = @(z) PhiBarJacobian(z,TinOd,sigmaSquared)\kronPolyEval(f, PhiBar(z,TinOd,sigmaSquared));
+Ft = @(z) PhiBarJacobian(z,TinOd,sigmaSquared)\fsym(PhiBar(z,TinOd,sigmaSquared));
 
 %% Simulate original and transformed systems; same input should give same output
-x0 = [0 0 1 -2].'*scaling;
+% x0 = [0 0 1 -2].'*scaling;
+% x0 = [.1 0 0 0].'*scaling;
+x0 = [.1 .1 .1 .1].'*scaling;
 
-z0 = newtonIteration(x0, @(z) PhiBar(z,TinOd,sigmaSquared), @(z) PhiBarJacobian(z,TinOd,sigmaSquared),100,true);
+z0 = newtonIteration(x0, @(z) PhiBar(z,TinOd,sigmaSquared), @(z) PhiBarJacobian(z,TinOd,sigmaSquared),1,true);
 
+% z0 = sigmaSquared(:,1).^(1/4).*(TinOd{1}\x0)
 
 %% Apply reduction by eliminating z3 (set it and its derivative to zero)
 if reduction
     z0(4) = 0; z0(3) = 0;
-    Fttemp = @(z) PhiBarJacobian(z,TinOd,sigmaSquared)\kronPolyEval(f, PhiBar(z,TinOd,sigmaSquared));
+    % Fttemp = @(z) PhiBarJacobian(z,TinOd,sigmaSquared)\kronPolyEval(f, PhiBar(z,TinOd,sigmaSquared));
+    Fttemp = @(z) PhiBarJacobian(z,TinOd,sigmaSquared)\fsym(PhiBar(z,TinOd,sigmaSquared));
     Ir = eye(4); Ir(end) = 0; Ir(3,3) = 0;
     Ft = @(z) Ir*Fttemp(z);
 end
@@ -104,11 +119,13 @@ end
 % Get outputs
 y1 = zeros(length(t1),p);
 for i=1:length(t1)
-    y1(i,:) = kronPolyEval(h, X1(i,:).');
+    % y1(i,:) = kronPolyEval(h, X1(i,:).');
+    y1(i,:) = hsym(X1(i,:).');
 end
 y2 = zeros(length(t2),p);
 for i=1:length(t2)
-    y2(i,:) = kronPolyEval(h, X2(i,:).');
+    % y2(i,:) = kronPolyEval(h, X2(i,:).');
+    y2(i,:) = hsym(X2(i,:).');
 end
 
 % Plot state trajectories
