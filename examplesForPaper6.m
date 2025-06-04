@@ -58,6 +58,7 @@ runExample12();
 [ns,energyTimings,transformationTimings] = runExample17_timings(5);
 [ns,energyTimings,transformationTimings] = runExample17_timings(6);
 
+%%
 runExample17_checkDiag(6)
 runExample17_checkDiag(8)
 runExample17_checkDiag(16)

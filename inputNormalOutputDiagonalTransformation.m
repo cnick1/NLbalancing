@@ -84,7 +84,7 @@ validateattributes(v, {'cell'}, {})
 validateattributes(w, {'cell'}, {})
 dv = length(v); %#ok<NASGU>
 dw = length(w); %#ok<NASGU>
-n = sqrt(length(v{2}));
+n = sqrt(numel(v{2}));
 
 method = 'two-step'; % 'two-step' is best
 switch method
