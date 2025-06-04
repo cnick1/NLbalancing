@@ -142,7 +142,7 @@ switch method
         
         if isa(V2, 'factoredMatrixInverse') && isa(W2, 'factoredMatrix')
             % handle factored matrix class
-            Rinv = cholinv(V2);  % V₂ = "P⁻¹" = (R⁻¹*R⁻ᵀ)⁻¹ = R*Rᵀ
+            Rinv = cholinv(V2);  % V₂ = "P⁻¹" = (R⁻ᵀ*R⁻¹)⁻¹ = R*Rᵀ
             L = chol(W2);        % W₂ = "Q" = L*Lᵀ
             % [~, Xi, V] = svd(L.' * Rinv.'); % from Theorem 2
             [V, Xi, ~] = svd(Rinv * L); % just to avoid transposing things
