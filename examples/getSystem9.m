@@ -1,4 +1,4 @@
-function [f, g, h, D, y] = getSystem9(eps, N, y0)
+function [f, g, h, D, y, vref] = getSystem9(eps, N, y0)
 %getSystem9 Returns a cubic Allen-Cahn model using Chebychev spatial discretization [1].
 %
 %   Usage:  [f,g,h,D,y] = getSystem9(eps, N, y0)

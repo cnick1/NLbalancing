@@ -14,7 +14,7 @@ function runExample2_balancingTransformation(degree,lim)
 %
 %   We compute the energy functions, the input-normal/output-diagonal
 %   transformation, and then the true balancing transformation, given by the
-%   composition x = ̅Φ(z̄(z̄) = Φ(𝝋(z̄)). We visualize this mapping
+%   composition x = ̅Φ(z̄) = Φ(𝝋(z̄)). We visualize this mapping
 %   from the z̄ coordinates to the x coordinates by forming a grid in the
 %   z̄ coordinates and mapping that grid to the x coordinates.
 %
@@ -36,7 +36,7 @@ set(groot,'defaultLineLineWidth',1,'defaultTextInterpreter','TeX')
 fprintf('Running Example 2\n')
 
 if nargin < 2
-    lim = 0.5;
+    lim = 1;
     if nargin < 1
         degree = 4;
     end
@@ -44,6 +44,7 @@ end
 
 %% Get system dynamics
 [f, g, h] = getSystem2(true);  % Kawano model
+% f = {f{1},0*f{2}}; 
 
 %%  Compute the energy functions
 fprintf(" ~~~~~~~~~~~~~~~~~~~~~~~~~ Computing energy functions:  ~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
@@ -77,7 +78,7 @@ for i=1:length(xH(:))
 end
 
 % Prepare figure
-figure("Position", [185 337.6667 997.3333 420]);
+figure("Position", [185 42 997.3333 420]);
 subplot(1,2,2); title(sprintf("z for z ∈[-%1.1f,%1.1f] \\times [-%1.1f,%1.1f] ",lim,lim,lim,lim))
 hold on; axis equal; xlabel("z_1"); ylabel("z_2")
 for i=1:size(xH,2)
@@ -99,6 +100,10 @@ end
 F = @(x) kronPolyEval(f, x);
 Ft = @(z) PhiBarJacobian(z,TinOd,sigmaSquared)\kronPolyEval(f, PhiBar(z,TinOd,sigmaSquared));
 
+% Tbal = TinOd{1}/diag(sigmaSquared.^(1/4));
+% ftilde = {Tbal\f{1}*Tbal, 0*f{2}};
+% Ft = @(z) kronPolyEval(ftilde, z);
+
 x0 = [1 1].'*(0.5*lim);
 
 % Solve for z0 initial condition with a Newton type iteration
@@ -113,7 +118,6 @@ plot(X1(:,1),X1(:,2),'g','LineWidth',1.5)
 subplot(1,2,2)
 plot(Z(:,1),Z(:,2),'r--','LineWidth',1.5)
 
-
 %% Transform Z trajectory into X coordinates to compare
 X2 = zeros(size(Z));
 for i = 1:length(Z)
@@ -122,6 +126,9 @@ end
 
 subplot(1,2,1)
 plot(X2(:,1),X2(:,2),'r--','LineWidth',1.5)
+xlim([-1.4616    2.1246])
+ylim([-1.9309    1.7470])
+drawnow
 end
 
 
