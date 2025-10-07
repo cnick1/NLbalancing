@@ -55,7 +55,7 @@ dsigmaSquared = zeros(size(sigmaSquared) - [0 1]);
 sigmaSquared = flip(sigmaSquared,2);
 
 for i=1:n
-    dsigmaSquared(i,:) = polyder(sigmaSquared(i,:));
+    dsigmaSquared(i,:) = polyder(sigmaSquared(i,:)); % not used?
 end
 
 %% Compute z given z̄ via Newton iteration
@@ -66,7 +66,7 @@ end
 sigma = @(z) arrayfun(@(i) real(polyval(sigmaSquared(i,:), z(i))^(1/2)), 1:n).';
     function ds = dsigma(z)
         s = sigma(z);
-        ds = arrayfun(@(i) polyval(sigmaSquared(i,:), z(i)) / (2*s(i)), 1:n).';
+        ds = arrayfun(@(i) polyval(dsigmaSquared(i,:), z(i)) / (2*s(i)), 1:n).';
     end
 
 % Define function and Jacobian for Newton iteration
