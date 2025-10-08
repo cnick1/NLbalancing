@@ -28,7 +28,7 @@ set(groot,'defaultLineLineWidth',1,'defaultTextInterpreter','TeX')
 fprintf('Running Example 11\n')
 
 if nargin < 2
-    lim = .01;
+    lim = 11;
     if nargin < 1
         degree = 4;
     end
@@ -53,8 +53,8 @@ fprintf(" ~~~~~~~~~~~ Computing transformation and singular value functions:  ~~
 numLines = 41; numPoints = 201;
 
 % Generate original z coordinates
-[xH, yH] = meshgrid(linspace(-lim, lim, numLines), linspace(-lim, lim, numPoints)); % Horizontal lines
-[yV, xV] = meshgrid(linspace(-lim, lim, numLines), linspace(-lim, lim, numPoints)); % Vertical lines
+[xH, yH] = meshgrid(linspace(-lim, lim, numLines), 2*linspace(-lim, lim, numPoints)); % Horizontal lines
+[yV, xV] = meshgrid(2*linspace(-lim, lim, numLines), linspace(-lim, lim, numPoints)); % Vertical lines
 
 % Compute transformed coordinates
 xHtr = zeros(size(xH)); yHtr = zeros(size(yH));
@@ -92,7 +92,7 @@ end
 F = @(x) kronPolyEval(f, x);
 Ft = @(z) PhiBarJacobian(z,TinOd,sigmaSquared)\kronPolyEval(f, PhiBar(z,TinOd,sigmaSquared));
 
-x0 = [1 1].'*(0.5*lim);
+x0 = 1e-5*[1 1].'*(0.5*lim);
 
 % Solve for z0 initial condition with a Newton type iteration
 z0 = newtonIteration(x0, @(z) PhiBar(z,TinOd,sigmaSquared), @(z) PhiBarJacobian(z,TinOd,sigmaSquared),10,true);

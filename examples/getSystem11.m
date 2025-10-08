@@ -10,11 +10,20 @@ function [f, g, h] = getSystem11(degree, m, L)
 %
 %   Outputs:    f,g,h  - Cell arrays containing the polynomial coefficients
 %                        for the drift, input, and output
+%               FofXU  - function handle for the function
+%                               ẋ = f(x,u)
+%                                 = f(x) + g(x) u
+%                        Typically you could construct this with
+%                        kronPolyEval(f,x), etc., but since the model here
+%                        is non-polynomial, it is more correct to use the
+%                        non-polynomial model, e.g. for simulations.
 %
-% Description: The polynomial approximation to the pendulum is
+% Description: This example is for a pendulum made from a uniform rod. For
+% the idealized pendulum that is non-dimensionalized, use getSystem26
+% instead. The polynomial approximation to the pendulum is
 %           ẋ₁ = x₂
 %           ẋ₂ = 3u/(mL²) + 3g/(2L) ( x₁ - x₁³/6 + x₁⁵/120 - x₁⁷/5040 + x₁⁹/362880 + ... )
-%            y = x₁
+%           y  = x₁
 %
 %   Reference: [1] N. A. Corbin and B. Kramer, “Computing solutions to the
 %               polynomial-polynomial regulator problem,” in 2024 63rd IEEE
@@ -51,5 +60,11 @@ C = [1, 0]; % Measure angle of pendulum
 
 g = {B};
 h = {C};
+
+
+F = @(x) [x(2); 3 * gravity / (2 * L) * sin(x(1))];
+G = @(x) B;
+FofXU = @(x,u) (F(x) + G(x)*u);
+
 
 end

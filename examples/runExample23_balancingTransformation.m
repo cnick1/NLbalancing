@@ -83,7 +83,7 @@ end
 
 %% Get system dynamics
 [f, g, h] = getSystem23(linear); n=3;
-% f{2} = 0.01*f{2}; % For testing scaling f2
+f{2} = 0.05*f{2}; % For testing scaling f2
 
 %%  Compute the energy functions
 fprintf(" ~~~~~~~~~~~~~~~~~~~~~~~~~ Computing energy functions:  ~~~~~~~~~~~~~~~~~~~~~~~~~ \n")

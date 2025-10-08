@@ -1,7 +1,7 @@
 function [f, g, h, D, y, vref] = getSystem9(eps, N, y0)
 %getSystem9 Returns a cubic Allen-Cahn model using Chebychev spatial discretization [1].
 %
-%   Usage:  [f,g,h,D,y] = getSystem9(eps, N, y0)
+%   Usage:  [f,g,h,D,y,vref] = getSystem9(eps, N, y0)
 %
 %   Inputs:        eps - Diffusion coefficient
 %                    N - number of Chebychev nodes
@@ -11,11 +11,12 @@ function [f, g, h, D, y, vref] = getSystem9(eps, N, y0)
 %                        for the drift, input, and output
 %                    D - differentiation matrix
 %                    y - spatial domain
+%                 vref - reference solution shifted to origin
 %
 %   Description: The Allen-Cahn equation is
-%                   u_t = eps*u_xx+u-u^3, u(-1)=-1, u(1)=1
+%                   uₜ = eps*uₓₓ+u-u³, u(-1)=-1, u(1)=1
 %       The spatial domain is discretized using Chebychev points, and the
-%       spatial derivative becomes u_x = D*u with differentiation matrix D.
+%       spatial derivative becomes uₓ = D*u with differentiation matrix D.
 %       The spatial domain x and differentiation matrix D are given by the
 %       cheb() function from [1]. The system has equilibrium solutions
 %       u(x) = -1, 0, 1; however, these don't satisfy the boundary
@@ -23,13 +24,13 @@ function [f, g, h, D, y, vref] = getSystem9(eps, N, y0)
 %       steady-state of the system: u(x) = tanh((x-x0)/sqrt(2*eps)).
 %
 %       Upon discretization, the model is
-%                   u_t = eps*D^2*u+u-u^3
+%                   uₜ = eps*D²*u+u-u³
 %
-%           -> A = eps*D^2 + I
+%           -> A = eps*D² + I
 %       But the equilibrium at the origin is the unstable u(x)=0. We shift
 %       the equilibrium u_ref = tanh((x-x0)/sqrt(2*eps)) to the origin,
 %       giving a new A matrix and introducing a quadratic drift component
-%       F2 as well. u^3 can be written as F3*kron(u,kron(u,u)).
+%       F2 as well. u³ can be written as F3*kron(u,kron(u,u)).
 %
 %       The model and code is based on p34.m from [1].
 %
@@ -37,9 +38,10 @@ function [f, g, h, D, y, vref] = getSystem9(eps, N, y0)
 %               for Industrial and Applied Mathematics, 2000.
 %               doi: 10.1137/1.9780898719598.
 %
+%   Part of the PPR repository.
 %%
 if nargin < 3
-    y0 = [];
+    y0 = 0.5;
     if nargin < 2
         N = 20;
         if nargin < 1
@@ -56,13 +58,12 @@ D2([1 N+1],:) = zeros(2,N+1);
 n = N+1;
 
 % Shift reference equilibrium to the origin
-% vref = tanh((y-y0)/sqrt(2*eps));
-if isempty(y0)
-    vref= 0;
-else
-    load(fullfile('examples', 'systemData',sprintf('system9_equilibria_N=%i.mat',N)))
-    vref = d(y0); vref = vref{1}; %plot(y,vref)
-end
+vref = tanh((y-y0)/sqrt(2*eps));
+% if isempty(y0)
+%     vref= 0;
+% else
+%     load(fullfile('examples', 'systemData','system9_equilibrum.mat'), 'vref')
+% end
 
 f{1} = eps*D2 + eye(n) - 3*diag(vref.^2);
 f{2} = sparse(1:n,linspace(1,n^2,n),-3*vref);

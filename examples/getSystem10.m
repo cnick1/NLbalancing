@@ -1,6 +1,5 @@
 function [f, g, h] = getSystem10()
-%getSystem10  Generates a simple 1D polynomial system for testing basin
-%             of attraction.
+%getSystem10  Generates a 1D polynomial system with transcritical bifurcation.
 %
 %   Usage:  [f,g,h] = getSystem10()
 %
@@ -9,9 +8,7 @@ function [f, g, h] = getSystem10()
 %
 %   Description: The dynamics correspond to the input-output system
 %       ẋ = 1/10 x - 2 x² + x³ + u
-%             y = x
-%
-%   for which there is an analytic solution to the past and future energy functions.
+%       y = x
 %
 %   The state equation is similar to the model from [1].
 %
@@ -19,7 +16,7 @@ function [f, g, h] = getSystem10()
 %               for flow control problems,” in 2018 American Control Conference
 %               (ACC), Jun. 2018, doi: 10.23919/acc.2018.8431410.
 %
-%   Part of the NLbalancing repository.
+%   Part of the PPR repository.
 %%
 
 A = 1/10;
