@@ -103,7 +103,7 @@ if verbose
 end
 
 % Rewritten by N Corbin to use ppr()
-options.skipGains = true; options.verbose = verbose;
+options.verbose = verbose;
 [v] = ppr(f, g, q, -1, degree, options);
 
 end
