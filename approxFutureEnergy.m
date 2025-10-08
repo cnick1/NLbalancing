@@ -22,27 +22,40 @@ function w = approxFutureEnergy(f, g, h, eta, degree, verbose)
 %   Output:
 %       w       - cell array containing the polynomial energy function coefficients
 %
-%   Description: Computes a degree d polynomial approximation to the energy function
+%   Description: For control-affine dynamics ẋ = f(x) + g(x) u, y = h(x) we
+%   seek an approximation of the H∞ future energy function
 %
-%          E^+(x) = 1/2 ( w{2}'*(x⊗x) + ... + w{d}'*(...⊗x) )
+%           E⁺(x) = minᵤ J(x,u) = ½∫ ||y||² + ||u||²/η dt
 %
-%   for the polynomial control-affine system
+%   where η=1-1/γ² and γ is the H∞ gain parameter. The solution is given by the
+%   solution to the HJB PDE
 %
-%    ẋ = Ax + F2*(x⊗x) + F3*(x⊗x⊗x) + ...
-%              + Bu + G1*(x⊗u) + G2*(x⊗x⊗u) + ...
-%          y = Cx + H2*(x⊗x) + H3*(x⊗x⊗x) + ...
+%           0 = 𝜕ᵀE⁺(x)/𝜕x f(x) - η/2 𝜕ᵀE⁺(x)/𝜕x g(x) gᵀ(x) 𝜕E⁺(x)/𝜕x + ½ h(x)ᵀ h(x)
 %
-%   where eta = η=1-1/γ², where γ is the H∞ gain parameter. w{2} = vec(W2) = W2(:)
-%   solves the H∞ Algebraic Riccati Equation
+%   A local approximation can be computed using the method of Al'brekht [2],
+%   i.e. we compute the Taylor expansions:
 %
-%    A'*W2 + W2*A - eta*W2*B*B'*W2 + C'*C = 0,
+%           E⁺(x) = 1/2 ( w₂ᵀ(x ⊗ x) + w₃ᵀ(x ⊗ x ⊗ x) + ... +   wᵈᵀ(... ⊗ x) )
 %
-%   and the remaining w{i} solve linear systems arising from the Future H∞
-%   Hamilton-Jacobi-Bellman Partial Differential Equation.
+%   based on the Taylor expansions for the dynamics, written as
+%
+%           ẋ = A x + F₂ (x ⊗ x) + F₃ (x ⊗ x ⊗ x) + ...
+%               + B u + G₁ (x ⊗ u) + G₂ (x ⊗ x ⊗ u) + ...
+%           y = C x + H₂ (x ⊗ x) + H₃ (x ⊗ x ⊗ x)
+%
+%   Inserting all these polynomial expressions into the HJB PDEs (1) and (2)
+%   leads to equations for the energy function coefficients w₂, w₃,..., wᵈ. The
+%   first coefficient w₂ = vec(W₂) = W₂(:) solves the H∞ Algebraic Riccati
+%   Equation
+%
+%           Aᵀ W₂ + W₂ A + Cᵀ C - η W₂ B Bᵀ W₂ = 0,
+%
+%   The remaining wᵢ solve linear systems arising from (1).
 %
 %   Details are in Section III.B of reference [1] or III.A of reference [2].
 %
-%   Requires the following functions from the KroneckerTools repository:
+%   The solution is computed using the ppr() function in the PPR repository and
+%   requires the following functions from the KroneckerTools repository:
 %      KroneckerSumSolver
 %      kronMonomialSymmetrize
 %      LyapProduct
