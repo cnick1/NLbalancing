@@ -65,8 +65,8 @@ end
 % fsym = @(x) double(subs(fsymtemp,sym('x', [1, 4]).',x));
 
 fsym = @(x) [x(3); x(4);
-((cos(x(2)) + 1)*(x(4) + (49*sin(x(2) + x(1)))/5 + x(3)*(x(3)*sin(x(2)) + (x(4)*sin(x(2)))/2) - (x(3)*x(4)*sin(x(2)))/2))/(2*cos(x(2)) - (cos(x(2)) + 1)^2 + 3) - (x(3) + (49*sin(x(2) + x(1)))/5 + (98*sin(x(1)))/5 - x(4)^2*sin(x(2)) - 2*x(3)*x(4)*sin(x(2)))/(2*cos(x(2)) - (cos(x(2)) + 1)^2 + 3);
-((cos(x(2)) + 1)*(x(3) + (49*sin(x(2) + x(1)))/5 + (98*sin(x(1)))/5 - x(4)^2*sin(x(2)) - 2*x(3)*x(4)*sin(x(2))))/(2*cos(x(2)) - (cos(x(2)) + 1)^2 + 3) - ((2*cos(x(2)) + 3)*(x(4) + (49*sin(x(2) + x(1)))/5 + x(3)*(x(3)*sin(x(2)) + (x(4)*sin(x(2)))/2) - (x(3)*x(4)*sin(x(2)))/2))/(2*cos(x(2)) - (cos(x(2)) + 1)^2 + 3)];
+    ((cos(x(2)) + 1)*(x(4) + (49*sin(x(2) + x(1)))/5 + x(3)*(x(3)*sin(x(2)) + (x(4)*sin(x(2)))/2) - (x(3)*x(4)*sin(x(2)))/2))/(2*cos(x(2)) - (cos(x(2)) + 1)^2 + 3) - (x(3) + (49*sin(x(2) + x(1)))/5 + (98*sin(x(1)))/5 - x(4)^2*sin(x(2)) - 2*x(3)*x(4)*sin(x(2)))/(2*cos(x(2)) - (cos(x(2)) + 1)^2 + 3);
+    ((cos(x(2)) + 1)*(x(3) + (49*sin(x(2) + x(1)))/5 + (98*sin(x(1)))/5 - x(4)^2*sin(x(2)) - 2*x(3)*x(4)*sin(x(2))))/(2*cos(x(2)) - (cos(x(2)) + 1)^2 + 3) - ((2*cos(x(2)) + 3)*(x(4) + (49*sin(x(2) + x(1)))/5 + x(3)*(x(3)*sin(x(2)) + (x(4)*sin(x(2)))/2) - (x(3)*x(4)*sin(x(2)))/2))/(2*cos(x(2)) - (cos(x(2)) + 1)^2 + 3)];
 % fsym = @(x) kronPolyEval(f, x);
 
 hsym = @(x) double(subs(hsymtemp,sym('x', [1, 4]).',x));
@@ -93,7 +93,7 @@ Ft = @(z) PhiBarJacobian(z,TinOd,sigmaSquared)\fsym(PhiBar(z,TinOd,sigmaSquared)
 % x0 = [.1 0 0 0].'*scaling;
 x0 = [.1 .1 .1 .1].'*scaling;
 
-z0 = newtonIteration(x0, @(z) PhiBar(z,TinOd,sigmaSquared), @(z) PhiBarJacobian(z,TinOd,sigmaSquared),1,true);
+z0 = newtonIteration(x0, @(z) PhiBar(z,TinOd,sigmaSquared), @(z) PhiBarJacobian(z,TinOd,sigmaSquared),maxIter=10,verbose=true);
 
 % z0 = sigmaSquared(:,1).^(1/4).*(TinOd{1}\x0)
 

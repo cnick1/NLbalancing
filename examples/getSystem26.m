@@ -147,7 +147,7 @@ else % standard state-space form
 end
 
 B = [0; 1];
-C = [1; 0];
+C = [1 0];
 
 g = {B};
 h = {C};

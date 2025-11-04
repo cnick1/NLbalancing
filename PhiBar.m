@@ -1,4 +1,4 @@
-function x = PhiBar(zbar,TinOd,sigmaSquared)
+function x = PhiBar(zbar, TinOd, sigmaSquared, options)
 %PhiBar Return the balancing transformation x = ̅Φ(z̄) = Φ(𝝋(z̄)) (at one point).
 %
 %   Usage:  x = PhiBar(zbar,TinOd,sigmaSquared)
@@ -7,6 +7,7 @@ function x = PhiBar(zbar,TinOd,sigmaSquared)
 %               TinOd - cell array containing input-normal/output-diagonal
 %                       transformation coefficients
 %        sigmaSquared - the coefficients of the squared singular value functions
+%             options - name-value pair optional arguments
 %
 %   Outputs:       x  - the value of x = ̅Φ(z̄) = Φ(𝝋(z̄)
 %
@@ -36,6 +37,14 @@ function x = PhiBar(zbar,TinOd,sigmaSquared)
 %
 %   Part of the NLbalancing repository.
 %%
+arguments
+    zbar
+    TinOd
+    sigmaSquared
+    options.verbose = false
+    options.maxIter = 10
+    options.tol = 1e-14
+end
 
 n = length(zbar);
 dsigmaSquared = zeros(size(sigmaSquared) - [0 1]);
@@ -61,7 +70,7 @@ f = @(z) z .* sqrt(sigma(z)); % 𝝋⁻¹(z)
 J = @(z) diag( sqrt(sigma(z)) + z .* dsigma(z) ./ (2 * sqrt(sigma(z))) ); % [∂𝝋⁻¹(z)/∂z]
 
 % Solve for z using Newton iteration
-z = newtonIteration(zbar, f, J);
+z = newtonIteration(zbar, f, J, tol=options.tol, maxIter=options.maxIter, verbose=options.verbose);
 
 %% Evaluate x = ̅Φ(z̄): compute x given z
 x = kronPolyEval(TinOd, z);

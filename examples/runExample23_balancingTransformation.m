@@ -1,23 +1,21 @@
-function runExample23_balancingTransformation(degree,linear,reduction,scaling)
-%runExample23_balancingTransformation Runs the 3D example to visualize the nonlinear balancing transformations.
+function runExample23_balancingTransformation(degree,scaling,reduction)
+%runExample23_balancingTransformation Runs the Otto 3D example to compare linear vs nonlinear balancing.
 %
-%   Usage:  runExample23_balancingTransformation(degree,linear,reduction,scaling)
+%   Usage:  runExample23_balancingTransformation(degree,reduction,scaling)
 %
 %   Inputs:
 %       degree    - desired degree of the energy function approximation
-%       linear    - boolean, whether to use the linear model from [3] or
-%                   nonlinear model from [1] (debugging option)
-%       reduction - boolean, whether or not to apply reduction
-%       scaling - factor applied to the initial condition to move it closer
+%       scaling   - factor applied to the initial condition to move it closer
 %                   or farther from the origin
+%       reduction - boolean, whether or not to apply reduction
 %
-%   Description: These simple 3D examples capture the key idea in the
+%   Description: This simple 3D example captures the key idea in the
 %   model reduction problem: the presence of a subsystem that in some sense
 %   contributes little (perhaps is decoupled) to the overall dynamics, yet
-%   drives interactions that cannot directly be eliminated. Consider the
-%   linear system from [3]:
-%           ẋ₁ = −x₁ + 100 x₃ + u,
-%           ẋ₂ = −2 x₂ + 100 x₃ + u,
+%   drives interactions that cannot directly be eliminated.
+%       Consider the nonlinear model from [1,2]:
+%           ẋ₁ = −x₁ + 20 x₁ x₃ + u,
+%           ẋ₂ = −2 x₂ + 20 x₂ x₃ + u,
 %           ẋ₃ = −5 x₃ + u,
 %            y = x₁ + x₂ + x₃,
 %   The third state component is decoupled and decays quickly, so we
@@ -26,20 +24,31 @@ function runExample23_balancingTransformation(degree,linear,reduction,scaling)
 %   in some sense directly demonstrates the need for balancing: the state
 %   contributes little to observability (since it decays quickly and
 %   contributes little to the output) but contributes significantly to
-%   controllability (since it drives the other states).
-%       The model from [1,2] is a nonlinear example exhibiting the same
-%   features. The linear interaction is now replaced with a nonlinear one:
-%           ẋ₁ = −x₁ + 20 x₁ x₃ + u,
-%           ẋ₂ = −2 x₂ + 20 x₂ x₃ + u,
-%           ẋ₃ = −5 x₃ + u,
-%            y = x₁ + x₂ + x₃,
+%   controllability (since it drives the other states). This model is a
+%   nonlinear adaptation of the linear balancing example Holmes/Rowley
+%   showed in [3], see runExample23_holmes().
+%
 %   Despite being so simple, this is a challenging problem because the
 %   nonlinear interaction is strong: those terms are much larger than the
 %   linear terms!
 %
-%   In this script, we use nonlinear balancing to try to approximate the
-%   same test cases from [1,2,3], i.e. approximating the impulse response
+%   In this script, we use linear vs nonlinear balancing to try to approximate
+%   the same test cases from [1-3], i.e. approximating the impulse response
 %   of these systems with a 2D ROM.
+%
+%   Note: We can also look at just the balancing transformation without
+%   reduction. In this case, if the transformation is valid (bijective) and
+%   well conditioned, the transformed system should be identical to the
+%   original system. However, we know that the nonlinear transformations
+%   are only valid transformations locally; on the other hand, the linear
+%   transformation may only balance the system locally, but it is a valid
+%   transformation globally!
+%
+%   The recommended test cases are:
+%       runExample23(2)
+%       runExample23(4) % fails due to singularities
+%
+%       runExample23(2,0.05)
 %
 %   References: [1] S. E. Otto, A. Padovan, and C. W. Rowley, "Optimizing
 %                   oblique projections for nonlinear systems using
@@ -64,26 +73,19 @@ set(groot,'defaultLineLineWidth',1.5,'defaultTextInterpreter','LaTeX')
 
 fprintf('Running Example 23\n')
 
-if nargin < 4
-    scaling = 1/10;
-    if nargin < 3
-        reduction = true;
-        if nargin < 2
-            linear = false;
-            if nargin < 1
-                if linear
-                    degree = 2;
-                else
-                    degree = 4;
-                end
-            end
+if nargin < 3
+    reduction = true;
+    if nargin < 2
+        scaling = 0.5;
+        if nargin < 1
+            degree = 2;
         end
     end
 end
 
 %% Get system dynamics
-[f, g, h] = getSystem23(linear); n=3;
-f{2} = 0.05*f{2}; % For testing scaling f2
+[f, g, h] = getSystem23();
+f{2} = f{2}*1/10;
 
 %%  Compute the energy functions
 fprintf(" ~~~~~~~~~~~~~~~~~~~~~~~~~ Computing energy functions:  ~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
@@ -104,8 +106,7 @@ Ft = @(z) PhiBarJacobian(z,TinOd,sigmaSquared)\kronPolyEval(f, PhiBar(z,TinOd,si
 x0 = [1 1 1].'*scaling;
 
 % Solve for z0 initial condition with a Newton type iteration
-z0 = newtonIteration(x0, @(z) PhiBar(z,TinOd,sigmaSquared), @(z) PhiBarJacobian(z,TinOd,sigmaSquared),100,true);
-
+z0 = newtonIteration(x0, @(z) PhiBar(z,TinOd,sigmaSquared), @(z) PhiBarJacobian(z,TinOd,sigmaSquared),maxIter=100,verbose=true);
 
 %% Apply reduction by eliminating z3 (set it and its derivative to zero)
 if reduction
@@ -132,8 +133,8 @@ plot(t1,X1)
 plot(t2,X2,'--')
 
 title('Reconstructed state trajectories'); xlabel('Time $t$')
-ylim(max(x0)*[-1.5 1.5]); ylabel('$x_i(t)$')
-legend('FOM x_1','FOM x_2','FOM x_3','ROM x_1','ROM x_2','ROM x_3')
+ylabel('$x_i(t)$')
+legend('FOM $x_1$','FOM $x_2$','FOM $x_3$','ROM $x_1$','ROM $x_2$','ROM $x_3$')
 
 % Plot outputs
 subplot(2,1,2); hold on;
@@ -141,9 +142,10 @@ plot(t1,sum(X1,2))
 plot(t2,sum(X2,2),'--')
 
 title('Model output'); xlabel('Time $t$')
-ylim(max(x0)*[-3.5 3.5]); ylabel('$y(t)$')
+ylabel('$y(t)$')
 legend('FOM output','ROM output')
 
+fprintf('The output error is: %f \n', norm(interp1(t2, sum(X2,2), 0:.1:5) - interp1(t1, sum(X1,2), 0:.1:5)))
 
 end
 

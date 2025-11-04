@@ -22,14 +22,30 @@ addpath('examples')
 runExample2_balancingTransformation(2)  % 2D Kawano QB model
 runExample2_balancingTransformation(4)  % 2D Kawano QB model
 
+runExample12_balancingTransformation(2) % 2D Fujimoto/Scherpen model
+runExample12_balancingTransformation(4) % 2D Fujimoto/Scherpen model
+
+runExample13_balancingTransformation(2) % 2D Gray/Scherpen model 
+runExample13_balancingTransformation(4) % 2D Gray/Scherpen model 
+
+runExample14_balancingTransformation(2) % 2D double pendulum gradient system 
+runExample14_balancingTransformation(4) % 2D double pendulum gradient system 
+
+runExample31_balancingTransformation(2) % 2D stable pendulum system 
+runExample31_balancingTransformation(4) % 2D stable pendulum system 
+
+%% OLD 
 runExample11_balancingTransformation() % 2D inverted pendulum (REVISIT THIS WITH PPR EX 26!) ALSO STABLE PENDULUM! ALSO CHANGE THE ETA TO STABILIZE AND PLOT THE CLOSED-LOOP TRAJECTORIES
 
-runExample12_balancingTransformation() % 2D Fujimoto/Scherpen model
-runExample13_balancingTransformation() % 2D Gray/Scherpen model 
-runExample14_balancingTransformation() % 2D double pendulum gradient system 
 runExample15_balancingTransformation() % 4D double pendulum *** THIS IS THE FUJIMOTO/TSUBAKINO COMPARISON TO LOOK AT 
 runExample23_balancingTransformation() % 3D Otto model
 runExample24_balancingTransformation() % 2D similar to Otto model
+
+runExample26_balancingTransformation(2)
+runExample26_balancingTransformation(4)
+runExample26_balancingTransformation(6)
+runExample26_balancingTransformation(8)
+runExample26_balancingTransformation(10)
 
 
 %% Example 24: 2D models

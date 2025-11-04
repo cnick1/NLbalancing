@@ -1,4 +1,4 @@
-function w = approxFutureEnergy(f, g, h, eta, degree, verbose)
+function [w, K] = approxFutureEnergy(f, g, h, eta, degree, verbose)
 %approxFutureEnergy  Compute the future energy function for a polynomial control-affine dynamical system.
 %
 %   Usage: w = approxFutureEnergy(f,g,h,eta,d,verbose)
@@ -21,6 +21,8 @@ function w = approxFutureEnergy(f, g, h, eta, degree, verbose)
 %
 %   Output:
 %       w       - cell array containing the polynomial energy function coefficients
+%       K       - the gain coefficients corresponding to the optimal controller 
+%                 given by the future energy function (optional)
 %
 %   Description: For control-affine dynamics ẋ = f(x) + g(x) u, y = h(x) we
 %   seek an approximation of the H∞ future energy function
@@ -103,6 +105,6 @@ end
 
 % Rewritten by N Corbin to use ppr()
 options.verbose = verbose;
-[w] = ppr(f, g, h2q(h), 1/eta, degree, options);
+[w, K] = ppr(f, g, h2q(h), 1/eta, degree, options);
 
 end

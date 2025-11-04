@@ -1,4 +1,4 @@
-function z = newtonIteration(x, g, J, maxIter, verbose)
+function z = newtonIteration(x, g, J, options)
 %newtonIteration Solve g(z) = x for z using Newton iteration
 %
 %   Usage:  z = newtonIteration(x, g, J)
@@ -6,8 +6,7 @@ function z = newtonIteration(x, g, J, maxIter, verbose)
 %   Inputs:     x - point at which to evaluate the transformation
 %               g - function handle for the function g(z)
 %               J - function handle for the Jacobian J(z) = ∂g(z)/∂z
-%         maxIter - maximum number of iterations
-%         verbose - boolean, whether to print runtime info
+%         options - name-value pair optional arguments
 %
 %   Outputs:    z - the value of z = g⁻¹(x)
 %
@@ -58,34 +57,36 @@ function z = newtonIteration(x, g, J, maxIter, verbose)
 %
 %   Part of the NLbalancing repository.
 %%
-if nargin < 5
-    verbose = false;
-    if nargin < 4
-        maxIter = 10;
-        if nargin < 3
-            error("Must supply x, f, and J")
-        end
-    end
+arguments
+    x
+    g
+    J
+    options.verbose = false
+    options.maxIter = 10
+    options.tol = 1e-14
+    options.z0 = x.*0 % default initial guess of z=0
 end
 
 % Solve for z0 initial condition with a Newton type iteration
-if verbose; fprintf("    Using Newton iteration to find transformed initial condition ... "); end
+if options.verbose; fprintf("    Using Newton iteration to find transformed initial condition ... "); end
 
-z = x.*0; % Default initial guess of z=0
-tol = 1e-14; % can edit tolerance
+converged = false;
+z = options.z0;
 
-for iter = 1:maxIter
+for iter = 1:options.maxIter
     % Update guess iteratively
     z = z - J(z)\(g(z)-x); % Proper Newton iteration
     
     % Break upon convergence within tolerance
-    if norm(g(z)-x) < tol
-        if verbose; fprintf("converged in %i iterations. ",iter); end
+    if norm(g(z)-x) < options.tol
+        if options.verbose; fprintf("converged in %i iterations. ",iter); end
+        converged = true;
         break;
     end
 end
 
-if verbose; fprintf(['\n         -> Initial condition: z0 = [', repmat('%2.2e ', 1, numel(z)), '], '], z); end
-if verbose; fprintf('       error: %2.2e \n', norm(g(z)-x)); end
+if options.verbose; fprintf(['\n         -> Initial condition: z0 = [', repmat('%2.2e ', 1, numel(z)), '], '], z); end
+if options.verbose; fprintf('       error: %2.2e \n', norm(g(z)-x)); end
+if ~converged; warning('Newton iteration failed to converge to desired tolerance in %i iterations; final error is %2.2e \n', options.maxIter, norm(g(z)-x)); end
 
 end

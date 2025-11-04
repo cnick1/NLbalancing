@@ -52,7 +52,7 @@ for i = 1:2
     % plot(z, polyval(flip(sigmaSquared(i, :)), z)) % plot squared singular value functions
 end
 set(gca,'yscale','log')
-xlabel('z_i'); ylabel('\sigma_i'); legend('\sigma_1','\sigma_2')
+xlabel('z_i'); ylabel('\sigma_i'); legend('$\sigma_1$','$\sigma_2$')
 
 %% Plot grid transformations
 % Parameters
@@ -101,7 +101,7 @@ Ft = @(z) PhiBarJacobian(z,TinOd,sigmaSquared)\kronPolyEval(f, PhiBar(z,TinOd,si
 x0 = [1 1].'*(0.7*lim);
 
 % Solve for z0 initial condition with a Newton type iteration
-z0 = newtonIteration(x0, @(z) PhiBar(z,TinOd,sigmaSquared), @(z) PhiBarJacobian(z,TinOd,sigmaSquared),10,true);
+z0 = newtonIteration(x0, @(z) PhiBar(z,TinOd,sigmaSquared), @(z) PhiBarJacobian(z,TinOd,sigmaSquared),maxIter=10,verbose=true);
 
 
 % Simulate both systems

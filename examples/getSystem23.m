@@ -1,9 +1,9 @@
-function [f, g, h] = getSystem23(linear)
+function [f, g, h] = getSystem23(holmes)
 %getSystem23  Returns the 3D nonlinear model from [1,2].
 %
 %   Usage:  [f,g,h] = getSystem23()
 %
-%   Inputs:     linear - boolean, whether to use the linear model from [3]
+%   Inputs:     holmes - boolean, whether to use the linear model from [3]
 %                        or nonlinear model from [1,2]
 %
 %   Outputs:     f,g,h - Cell arrays containing the polynomial coefficients
@@ -44,14 +44,14 @@ function [f, g, h] = getSystem23(linear)
 %%
 
 if nargin < 1
-    linear = false;
+    holmes = false;
 end
 
 
 n = 3;
 x = sym('x', [1, n]).'; syms(x);
 
-if linear
+if holmes
     fsym = [-x1 + 100*x3;
         -2*x2 + 100*x3;
         -5*x3];

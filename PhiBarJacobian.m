@@ -1,4 +1,4 @@
-function J = PhiBarJacobian(zbar,TinOd,sigmaSquared)
+function J = PhiBarJacobian(zbar, TinOd, sigmaSquared, options)
 %PhiBarJacobian Return the Jacobian J(z̄) of the balancing transformation x = ̅Φ(z̄) = Φ(𝝋(z̄)) (at one point).
 %
 %   Usage:  J = PhiBarJacobian(zbar,TinOd,sigmaSquared)
@@ -7,6 +7,7 @@ function J = PhiBarJacobian(zbar,TinOd,sigmaSquared)
 %               TinOd - cell array containing input-normal/output-diagonal
 %                       transformation coefficients
 %        sigmaSquared - the coefficients of the squared singular value functions
+%             options - name-value pair optional arguments
 %
 %   Outputs:       J  - the value of the Jacobian of the balancing transformation
 %
@@ -49,6 +50,14 @@ function J = PhiBarJacobian(zbar,TinOd,sigmaSquared)
 %
 %   Part of the NLbalancing repository.
 %%
+arguments
+    zbar
+    TinOd
+    sigmaSquared
+    options.verbose = false
+    options.maxIter = 10
+    options.tol = 1e-14
+end
 
 n = length(zbar);
 dsigmaSquared = zeros(size(sigmaSquared) - [0 1]);
@@ -74,7 +83,7 @@ varphiInv = @(z) z .* sqrt(sigma(z)); % 𝝋⁻¹(z)
 dvarphiInv = @(z) diag(sqrt(sigma(z)) + z .* dsigma(z) ./ (2 * sqrt(sigma(z)))); % [∂𝝋⁻¹(z)/∂z]
 
 % Solve for z using Newton iteration
-z = newtonIteration(zbar, varphiInv, dvarphiInv);
+z = newtonIteration(zbar, varphiInv, dvarphiInv, tol=options.tol, maxIter=options.maxIter, verbose=options.verbose);
 
 %% Evaluate J(z̄) = ∂ ̅Φ(z̄)/∂̄z: composition of Jacobians [∂Φ(z)/∂z]*[∂𝝋(z̄)/∂z̄]
 % The key is that the Jacobian of the inverse is the inverse of the Jacobian,
