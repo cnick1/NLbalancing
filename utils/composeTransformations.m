@@ -1,5 +1,5 @@
 function [Tout] = composeTransformations(T1,T2,varargin)
-%composeTransformations Combines the transformations T1, T2, ... into one transformation
+%composeTransformations Combines polynomial transformations into one: x = Tᵒᵘᵗ(z) = T₁(T₂(...Tₙ(z)))
 %
 %   Usage: [Tout] = composeTransformations(T1,T2)
 %
@@ -10,13 +10,44 @@ function [Tout] = composeTransformations(T1,T2,varargin)
 %                   the transformations one at a time recursively.
 %
 %   Output:
-%       Tout - cell arrays containing the polynomial coefficients for the
-%              combined transformation.
+%       Tout - cell array containing the polynomial coefficients for the
+%              composed transformation.
 %
-%   TODO: figure out degree details
+%   Note: Generally, combining transformations increases the polynomial degree
+%   of the resulting transformation, so this is not always the most efficient
+%   way to do things. For example, if you combine two degree 3 transformations,
+%   you get a degree 9 transformation. It would likely be more efficient to just
+%   evaluate them one after the other. Additionally, in this function, we
+%   truncate the result to the degree of the first transformation, so there will
+%   be a truncation error.
 %
-%   Description: Given a transformation T, compute the transformed dynamics.
-%   TODO: Add more details here.
+%   Description: (Lemma 1, [1]) Consider the function p(Φ(z)), where
+%           p(x) = P₁x + P₂(x⊗x) + ... + Pd(x...⊗x)                      (1)
+%           Φ(z) = T₁z + T₂(z⊗z) + ... + Tₖ(z...⊗z)                      (2)
+%   In the new z coordinates, f(z) = p(Φ(z)) can be written to degree d as
+%           f(z) = F₁z + F₂(z⊗z) + ... + Fd(z...⊗z)
+%   where
+%            i
+%       Fᵢ = ∑ Pⱼ 𝓣ⱼ,ᵢ                                                    (3)
+%           j=1
+%   and 𝓣ⱼ,ᵢ is calligraphic T, used to compactly write the sum of all unique
+%   tensor products with j factors and nⁱ columns [2]. This is easily
+%   verifiable: inserting the expansions (1) and (2) gives
+%           p(Φ(z)) = P₁(Φ(z)) + P₂(Φ(z)⊗Φ(z)) + ...
+%                   = P₁(T₁z + T₂(z⊗z) + ...)
+%                     + P₂( (T₁z + T₂(z⊗z) + ...) ⊗ (T₁z + T₂(z⊗z) + ...) )
+%                     + ...
+%   This is exactly what is implemented in this function, where p(x) = T₁(x) and
+%   Φ(z) = T₂(z) in the derivation above. See also transformDynamics() for
+%   possible improvements.
+%
+%   References: [1] N. A. Corbin, A. Sarkar, J. M. A. Scherpen, and B. Kramer,
+%                “Scalable computation of input-normal/output-diagonal balanced
+%                realization for control-affine polynomial systems,” Oct. 2024,
+%                doi: 10.48550/arXiv.2410.22435
+%               [2] B. Kramer, S. Gugercin, and J. Borggaard, “Nonlinear
+%                balanced truncation: Part 2—model reduction on manifolds,”
+%                arXiv, Feb. 2023. doi: 10.48550/ARXIV.2302.02036
 %
 %   Authors: Nick Corbin, UCSD
 %
@@ -26,18 +57,10 @@ n = length(T1{1});
 
 Tout = cell(size(T1));
 
-for k = 1:ld
-    Tout{k} = zeros(n,n^k);
-    %     for i=1:k % row by row
-    %         for j = 1:n
-    %             Tout{k}(j,:) = Tout{k}(j,:) + calTTv(T2, i, k, T1{i}(j,:).').';
-    %         end
-    %     end
-    
-    % See Lemma 1 in my SCL paper: Ptilde_i = sum_j^i Pj cT_j,i
-    % See also transformDynamics() for possible improvements
-    for i=1:k % should also work like this, just required calTTv and symmetrization functions to appropriately handle matrices
-        Tout{k}= Tout{k} + calTTv(T2, i, k, T1{i}.').';
+for i = 1:ld
+    Tout{i} = zeros(n,n^i);
+    for j=1:i  % This is the summation in equation (3)
+        Tout{i}= Tout{i} + calTTv(T2, j, i, T1{j}.').';
     end
 end
 
