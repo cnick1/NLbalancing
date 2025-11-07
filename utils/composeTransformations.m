@@ -39,7 +39,10 @@ function [Tout] = composeTransformations(T1,T2,varargin)
 %                     + ...
 %   This is exactly what is implemented in this function, where p(x) = T₁(x) and
 %   Φ(z) = T₂(z) in the derivation above. See also transformDynamics() for
-%   possible improvements.
+%   possible improvements. The quantities Pⱼ 𝓣ⱼ,ᵢ can be computed using the
+%   function calTTv() from the KroneckerTools repository; it is possible that
+%   improvements can be made to avoid having to transpose things. This function
+%   could also be adapted to take an optional polynomial degree argument.
 %
 %   References: [1] N. A. Corbin, A. Sarkar, J. M. A. Scherpen, and B. Kramer,
 %                “Scalable computation of input-normal/output-diagonal balanced
