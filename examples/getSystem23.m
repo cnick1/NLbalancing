@@ -4,7 +4,7 @@ function [f, g, h] = getSystem23(holmes)
 %   Usage:  [f,g,h] = getSystem23()
 %
 %   Inputs:     holmes - boolean, whether to use the linear model from [3]
-%                        or nonlinear model from [1,2]
+%                        or nonlinear model from [1,2] (default)
 %
 %   Outputs:     f,g,h - Cell arrays containing the polynomial coefficients
 %                        for the drift, input, and output
@@ -16,7 +16,7 @@ function [f, g, h] = getSystem23(holmes)
 %       ẋ₃ = −5 x₃ + u,
 %        y = x₁ + x₂ + x₃,
 %
-%   If the option linear is enabled, the model from [3, Section 5.6.1] is
+%   If the option holmes is enabled, the model from [3, Section 5.6.1] is
 %   returned instead. This model replaces the nonlinear interaction between
 %   x₃ and x₁ & x₂ with a linear interaction. The model from [3] inspired
 %   the model in [1,2].

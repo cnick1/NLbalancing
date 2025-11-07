@@ -19,9 +19,7 @@ function [sigmaSquared, TinOd, vbar, wbar] = inputNormalOutputDiagonalTransforma
 %                      using polyval() (and flip()).
 %
 %                      Warning: Note that the singular value functions are
-%                      NOT given by sigmaSquared.^(½). Use the function
-%                      utils/polySqrt() to get the coefficients of the
-%                      singular value functions.
+%                      NOT given by sigmaSquared.^(½).
 %
 %       TinOd        - cell array containing the output-diagonal
 %                      transformation coefficients.
@@ -190,7 +188,7 @@ switch method
         % Compute the higher-order terms according to Corollary 1 [1]
         for k = 3:degree + 1
             fprintf("    Computing degree %i coefficient... ", k - 1); tic
-
+            
             [Nk, Nkhat] = equivalenceClassIndices(n, k);
             
             %% Form input-normal equations coefficient matrix

@@ -7,7 +7,7 @@ function [Tout] = composeTransformations(T1,T2,varargin)
 %       T1,T2,... - cell arrays containing the polynomial transformation
 %                   coefficients. At least two transformations are required,
 %                   but more can be included and the function will apply
-%                   the transformations recursively.
+%                   the transformations one at a time recursively.
 %
 %   Output:
 %       Tout - cell arrays containing the polynomial coefficients for the
@@ -33,6 +33,9 @@ for k = 1:ld
     %             Tout{k}(j,:) = Tout{k}(j,:) + calTTv(T2, i, k, T1{i}(j,:).').';
     %         end
     %     end
+    
+    % See Lemma 1 in my SCL paper: Ptilde_i = sum_j^i Pj cT_j,i
+    % See also transformDynamics() for possible improvements
     for i=1:k % should also work like this, just required calTTv and symmetrization functions to appropriately handle matrices
         Tout{k}= Tout{k} + calTTv(T2, i, k, T1{i}.').';
     end

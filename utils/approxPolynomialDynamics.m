@@ -15,7 +15,34 @@ function [F,G,H] = approxPolynomialDynamics(f,g,h,x,degree)
 %       F,G,H   - cell arrays containing the polynomial coefficients for
 %                 the drift, input, and output. Computed using Yaylor
 %                 approximations.
-% 
+%
+%   Description: Consider the following control-affine dynamical system
+%
+%           ẋ = f(x) + g(x) u,                         (1)
+%           y = h(x),
+%
+%   where f(x), g(x), and h(x) are analytic functions, i.e. they have
+%   locally convergent polynomial approximations. This function returns a
+%   polynomial approximation to the symbolic dynamics (1) in Kronecker
+%   product form as 
+%
+%           ẋ = A x + F₂ (x ⊗ x) + F₃ (x ⊗ x ⊗ x) + ...
+%               + B u + G₁ (x ⊗ u) + G₂ (x ⊗ x ⊗ u) + ...
+%           y = C x + H₂ (x ⊗ x) + H₃ (x ⊗ x ⊗ x),
+%
+%   At the risk of stating the obvious, this utility is also helpful for
+%   converting polynomial dynamics into Kronecker product form. To use the
+%   function, simply define (as symbolic functions) f(x), g(x), and
+%   h(x), and the function will use Matlab's symbolic Taylor expansion
+%   tools to compute the coefficients F, G, and H, to be returned as a cell
+%   array.
+%
+%   Ex.     n = 2; x = sym('x', [1, n]).'; syms(x);
+%           f = [-2*x1 + 20*x1*x2; -5*x2];
+%           g = [1; 1];
+%           h = x1 + x2;
+%           [F,G,H] = approxPolynomialDynamics(f,g,h,x,2)
+%           
 %  Author: Nick Corbin, UCSD
 %
 %  License: MIT

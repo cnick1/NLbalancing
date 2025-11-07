@@ -38,11 +38,11 @@ function J = PhiBarJacobian(zbar, TinOd, sigmaSquared, options)
 %           [∂𝝋(z)/∂z]ᵢⱼ = 
 %            ( √ ̅σᵢ(z̄ᵢ) - z̄ᵢ ̅σᵢ'(z̄ᵢ)/(2√ ̅σᵢ(z̄ᵢ)) ) / ̅σᵢ(z̄ᵢ) for i=j, 0 else
 %   However, we can't compute  ̅σᵢ(z̄ᵢ), only σᵢ(zᵢ). No problem; instead
-%   of computing the diagonal matrix [∂𝝋(z)/∂z], we will compute its
+%   of computing the diagonal matrix [∂𝝋(z̄)/∂z̄], we will compute its
 %   inverse and then invert it, because the inverse of the Jacobian the
 %   same as the Jacobian of the inverse! Fortunately, we already know how
 %   to compute [∂𝝋⁻¹(z)/∂z], which was done in the function PhiBar(). Then
-%   we simply use the fact that [∂𝝋(z)/∂z] = [∂𝝋⁻¹(z)/∂z]⁻¹. In fact,
+%   we simply use the fact that [∂𝝋(z̄)/∂z̄] = [∂𝝋⁻¹(z)/∂z]⁻¹. In fact,
 %   [∂𝝋⁻¹(z)/∂z] will already be defined in the process of computing z
 %   given z̄, and since it is a diagonal matrix, inversion is not expensive.
 % 
@@ -64,7 +64,7 @@ dsigmaSquared = zeros(size(sigmaSquared) - [0 1]);
 sigmaSquared = flip(sigmaSquared,2);
 
 for i=1:n
-    dsigmaSquared(i,:) = polyder(sigmaSquared(i,:)); % not used?
+    dsigmaSquared(i,:) = polyder(sigmaSquared(i,:));
 end
 
 %% Compute z given z̄ via Newton iteration

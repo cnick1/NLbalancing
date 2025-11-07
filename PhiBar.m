@@ -66,11 +66,11 @@ sigma = @(z) arrayfun(@(i) real( sqrt( polyval(sigmaSquared(i,:), z(i)) ) ), 1:n
     end 
 
 % Define function and Jacobian for Newton iteration
-f = @(z) z .* sqrt(sigma(z)); % 𝝋⁻¹(z)
-J = @(z) diag( sqrt(sigma(z)) + z .* dsigma(z) ./ (2 * sqrt(sigma(z))) ); % [∂𝝋⁻¹(z)/∂z]
+varphiInv = @(z) z .* sqrt(sigma(z)); % 𝝋⁻¹(z)
+dvarphiInv = @(z) diag(sqrt(sigma(z)) + z .* dsigma(z) ./ (2 * sqrt(sigma(z)))); % [∂𝝋⁻¹(z)/∂z]
 
 % Solve for z using Newton iteration
-z = newtonIteration(zbar, f, J, tol=options.tol, maxIter=options.maxIter, verbose=options.verbose);
+z = newtonIteration(zbar, varphiInv, dvarphiInv, tol=options.tol, maxIter=options.maxIter, verbose=options.verbose);
 
 %% Evaluate x = ̅Φ(z̄): compute x given z
 x = kronPolyEval(TinOd, z);

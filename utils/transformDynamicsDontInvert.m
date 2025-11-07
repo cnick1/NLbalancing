@@ -51,7 +51,7 @@ ft = cell(size(f)); gt = cell(size(g)); ht = cell(size(h));
 
 %% Transform drift f(x)
 for i = 1:lf*ld
-    ft{i} = zeros(n,n^i);
+    ft{i} = sparseIJV(n,n^i);
     % See Lemma 1 in my SCL paper: Ptilde_i = sum_j^i Pj cT_j,i
     % Note: index backwards so that if you only have e.g. T1 you can move on
     for j=flip(1:i)

@@ -3,7 +3,7 @@ function [ft, gt, ht] = transformDynamics(f, g, h, T)
 %   This function returns the expansions for the transformed dynamics in
 %   the form ż = f̃(z) + g̃(z) u, y = h̃(z)
 %
-%   Usage: [ft, gt, ht] = transformDynamics(f, g, h, T, Tinv)
+%   Usage: [ft, gt, ht] = transformDynamics(f, g, h, T)
 %
 %   Inputs:
 %       f,g,h - cell arrays containing the polynomial coefficients for
@@ -37,6 +37,9 @@ function [ft, gt, ht] = transformDynamics(f, g, h, T)
 %    coefficients for f̃(z) & g̃(z).
 %
 %   Authors: Nick Corbin, UCSD
+%
+%
+%
 %
 vec = @(X) X(:);
 
