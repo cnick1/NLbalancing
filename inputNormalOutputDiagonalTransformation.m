@@ -1,5 +1,5 @@
 function [sigmaSquared, TinOd, vbar, wbar] = inputNormalOutputDiagonalTransformation(v, w, degree, verbose)
-%inputNormalOutputDiagonalTransformation Compute the input-normal/output-diagonal transformation x = Φ(z) for a polynomial control-affine dynamical system.
+%inputNormalOutputDiagonalTransformation Return a polynomial input-normal/output-diagonal transformation x = Φ(z).
 %
 %   Usage: [sigmaSquared,Tbar] = outputDiagonalTransformation(v, w, Tin, Sigma, degree)
 %
@@ -64,11 +64,11 @@ function [sigmaSquared, TinOd, vbar, wbar] = inputNormalOutputDiagonalTransforma
 %
 %  Part of the NLbalancing repository.
 %%
-if (nargin < 4)
-    verbose = false;
-    if (nargin < 3)
-        degree = length(v) - 1;
-    end
+arguments
+    v 
+    w
+    degree = length(v) - 1
+    verbose = false
 end
 
 if (verbose)

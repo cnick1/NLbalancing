@@ -1,35 +1,47 @@
-function Tbal = balancingTransformation(TinOd, Tscal)
+function Tbal = balancingTransformation(v, w, degree, verbose)
 %balancingTransformation Return a polynomial balancing transformation x = ̅Φ(z̄) = Φ(𝝋(z̄))
 %
 %   Usage:  Tbal = balancingTransformation(TinOd, Tscal)
 %
-%   Inputs:     TinOd - cell array containing input-normal/output-diagonal
-%                       transformation coefficients               ( Φ(z) )
-%               Tscal - cell array containing scaling transformation 
-%                       coefficients                              ( 𝝋(z̄) )
+%   Inputs:
+%       v,w     - cell arrays containing the polynomial energy function
+%                 coefficients; these should already be in input-normal form.
+%       degree  - desired degree of the computed transformation (default =
+%                 degree of energy functions - 1).
+%       verbose - optional argument to print runtime information.
 %
-%   Outputs:     Tbal - cell array containing scaling transformation 
+%   Outputs:     Tbal - cell array containing balancing transformation 
 %                       coefficients                              ( ̅Φ(z̄) )
 %
-%   Description: The nonlinear balancing transformation is x = ̅Φ(z̄) =
-%   Φ(𝝋(z̄), which composition of the input-normal/output-diagonal
-%   transformation x = Φ(z) and the scaling transformation z = 𝝋(z̄).
-%   The balancing transformation puts the energy functions in the form
+%   Description: The nonlinear balancing transformation x = ̅Φ(z̄) = Φ(𝝋(z̄))
+%   is the composition of the input-normal/output-diagonal transformation
+%   x = Φ(z) and the scaling transformation z = 𝝋(z̄). The balancing 
+%   transformation puts the energy functions in the form
 %           𝓔⁻( ̅Φ(z̄)) = 1/2 z̄ᵀ Σ⁻¹(z̄) z̄
 %           𝓔⁺( ̅Φ(z̄)) = 1/2 z̄ᵀ  Σ(z̄)  z̄
 %   where Σ(z̄) is the diagonal matrix of singular value functions ̅σᵢ(z̄ᵢ).
-%   In this function, we are attempting to compute an approximate
-%   polynomial expansion for the composite transformation.
+%   In this function, we compute an approximate polynomial expansion for 
+%   the composite transformation. This is done in three steps:
+%       1) Compute the input-normal/output-diagonal transformation x = Φ(z)
+%       2) Use the squared singular value functions (observability energy in
+%       the input-normal/output-diagonal coordinates) to compute the
+%       scaling transformation z = 𝝋(z̄)
+%       3) Construct the balancing transformation as the composition of the 
+%       two transformations x = ̅Φ(z̄) = Φ(𝝋(z̄))
 %
 %   References: [1]
 %
 %   Part of the NLbalancing repository.
 %%
 arguments
-    TinOd
-    Tscal
+    v 
+    w
+    degree = length(v) - 1
+    verbose = false
 end
 
+[sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree, verbose);
+[Tscal, TscalInv] = varphi(sigmaSquared, degree);
 Tbal = composeTransformations(TinOd, Tscal);
 
 end
