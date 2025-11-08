@@ -55,8 +55,10 @@ function [sigmaSquared, TinOd, vbar, wbar] = inputNormalOutputDiagonalTransforma
 %
 %   References: [1] N. A. Corbin, A. Sarkar, J. M. A. Scherpen, and B. Kramer,
 %                “Scalable computation of input-normal/output-diagonal balanced
-%                realization for control-affine polynomial systems,” Oct. 2024,
-%                doi: 10.48550/arXiv.2410.22435
+%                realization for control-affine polynomial systems,” Systems &
+%                Control Letters, vol. 204, p. 106178, Oct. 2025, doi:
+%                10.1016/j.sysconle.2025.106178.
+
 %
 %  Author: Nick Corbin, UCSD
 %
@@ -65,7 +67,7 @@ function [sigmaSquared, TinOd, vbar, wbar] = inputNormalOutputDiagonalTransforma
 %  Part of the NLbalancing repository.
 %%
 arguments
-    v 
+    v
     w
     degree = length(v) - 1
     verbose = false

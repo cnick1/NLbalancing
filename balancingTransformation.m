@@ -10,23 +10,23 @@ function Tbal = balancingTransformation(v, w, degree, verbose)
 %                 degree of energy functions - 1).
 %       verbose - optional argument to print runtime information.
 %
-%   Outputs:     Tbal - cell array containing balancing transformation 
+%   Outputs:     Tbal - cell array containing balancing transformation
 %                       coefficients                              ( ̅Φ(z̄) )
 %
 %   Description: The nonlinear balancing transformation x = ̅Φ(z̄) = Φ(𝝋(z̄))
 %   is the composition of the input-normal/output-diagonal transformation
-%   x = Φ(z) and the scaling transformation z = 𝝋(z̄). The balancing 
+%   x = Φ(z) and the scaling transformation z = 𝝋(z̄). The balancing
 %   transformation puts the energy functions in the form
 %           𝓔⁻( ̅Φ(z̄)) = 1/2 z̄ᵀ Σ⁻¹(z̄) z̄
 %           𝓔⁺( ̅Φ(z̄)) = 1/2 z̄ᵀ  Σ(z̄)  z̄
 %   where Σ(z̄) is the diagonal matrix of singular value functions ̅σᵢ(z̄ᵢ).
-%   In this function, we compute an approximate polynomial expansion for 
+%   In this function, we compute an approximate polynomial expansion for
 %   the composite transformation. This is done in three steps:
 %       1) Compute the input-normal/output-diagonal transformation x = Φ(z)
 %       2) Use the squared singular value functions (observability energy in
 %       the input-normal/output-diagonal coordinates) to compute the
 %       scaling transformation z = 𝝋(z̄)
-%       3) Construct the balancing transformation as the composition of the 
+%       3) Construct the balancing transformation as the composition of the
 %       two transformations x = ̅Φ(z̄) = Φ(𝝋(z̄))
 %
 %   References: [1]
@@ -34,23 +34,23 @@ function Tbal = balancingTransformation(v, w, degree, verbose)
 %   Part of the NLbalancing repository.
 %%
 arguments
-    v 
+    v
     w
     degree = length(v) - 1
     verbose = false
 end
 
 [sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree, verbose);
-[Tscal, TscalInv] = varphi(sigmaSquared, degree);
+[Tscal, TscalInv] = scalingTransformation(sigmaSquared, degree);
 Tbal = composeTransformations(TinOd, Tscal);
 
 end
 
-function [Tscal, TscalInv] = varphi(sigmaSquared, d)
-%varphi Return polynomial expansions for z = 𝝋(z̄) and ̄z = 𝝋⁻¹(z)
+function [Tscal, TscalInv] = scalingTransformation(sigmaSquared, d)
+%scalingTransformation Return polynomial expansions for z = 𝝋(z̄) and ̄z = 𝝋⁻¹(z)
 % i.e. scaling transformation and its inverse
 %
-%   Usage:  [Tscal, TscalInv] = varphi(sigmaSquared)
+%   Usage:  [Tscal, TscalInv] = scalingTransformation(sigmaSquared)
 %
 %   Inputs:
 %        sigmaSquared - the coefficients of the squared singular value functions
@@ -58,7 +58,7 @@ function [Tscal, TscalInv] = varphi(sigmaSquared, d)
 %
 %   Outputs:    Tscal - the coefficients of the scaling transformation
 %            TscalInv - the coefficients of the inverse transformation
-% 
+%
 %   Description: The nonlinear balancing transformation is x = ̅Φ(z̄) =
 %   Φ(𝝋(z̄), which composition of the input-normal/output-diagonal
 %   transformation x = Φ(z) and the scaling transformation z = 𝝋(z̄), where
@@ -131,7 +131,7 @@ end
 
 
 % function coeff = phiInvCoeffs(c, i)
-% % alternative way to possibly only compute up to the degree we need 
+% % alternative way to possibly only compute up to the degree we need
 % switch i
 %     case 1
 %         coeff = c(:,1).^(1/4);
@@ -161,31 +161,31 @@ end
 %     sigmaSquared
 %     d = size(sigmaSquared, 2)
 % end
-% 
-% [n,nd] = size(sigmaSquared); 
+%
+% [n,nd] = size(sigmaSquared);
 % coefficients = zeros(n, d+1);
-% 
+%
 % syms z c0
 % c = [c0, sym('c', [1, nd-1])];
-% 
+%
 % symvarphiInv = z * sum(c .* z.^(0:nd-1))^(1/4);
 % expansion = taylor(symvarphiInv, 'Order', d);
-% 
+%
 % % Option 1: not vectorized
 % % for i=1:n
 % %     temp = double(coeffs(subs(expansion,c,sigmaSquared(i,:)),z,'All'));
 % %     coefficients(i,:) = flip([zeros(1,d+1-length(temp)), temp]);
 % % end
-% 
+%
 % % Option 2: vectorized but possibly buggy
 % coefficients = cell2mat(arrayfun(@(i) coeffs2(subs(expansion,c,sigmaSquared(i,:)), z, d+1), 1:n, 'UniformOutput', false).');
-% 
+%
 % coefficients = coefficients(:,2:end);
-% 
+%
 % end
-% 
+%
 % function c = coeffs2(p,var,d)
 % c = zeros(1,d);
-% temp = coeffs(p,var,'All'); 
+% temp = coeffs(p,var,'All');
 % c(1:length(temp)) = double(flip(temp));
 % end

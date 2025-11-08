@@ -27,9 +27,9 @@ function [Tout] = composeTransformations(T1,T2,varargin)
 %   In the new z coordinates, f(z) = p(Φ(z)) can be written to degree d as
 %           f(z) = F₁z + F₂(z⊗z) + ... + Fd(z...⊗z)
 %   where
-%            i
+%            ᵢ
 %       Fᵢ = ∑ Pⱼ 𝓣ⱼ,ᵢ                                                    (3)
-%           j=1
+%           ʲ⁼¹
 %   and 𝓣ⱼ,ᵢ is calligraphic T, used to compactly write the sum of all unique
 %   tensor products with j factors and nⁱ columns [2]. This is easily
 %   verifiable: inserting the expansions (1) and (2) gives
@@ -46,8 +46,9 @@ function [Tout] = composeTransformations(T1,T2,varargin)
 %
 %   References: [1] N. A. Corbin, A. Sarkar, J. M. A. Scherpen, and B. Kramer,
 %                “Scalable computation of input-normal/output-diagonal balanced
-%                realization for control-affine polynomial systems,” Oct. 2024,
-%                doi: 10.48550/arXiv.2410.22435
+%                realization for control-affine polynomial systems,” Systems &
+%                Control Letters, vol. 204, p. 106178, Oct. 2025, doi:
+%                10.1016/j.sysconle.2025.106178.
 %               [2] B. Kramer, S. Gugercin, and J. Borggaard, “Nonlinear
 %                balanced truncation: Part 2—model reduction on manifolds,”
 %                arXiv, Feb. 2023. doi: 10.48550/ARXIV.2302.02036
