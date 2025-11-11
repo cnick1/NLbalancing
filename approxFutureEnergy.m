@@ -6,9 +6,9 @@ function [w, K] = approxFutureEnergy(f, g, h, eta, degree, verbose)
 %   Inputs:
 %       f,g,h   - cell arrays containing the polynomial coefficients
 %                 for the drift, input, and output.
-%                   • f must contain at least linear and quadratic coefficients
+%                   • f must contain at least a linear drift (A matrix)
 %                   • g must contain at least a linear input (B matrix)
-%                   • h must contain at least a linear input (C matrix)
+%                   • h must contain at least a linear output (C matrix)
 %       eta     - η=1-1/γ², where γ is the H∞ gain parameter. For open-loop
 %                 balancing, use eta=0. For closed-loop (HJB) balancing, use
 %                 eta=1. Any other value between -1 and ∞ corresponds to
@@ -21,7 +21,7 @@ function [w, K] = approxFutureEnergy(f, g, h, eta, degree, verbose)
 %
 %   Output:
 %       w       - cell array containing the polynomial energy function coefficients
-%       K       - the gain coefficients corresponding to the optimal controller 
+%       K       - the gain coefficients corresponding to the optimal controller
 %                 given by the future energy function (optional)
 %
 %   Description: For control-affine dynamics ẋ = f(x) + g(x) u, y = h(x) we
@@ -54,7 +54,8 @@ function [w, K] = approxFutureEnergy(f, g, h, eta, degree, verbose)
 %
 %   The remaining wᵢ solve linear systems arising from (1).
 %
-%   Details are in Section III.B of reference [1] or III.A of reference [2].
+%   Details are in Section III.B of reference [1] or III.A of reference [2], and
+%   in Algorithm 1 in both references.
 %
 %   The solution is computed using the ppr() function in the PPR repository and
 %   requires the following functions from the KroneckerTools repository:
@@ -63,24 +64,28 @@ function [w, K] = approxFutureEnergy(f, g, h, eta, degree, verbose)
 %      LyapProduct
 %      h2q
 %
-%   Authors: Jeff Borggaard, Virginia Tech
-%            Nick Corbin, UCSD
+%   Authors: Rewritten by Nick Corbin, UCSD to use the PPR package [3]
+%            Original version by Jeff Borggaard, Virginia Tech
 %
 %   License: MIT
 %
-%   Reference: [1] B. Kramer, S. Gugercin, J. Borggaard, and L. Balicki,
-%               “Scalable computation of energy functions for nonlinear
-%               balanced truncation,” Computer Methods in Applied Mechanics
-%               and Engineering, vol. 427, p. 117011, Jul. 2024, doi:
+%   References: [1] B. Kramer, S. Gugercin, J. Borggaard, and L. Balicki,
+%               “Scalable computation of energy functions for nonlinear balanced
+%               truncation,” Computer Methods in Applied Mechanics and
+%               Engineering, vol. 427, p. 117011, Jul. 2024, doi:
 %               10.1016/j.cma.2024.117011
-%              [2] N. A. Corbin and B. Kramer, “Scalable computation of 𝓗∞
-%               energy functions for polynomial control-affine systems,"
-%               IEEE Transactions on Automatic Control, pp. 1–13, 2024,
-%               doi: 10.1109/tac.2024.3494472
+%               [2] N. A. Corbin and B. Kramer, “Scalable computation of 𝓗∞
+%               energy functions for polynomial control-affine systems," IEEE
+%               Transactions on Automatic Control, pp. 1–13, 2024, doi:
+%               10.1109/tac.2024.3494472
+%               [3] N. A. Corbin and B. Kramer, “Computing solutions to the
+%               polynomial-polynomial regulator problem,” in 2024 IEEE 63rd
+%               Conference on Decision and Control (CDC), IEEE, Dec. 2024, pp.
+%               2689–2696. doi: 10.1109/cdc56724.2024.10885897.
 %
-%             See Algorithm 1 in [1].
+%   Part of the NLbalancing repository.
 %
-%  Part of the NLbalancing repository.
+%   See also: ppr
 %%
 
 if (nargin < 6)

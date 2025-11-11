@@ -29,9 +29,32 @@ function [Tbal] = balancingTransformation(v, w, degree, verbose)
 %       3) Construct the balancing transformation as the composition of the
 %       two transformations x = ̅Φ(z̄) = Φ(𝝋(z̄))
 %
-%   References: [1]
+%   References: [1] J. M. A. Scherpen, “Balancing for nonlinear systems,”
+%               Systems & Control Letters, vol. 21, no. 2, pp. 143–153, Aug.
+%               1993, doi: 10.1016/0167-6911(93)90117-o.
+%               [2] J. M. A. Scherpen and A. J. Van Der Schaft, “Normalized
+%               coprime factorizations and balancing for unstable nonlinear
+%               systems,” International Journal of Control, vol. 60, no. 6, pp.
+%               1193–1222, Aug. 1993, doi: 10.1080/00207179408921517.
+%               [3] J. M. A. Scherpen, “Balancing for nonlinear systems,”
+%               University of Twente, 1994.
+%               [4] K. Fujimoto and J. M. A. Scherpen, “Balanced realization and
+%               model order reduction for nonlinear systems based on singular
+%               value analysis,” SIAM Journal on Control and Optimization, vol.
+%               48, no. 7, pp. 4591–4623, Jan. 2010, doi: 10.1137/070695332.
+%               [5] N. A. Corbin and B. Kramer, “Scalable computation of 𝓗_∞
+%               energy functions for polynomial control-affine systems,” IEEE
+%               Transactions on Automatic Control, vol. 70, no. 5, pp.
+%               3088–3100, May 2025, doi: 10.1109/tac.2024.3494472.
+%               [6] N. A. Corbin, A. Sarkar, J. M. A. Scherpen, and B. Kramer,
+%               “Scalable computation of input-normal/output-diagonal balanced
+%               realization for control-affine polynomial systems,” Systems &
+%               Control Letters, vol. 204, p. 106178, Oct. 2025, doi:
+%               10.1016/j.sysconle.2025.106178.
 %
 %   Part of the NLbalancing repository.
+%
+%   See also: approxPastEnergy, approxFutureEnergy, inputNormalOutputDiagonalTransformation, composeTransformations
 %%
 arguments
     v
