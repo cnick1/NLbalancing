@@ -61,7 +61,9 @@ n = length(T1{1});
 
 Tout = cell(size(T1));
 
-for i = 1:ld
+
+Tout{1}= calTTv(T2, 1, 1, T1{1}.').';
+for i = 2:ld
     Tout{i} = zeros(n,n^i);
     for j=1:i  % This is the summation in equation (3)
         Tout{i}= Tout{i} + calTTv(T2, j, i, T1{j}.').';
