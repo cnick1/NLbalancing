@@ -16,8 +16,22 @@ function [vtilde, wtilde] = transformEnergyFunctions(v, w, T, inputNormal)
 %       v,w   - cell arrays containing the transformed polynomial energy function
 %               coefficients
 %
-%   Description: Given a transformation T, compute the transformed energy functions
-%   given by the coefficients vtilde, wtilde. TODO: Add more details here.
+%   Description: Consider past and future energy functions given by the
+%   polynomial expansions
+%           𝓔⁻(x) = ½ ( v₂ᵀ(z⊗z) + v₃ᵀ(z⊗z⊗z) + ... ),
+%           𝓔⁺(x) = ½ ( w₂ᵀ(z⊗z) + w₃ᵀ(z⊗z⊗z) + ... ),
+%   and consider a polynomial transformation
+%            x = Φ(z)
+%              = T₁z + T₂(z⊗z) + ... + Td(z...⊗z).
+%   As shown in Lemma 1 in [1], the energy functions can be expressed in the
+%   transformed z coordinates as
+%           𝓔⁻(Φ(z)) = ½ ( ṽ₂ᵀ(z⊗z) + ṽ₃ᵀ(z⊗z⊗z) + ... )
+%           𝓔⁺(Φ(z)) = ½ ( w̃₂ᵀ(z⊗z) + w̃₃ᵀ(z⊗z⊗z) + ... )
+%   where the transformed coordinates are computed using the calligraphic T
+%   notation according to
+%                 ₖ                     ₖ
+%           ṽₖᵀ = ∑ vⱼᵀ 𝓣ⱼ,ₖ ,    w̃ₖᵀ = ∑ wⱼᵀ 𝓣ⱼ,ₖ
+%                ʲ⁼¹                  ʲ⁼¹
 %
 %   Authors: Nick Corbin, UCSD
 %
