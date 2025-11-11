@@ -1,10 +1,9 @@
-function P = transformationInverse(T, T1Inv)
+function P = transformationInverse(T)
 %transformationInverse Return the coefficients of the inverse of the transformation.
 %
 %   Usage:  P = transformationInverse(T)
 %
 %   Inputs:      T - cell array containing transformation coefficients
-%            T1Inv - optional analytical solution for T₁⁻¹
 %
 %   Outputs:     P - cell array of the inverse transformation coefficients
 %
@@ -48,16 +47,11 @@ function P = transformationInverse(T, T1Inv)
 %
 %   Part of the NLbalancing repository.
 %%
-arguments
-    T
-    T1Inv = inv(T{1})
-end
-
 P = cell(size(T)); % default to producing an expansion the same size as T
 
 n = size(T{1}, 1);
-P{1} = T1Inv;
 
+P{1} = invertibleMatrix(inv(T{1}), T{1}); % See invertibleMatrix; if T{1} is an invertibleMatrix already, inv() does not actually have to compute it
 for i=2:length(T)
     P{i} = zeros(size(T{i}));
     for j = 1:(i-1) % Compute the sum ∑ Pⱼ 𝓣ⱼ,ᵢ
@@ -71,6 +65,8 @@ for i=2:length(T)
     %     P{i}(idx,:) = calTTv(P,i,i,P{i}(idx,:).').';
     % end
     P{i} = calTTv(P,i,i,P{i}.').';
+    
+    % Row symmetrization may be necessary
 end
 
 end
