@@ -107,7 +107,8 @@ end
 % we do a coefficient matching that leads to the following sets of terms
 % that need to be combined.
 
-% Should also be able to rewrite to use analytical Tinv
+% If the analytical inverse of T{1} is known, use the invertibleMatrix
+% class to pass it and overload the matrix inversion
 
 % Drift f(x)
 for k = 1:lf
