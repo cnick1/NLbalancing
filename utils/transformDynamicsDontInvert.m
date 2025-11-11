@@ -1,7 +1,6 @@
 function [ft, gt, ht] = transformDynamicsDontInvert(f, g, h, T)
 %transformDynamicsDontInvert Transform the model given by f, g, h by transformation T.
-%   This function returns the expansions for the transformed dynamics in
-%   the form
+%   This function returns the expansions for the transformed dynamics in the form
 %             ∂Φ(z)/∂z ż = ft(z) + gt(z) u,    y = ht(z).
 %          NOTE, THE JACOBIAN IS THEN NEEDED ON THE LEFT-HAND-SIDE.
 %

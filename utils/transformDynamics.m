@@ -1,7 +1,7 @@
 function [ft, gt, ht] = transformDynamics(f, g, h, T)
-%transformDynamics Transform the model given by f, g, h by transformation T.
-%   This function returns the expansions for the transformed dynamics in
-%   the form ż = f̃(z) + g̃(z) u, y = h̃(z)
+%transformDynamics Transform the control-affine dynamic model given by f, g, h by transformation T.
+%   This function returns the expansions for the transformed dynamics in the form
+%       ż = f̃(z) + g̃(z) u, y = h̃(z)
 %
 %   Usage: [ft, gt, ht] = transformDynamics(f, g, h, T)
 %
@@ -16,31 +16,39 @@ function [ft, gt, ht] = transformDynamics(f, g, h, T)
 %                  for the transformed drift, input, and output.
 %
 %   Description: Given a transformation x = Φ(z), we seek to represent the
-%    dynamics for the control-affine system
+%   dynamics for the control-affine system
 %        ẋ = f(x) + g(x) u
 %        y = h(x)
-%    in the new coordinates as
+%   in the new coordinates as
 %        ż = f̃(z) + g̃(z) u
 %        y = h̃(z)
-%    In general, it is not possible to do this explicitly. Applying the
-%    transformation yields
+%   In general, it may not be possible to do this exactly. Applying the
+%   transformation yields
 %        ∂Φ(z)/∂z ż = f(Φ(z)) + g(Φ(z)) u
 %                 y = h(Φ(z))
-%    and we do not in general have an explicit way to write [∂Φ(z)/∂z]⁻¹.
-%    In this function, we will approximate the functions f̃(z), g̃(z),
-%    h̃(z) by computing their Taylor expansions. This can be done exactly
-%    for linear transformations but for polynomial approximations involves
-%    a truncation of the expansions.
+%   and we do not in general have an exact way to write [∂Φ(z)/∂z]⁻¹. In this
+%   function, we will approximate the functions f̃(z), g̃(z), h̃(z) by computing
+%   their Taylor expansions. This can be done exactly for linear transformations
+%   but for polynomial approximations involves a truncation of the expansions.
+%   Instead of computing [∂Φ(z)/∂z]⁻¹ explicitly, we will leave it on the
+%   left-hand-side and match terms of the same degree; doing it this way, we
+%   only ever have to invert T₁, which we may have a closed-form analytical
+%   expression for.
 %
-%    Inserting the expansions for f̃(z) and g̃(z), we can proceed to
-%    collect terms of the same degree, leading to the formulas for the
-%    coefficients for f̃(z) & g̃(z).
+%   Inserting the expansions for f̃(z) and g̃(z), we can proceed to collect
+%   terms of the same degree, leading to the formulas for the coefficients for
+%   f̃(z) & g̃(z).
 %
 %   Authors: Nick Corbin, UCSD
 %
-%
-%
-%
+%  See also: invertibleMatrix
+%%
+arguments
+    f
+    g
+    h
+    T
+end
 vec = @(X) X(:);
 
 ld = length(T);
