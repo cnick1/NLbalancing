@@ -75,4 +75,13 @@ z = newtonIteration(zbar, varphiInv, dvarphiInv, tol=options.tol, maxIter=option
 %% Evaluate x = ̅Φ(z̄): compute x given z
 x = kronPolyEval(TinOd, z);
 
+% Assign output
+if nargout <= 1
+    varargout{1} = x;
+else
+    if nargout ~= length(x); error('Insufficient number of outputs from right hand side of equal sign to satisfy assignment.'); end
+    Xcell = num2cell(x);
+    [varargout{1:nargout}] = deal(Xcell{:});
+end
+
 end

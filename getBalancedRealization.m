@@ -1,7 +1,7 @@
-function [fbal,gbal,hbal] = getBalancedRealization(f,g,h,nvp)
+function [fbal,gbal,hbal,Tbal] = getBalancedRealization(f,g,h,nvp)
 %getBalancedRealization Returns a balanced realization for f,g,h in Kronecker polynomial form
 %
-%   Usage: [fbal,gbal,hbal] = getBalancedRealization(f,g,h)
+%   Usage: [fbal,gbal,hbal,Tbal] = getBalancedRealization(f,g,h)
 %
 %   Inputs:
 %       f,g,h   - cell arrays containing the polynomial coefficients
@@ -9,6 +9,8 @@ function [fbal,gbal,hbal] = getBalancedRealization(f,g,h,nvp)
 %                   • f must contain at least a linear drift  (A matrix)
 %                   • g must contain at least a linear input  (B matrix)
 %                   • h must contain at least a linear output (C matrix)
+%          Tbal - cell array containing balancing transformation 
+%                 coefficients ( ̅Φ(z̄) )
 %
 %   Optional name/value pair inputs:
 %        degree - desired degree of polynomial transformation. Ex. for linear
