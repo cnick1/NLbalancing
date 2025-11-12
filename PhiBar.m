@@ -1,4 +1,4 @@
-function x = PhiBar(zbar, TinOd, sigmaSquared, options)
+function varargout = PhiBar(zbar, TinOd, sigmaSquared, options)
 %PhiBar Return the balancing transformation x = ̅Φ(z̄) = Φ(𝝋(z̄)) (at one point).
 %
 %   Usage:  x = PhiBar(zbar,TinOd,sigmaSquared)

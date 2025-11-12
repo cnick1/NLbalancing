@@ -1,4 +1,4 @@
-function z = newtonIteration(x, g, J, options)
+function varargout = newtonIteration(x, g, J, options)
 %newtonIteration Solve g(z) = x for z using Newton iteration
 %
 %   Usage:  z = newtonIteration(x, g, J)
