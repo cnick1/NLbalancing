@@ -1,21 +1,22 @@
-function runExample24_newtonIteration(degree)
-%runExample24_newtonIteration Runs the 2D example to visualize the nonlinear balancing transformations.
+function runExample11_newtonIteration(degree,lim)
+%runExample11_newtonIteration Runs the 2D inverted pendulum example to
+%   visualize the nonlinear balancing transformations.
 %
-%   Usage:  runExample24_newtonIteration(degree)
+%   Usage:  runExample11_newtonIteration(degree,lim)
 %
-%   Inputs:
-%       degree - desired degree of the energy function approximation
+%   Inputs:    degree - desired degree of the energy function approximation
+%                 lim - the size of the grid in the z coordinates
 %
-%   Description: This simple 2D example aims to capture the key idea in the
-%   model reduction problem: the presence of a subsystem that in some sense
-%   contributes little (perhaps is decoupled) to the overall dynamics, yet
-%   drives interactions that cannot directly be eliminated. The model is:
-%           ẋ₁ = −2 x₁ + 20 x₁ x₂ + u,
-%           ẋ₂ = −5 x₂ + u,
-%            y = x₁ + x₂.
-%   Despite being so simple, this is a challenging problem because the
-%   nonlinear interaction is strong: those terms are much larger than the
-%   linear terms!
+%   Description: The polynomial approximation to the pendulum is
+%           ẋ₁ = x₂
+%           ẋ₂ = 3u/(mL²) + 3g/(2L) ( x₁ - x₁³/6 + x₁⁵/120 - x₁⁷/5040 + x₁⁹/362880 + ... )
+%            y = x₁
+%
+%   We compute the energy functions, the input-normal/output-diagonal
+%   transformation, and then the true balancing transformation, given by the
+%   composition x = ̅Φ(z̄(z̄) = Φ(𝝋(z̄)). We visualize this mapping
+%   from the z̄ coordinates to the x coordinates by forming a grid in the
+%   z̄ coordinates and mapping that grid to the x coordinates.
 %
 %   References: [1]
 %
@@ -24,19 +25,22 @@ function runExample24_newtonIteration(degree)
 % close all;
 set(groot,'defaultLineLineWidth',1,'defaultTextInterpreter','TeX')
 
-fprintf('Running Example 24\n')
+fprintf('Running Example 11\n')
 
-if nargin < 1
-    degree = 4;
+if nargin < 2
+    lim = 11;
+    if nargin < 1
+        degree = 4;
+    end
 end
 
-lim=.025;
-
-[f, g, h] = getSystem24(false); eta = 0; n = 2;
-% f{2} = 0.1*f{2}; lim=1; % For testing scaling f2
+%% Get system dynamics
+m = 1; L = 10; nFterms = degree-1;
+[f, g, h] = getSystem11(nFterms, m, L);
 
 %%  Compute the energy functions
 fprintf(" ~~~~~~~~~~~~~~~~~~~~~~~~~ Computing energy functions:  ~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
+eta = .5;
 [v] = approxPastEnergy(f, g, h, eta, degree, false);
 [w] = approxFutureEnergy(f, g, h, eta, degree, false);
 
@@ -44,23 +48,13 @@ fprintf(" ~~~~~~~~~~~~~~~~~~~~~~~~~ Computing energy functions:  ~~~~~~~~~~~~~~~
 fprintf(" ~~~~~~~~~~~ Computing transformation and singular value functions:  ~~~~~~~~~~~~ \n")
 [sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);
 
-% Plot the squared singular value functions
-z = linspace(- 1, 1, 51);
-figure; hold on; title("Singular value functions")
-for i = 1:2
-    plot(z, real(sqrt(polyval(flip(sigmaSquared(i, :)), z))))
-    % plot(z, polyval(flip(sigmaSquared(i, :)), z)) % plot squared singular value functions
-end
-set(gca,'yscale','log')
-xlabel('z_i'); ylabel('\sigma_i'); legend('$\sigma_1$','$\sigma_2$')
-
 %% Plot grid transformations
 % Parameters
-numLines = 15; numPoints = 201;
+numLines = 41; numPoints = 201;
 
 % Generate original z coordinates
-[xH, yH] = meshgrid(linspace(-lim, lim, numLines), linspace(-lim, lim, numPoints)); % Horizontal lines
-[yV, xV] = meshgrid(linspace(-lim, lim, numLines), linspace(-lim, lim, numPoints)); % Vertical lines
+[xH, yH] = meshgrid(linspace(-lim, lim, numLines), 2*linspace(-lim, lim, numPoints)); % Horizontal lines
+[yV, xV] = meshgrid(2*linspace(-lim, lim, numLines), linspace(-lim, lim, numPoints)); % Vertical lines
 
 % Compute transformed coordinates
 xHtr = zeros(size(xH)); yHtr = zeros(size(yH));
@@ -98,14 +92,14 @@ end
 F = @(x) kronPolyEval(f, x);
 Ft = @(z) PhiBarJacobian(z,TinOd,sigmaSquared)\kronPolyEval(f, PhiBar(z,TinOd,sigmaSquared));
 
-x0 = [1 1].'*(0.7*lim);
+x0 = 1e-5*[1 1].'*(0.5*lim);
 
 % Solve for z0 initial condition with a Newton type iteration
 z0 = newtonIteration(x0, @(z) PhiBar(z,TinOd,sigmaSquared), @(z) PhiBarJacobian(z,TinOd,sigmaSquared),maxIter=10,verbose=true);
 
 
 % Simulate both systems
-[t1, X1] = ode45(@(t, x) F(x), [0, 5], x0);
+[~, X1] = ode45(@(t, x) F(x), [0, 5], x0);
 [~, Z] = ode45(@(t, z) Ft(z), [0, 5], z0);
 
 subplot(1,2,1)

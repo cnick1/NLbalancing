@@ -1,7 +1,7 @@
-function runExample15_balancingTransformation(degree,reduction,scaling)
-%runExample15_balancingTransformation Runs the 4D double pendulum example to visualize the nonlinear balancing transformations.
+function runExample15_newtonIteration(degree,reduction,scaling)
+%runExample15_newtonIteration Runs the 4D double pendulum example to visualize the nonlinear balancing transformations.
 %
-%   Usage:  runExample15_balancingTransformation(degree)
+%   Usage:  runExample15_newtonIteration(degree)
 %
 %   Inputs:
 %       degree    - desired degree of the energy function approximation

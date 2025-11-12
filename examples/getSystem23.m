@@ -1,10 +1,7 @@
-function [f, g, h] = getSystem23(holmes)
-%getSystem23  Returns the 3D nonlinear model from [1,2].
+function [f, g, h] = getSystem23()
+%getSystem23  Returns Otto's 3D nonlinear model.
 %
 %   Usage:  [f,g,h] = getSystem23()
-%
-%   Inputs:     holmes - boolean, whether to use the linear model from [3]
-%                        or nonlinear model from [1,2] (default)
 %
 %   Outputs:     f,g,h - Cell arrays containing the polynomial coefficients
 %                        for the drift, input, and output
@@ -14,17 +11,13 @@ function [f, g, h] = getSystem23(holmes)
 %       ẋ₁ = −x₁ + 20 x₁ x₃ + u,
 %       ẋ₂ = −2 x₂ + 20 x₂ x₃ + u,
 %       ẋ₃ = −5 x₃ + u,
-%        y = x₁ + x₂ + x₃,
-%
-%   If the option holmes is enabled, the model from [3, Section 5.6.1] is
-%   returned instead. This model replaces the nonlinear interaction between
-%   x₃ and x₁ & x₂ with a linear interaction. The model from [3] inspired
-%   the model in [1,2].
-%
-%       ẋ₁ = −x₁ + 100 x₃ + u,
-%       ẋ₂ = −2 x₂ + 100 x₃ + u,
-%       ẋ₃ = −5 x₃ + u,
 %        y = x₁ + x₂ + x₃.
+%
+%   This model was derived in [1,2] inspired by the linear model from [3,
+%   Section 5.6.1]. Similar to that model, which can be found in
+%   getSystem32(), the output contains all of the states, and the input affects all of 
+%   the states. The third state is not exactly decoupled from the others, and
+%   while it decays quickly, it also drives the other states very strongly.
 %
 %   References: [1] S. E. Otto, A. Padovan, and C. W. Rowley, "Optimizing
 %                   oblique projections for nonlinear systems using
@@ -41,29 +34,18 @@ function [f, g, h] = getSystem23(holmes)
 %                   symmetry. Cambridge University Press, 2012. doi:
 %                   10.1017/cbo9780511919701.
 %
+%   See also: getSystem32
 %%
-
-if nargin < 1
-    holmes = false;
-end
-
 
 n = 3;
 x = sym('x', [1, n]).'; syms(x);
 
-if holmes
-    fsym = [-x1 + 100*x3;
-        -2*x2 + 100*x3;
-        -5*x3];
-    gsym = [1;1;1];
-    hsym = x1+x2+x3;
-else
-    fsym = [-x1 + 20*x1*x3;
-        -2*x2 + 20*x2*x3;
-        -5*x3];
-    gsym = [1;1;1];
-    hsym = x1+x2+x3;
-end
+
+fsym = [-x1 + 20*x1*x3;
+    -2*x2 + 20*x2*x3;
+    -5*x3];
+gsym = [1;1;1];
+hsym = x1+x2+x3;
 
 
 [f, g, h] = approxPolynomialDynamics(fsym, gsym, hsym, x, 3);

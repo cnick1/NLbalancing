@@ -1,45 +1,60 @@
-function runExample13_balancingTransformation(degree,lim)
-%runExample13_balancingTransformation Runs the 2D example from Gray & Scherpen 2001 [1] to visualize the nonlinear balancing transformations.
+function runExample12_newtonIteration(degree,lim)
+%runExample12_newtonIteration Runs the 2D Fujimoto/Scherpen example to visualize the nonlinear balancing transformations.
 %
-%   Usage:  runExample13_balancingTransformation(degree,lim)
+%   Usage:  runExample12_newtonIteration(degree,lim)
 %
 %   Inputs:    degree - desired degree of the energy function approximation
 %                 lim - the size of the grid in the z coordinates
 %
-%   Description: The 2D model from [1] is
-%           f(x) = -[α² x₁ + 2 α x₂ + (α² - 2)x₂²;
-%                                x₂              ]
-%           g(x) = √2[α - 2 x₂;
-%                        1    ]
-%           h(x) = 1/√3 [3 α (x₁ + x₂²) + (α - 2√2)x₂]
+%   Description: The 2D model from [1-3] is
+%       f(x) = [-9x₁ + 6x₁² x₂ + 6x₂³ - x₁⁵ - 2x₁³ x₂² - x₁ x₂⁴
+%               -9x₂ - 6x₁³ - 6x₁x₂² - x₁⁴ x₂ - 2x₁² x₂³ - x₂⁵]
+%       g(x) = [\frac{3√2(9-6x₁x₂+x₁⁴-x₂⁴)}{9+x₁⁴+2x₁²x₂²+x₂⁴},
+%                 \frac{√2(-9x₁² - 27 x₂² + 6 x₁³ x₂ + 6 x₁ x₂³ - (x₁² + x₂²)³)}{9+x₁⁴+2x₁²x₂²+x₂⁴};
+%               \frac{√2(27x₁²+9x₂²+6x₁³x₂+6x₁x₂³+(x₁²+x₂²)³}{9+x₁⁴+2x₁²x₂²+x₂⁴},
+%                 \frac{3√2(9 + 6 x₁ x₂  - x₁⁴ + x₂⁴)}{9+x₁⁴+2x₁²x₂²+x₂⁴}]
+%       h(x) = [\frac{2√2(3x₁ + x₁ x₂² + x₂³)(3 - x₁⁴ - 2x₁² x₂² - x₂⁴)}{1 + x₁⁴ + 2 x₁² x₂² + x₂⁴};
+%                 \frac{√2(3x₂ - x₁³ - x₁ x₂²)(3 - x₁⁴ - 2 x₁² x₂² - x₂⁴)}{1 + x₁⁴ + 2 x₁² x₂² + x₂⁴}]
 %
-%   where α = (√3 + √2)(√3 + 2). We compute the energy functions, the
-%   input-normal/output-diagonal transformation, and then the true balancing
-%   transformation, given by the composition x = ̅Φ(z̄(z̄) = Φ(𝝋(z̄)). We visualize
-%   this mapping from the z̄ coordinates to the x coordinates by forming a grid
-%   in the z̄ coordinates and mapping that grid to the x coordinates.
+%   We compute the energy functions, the input-normal/output-diagonal
+%   transformation, and then the true balancing transformation, given by the
+%   composition x = ̅Φ(z̄(z̄) = Φ(𝝋(z̄)). We visualize this mapping
+%   from the z̄ coordinates to the x coordinates by forming a grid in the
+%   z̄ coordinates and mapping that grid to the x coordinates.
 %
-%   References: [1] W. S. Gray and J. M. A. Scherpen, “On the nonuniqueness
-%               of singular value functions and balanced nonlinear
-%               realizations,” Systems & Control Letters, vol. 44, no. 3,
-%               pp. 219–232, Oct. 2001, doi: 10.1016/s0167-6911(01)00144-x
+%   References: [1] K. Fujimoto and J. M. A. Scherpen, “Model reduction
+%                for nonlinear systems based on the differential
+%                eigenstructure of Hankel operators,” in Proceedings of
+%                the 40th IEEE Conference on Decision and Control (Cat.
+%                No.01CH37228), IEEE, 2001. doi: 10.1109/cdc.2001.980322
+%               [2] K. Fujimoto and J. M. A. Scherpen, “Nonlinear
+%                input-normal realizations based on the differential
+%                eigenstructure of Hankel operators,” IEEE Transactions
+%                on Automatic Control, vol. 50, no. 1, pp. 2–18, Jan.
+%                2005, doi: 10.1109/tac.2004.840476
+%               [3] K. Fujimoto and J. M. A. Scherpen, “Balanced
+%                realization and model order reduction for nonlinear
+%                systems based on singular value analysis,” SIAM Journal
+%                on Control and Optimization, vol. 48, no. 7, pp.
+%                4591–4623, Jan. 2010, doi: 10.1137/070695332
 %
 %   Part of the NLbalancing repository.
 %%
 % close all;
 set(groot,'defaultLineLineWidth',1,'defaultTextInterpreter','TeX')
 
-fprintf('Running Example 13\n')
+fprintf('Running Example 12\n')
 
 if nargin < 2
-    lim = 1;
+    lim = 3;
     if nargin < 1
         degree = 4;
     end
 end
 
 %% Get system dynamics
-[f, g, h] = getSystem13();
+[f, g, h] = getSystem12(degree - 1, false);  % Scherpen model
+f{1} = full(f{1}); g{1} = full(g{1}); h{1} = full(h{1});
 
 %%  Compute the energy functions
 fprintf(" ~~~~~~~~~~~~~~~~~~~~~~~~~ Computing energy functions:  ~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
@@ -56,8 +71,8 @@ fprintf(" ~~~~~~~~~~~ Computing transformation and singular value functions:  ~~
 numLines = 41; numPoints = 201;
 
 % Generate original coordinates
-[xH, yH] = meshgrid(linspace(-lim, lim, numLines), linspace(-lim, lim, numPoints)); % Horizontal lines
-[yV, xV] = meshgrid(linspace(-lim, lim, numLines), linspace(-lim, lim, numPoints)); % Vertical lines
+[xH, yH] = meshgrid(linspace(-2*lim, 2*lim, numLines), linspace(-lim, lim, numPoints)); % Horizontal lines
+[yV, xV] = meshgrid(linspace(-lim, lim, numLines), linspace(-2*lim, 2*lim, numPoints)); % Vertical lines
 
 % Compute transformed coordinates
 xHtr = zeros(size(xH)); yHtr = zeros(size(yH));
@@ -109,11 +124,10 @@ axis equal;
 F = @(x) kronPolyEval(f, x);
 Ft = @(z) PhiBarJacobian(z,TinOd,sigmaSquared)\kronPolyEval(f, PhiBar(z,TinOd,sigmaSquared));
 
-x0 = [1 1].'*(0.5*lim);
+x0 = [1 1].'*(0.2*lim);
 
 % Solve for z0 initial condition with a Newton type iteration
-z0 = newtonIteration(x0, @(z) PhiBar(z,TinOd,sigmaSquared), @(z) PhiBarJacobian(z,TinOd,sigmaSquared),maxIter=10,verbose=true);
-
+z0 = newtonIteration(x0, @(z) PhiBar(z,TinOd,sigmaSquared), @(z) PhiBarJacobian(z,TinOd,sigmaSquared),maxIter=100,verbose=true);
 
 % Simulate both systems
 [~, X1] = ode45(@(t, x) F(x), [0, 5], x0);
@@ -140,7 +154,6 @@ plot(X2(:,1),X2(:,2),'r--','LineWidth',1.5)
 nexttile(3)
 plot(X2(:,1),X2(:,2),'r--','LineWidth',1.5)
 end
-
 
 
 function [x1, x2] = PhiBar2(zbar,TinOd,sigmaSquared)

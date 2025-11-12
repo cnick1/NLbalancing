@@ -1,64 +1,50 @@
-function runExample14_balancingTransformation(degree,lim)
-%runExample14_balancingTransformation Runs the 2D gradient double pendulum [1-3] example to visualize the nonlinear balancing transformations.
+function runExample2_newtonIteration(degree,lim)
+%runExample2_newtonIteration Runs the 2D quadratic-bilinear example
+%   from [1,2] to visualize the nonlinear balancing transformations.
 %
-%   Usage:  runExample14_balancingTransformation(degree,lim)
+%   Usage:  runExample2_newtonIteration(degree,lim)
 %
 %   Inputs:    degree - desired degree of the energy function approximation
 %                 lim - the size of the grid in the z coordinates
 %
-%   Description: This model has been used several times in the literature [1-3].
-%   The system describes a set of dynamics related to the double pendulum;
-%   however, where the double pendulum would have 4D dynamics and only
-%   marginal stability, the associated 2D gradient system is asymptotically
-%   stable, and hence the model was more approachable when method were more
-%   limited. The gradient system dynamics are
-%       ẋ = -M⁻¹(x) 𝜕V(x)/𝜕x + M⁻¹(x)[1;0] u
-%       y = x₁
-%   The mass matrix and its inverse are then
-%       M(x) = [m₁₁, m₁₂;    M⁻¹(x) = _______1̲_______   [m₂₂, -m₂₁;
-%               m₂₁, m₂₂]            (m₁₁m₂₂ - m₁₂m₂₁)  -m₁₂,  m₁₁]
-%   where the entries are
-%       m₁₁       = m₁ l₁² + m₂ l₁² + m₂ l₂² + 2 m₂ l₁ l₂ cos x₂
-%       m₁₂ = m₂₁ = m₂ l₂² + m₂ l₁ l₂ cos x₂
-%       m₂₂       = m₂ l₂²
-%   The potential energy of the system is
-%       V(x) = - m₁ g l₁ cos x₁ - m₂ g (l₁ cos x₁ + l₂ cos(x₁ + x₂))
+%   Description: The 2D quadratic-bilinear model is
+%        ẋ₁ = -x₁ + x₂ - x₂² + u₁ + 2 x₂ u₁ - 0.05 x₁ x₂ u₁
+%        ẋ₂ =     - x₂       + u₁           - 0.05 x₂² u₁
+%         y =  x₁
 %
 %   We compute the energy functions, the input-normal/output-diagonal
 %   transformation, and then the true balancing transformation, given by the
-%   composition x = ̅Φ(z̄(z̄) = Φ(𝝋(z̄)). We visualize this mapping
+%   composition x = ̅Φ(z̄) = Φ(𝝋(z̄)). We visualize this mapping
 %   from the z̄ coordinates to the x coordinates by forming a grid in the
 %   z̄ coordinates and mapping that grid to the x coordinates.
 %
-%   References: [1] J. M. A. Scherpen, “Balancing for nonlinear systems,”
-%               PhD Dissertation, University of Twente, 1994.
-%               [2] W. S. Gray and J. M. A. Scherpen, “Minimality and local
-%               state decompositions of a nonlinear state space realization
-%               using energy functions,” IEEE Transactions on Automatic
-%               Control, vol. 45, no. 11, pp. 2079–2086, 2000, doi:
-%               10.1109/9.887630
-%               [3] K. Fujimoto and J. M. A. Scherpen, “Nonlinear
-%               input-normal realizations based on the differential
-%               eigenstructure of Hankel operators,” IEEE Transactions on
-%               Automatic Control, vol. 50, no. 1, pp. 2–18, Jan. 2005,
-%               doi: 10.1109/tac.2004.840476
+%   Reference: [1] B. Kramer, S. Gugercin, J. Borggaard, and L. Balicki,
+%               “Scalable computation of energy functions for nonlinear
+%               balanced truncation,” Computer Methods in Applied Mechanics
+%               and Engineering, vol. 427, p. 117011, Jul. 2024, doi:
+%               10.1016/j.cma.2024.117011
+%              [2] Y. Kawano and J. M. A. Scherpen, “Model reduction by
+%               differential balancing based on nonlinear hankel operators,”
+%               IEEE Transactions on Automatic Control, vol. 62, no. 7,
+%               pp. 3293–3308, Jul. 2017, doi: 10.1109/tac.2016.2628201
 %
 %   Part of the NLbalancing repository.
 %%
 % close all;
 set(groot,'defaultLineLineWidth',1,'defaultTextInterpreter','TeX')
 
-fprintf('Running Example 14\n')
+fprintf('Running Example 2\n')
 
 if nargin < 2
-    lim = .25;
+    lim = 1;
     if nargin < 1
         degree = 4;
     end
 end
 
 %% Get system dynamics
-[f, g, h] = getSystem14(degree - 1, 1);
+[f, g, h] = getSystem2(true);  % Kawano model
+% f = {f{1},0*f{2}};
 
 %%  Compute the energy functions
 fprintf(" ~~~~~~~~~~~~~~~~~~~~~~~~~ Computing energy functions:  ~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
@@ -128,10 +114,14 @@ axis equal;
 F = @(x) kronPolyEval(f, x);
 Ft = @(z) PhiBarJacobian(z,TinOd,sigmaSquared)\kronPolyEval(f, PhiBar(z,TinOd,sigmaSquared));
 
+% Tbal = TinOd{1}/diag(sigmaSquared.^(1/4));
+% ftilde = {Tbal\f{1}*Tbal, 0*f{2}};
+% Ft = @(z) kronPolyEval(ftilde, z);
+
 x0 = [1 1].'*(0.5*lim);
 
 % Solve for z0 initial condition with a Newton type iteration
-z0 = newtonIteration(x0, @(z) PhiBar(z,TinOd,sigmaSquared), @(z) PhiBarJacobian(z,TinOd,sigmaSquared),maxIter=100,verbose=true);
+z0 = newtonIteration(x0, @(z) PhiBar(z,TinOd,sigmaSquared), @(z) PhiBarJacobian(z,TinOd,sigmaSquared),maxIter=10,verbose=true);
 
 % Simulate both systems
 [~, X1] = ode45(@(t, x) F(x), [0, 5], x0);
@@ -146,7 +136,6 @@ plot(Z(:,1),Z(:,2),'r--','LineWidth',1.5)
 nexttile(4)
 plot(Z(:,1),Z(:,2),'r--','LineWidth',1.5)
 
-
 %% Transform Z trajectory into X coordinates to compare
 X2 = zeros(size(Z));
 for i = 1:length(Z)
@@ -157,7 +146,11 @@ nexttile(1)
 plot(X2(:,1),X2(:,2),'r--','LineWidth',1.5)
 nexttile(3)
 plot(X2(:,1),X2(:,2),'r--','LineWidth',1.5)
+xlim([-1.4616    2.1246])
+ylim([-1.9309    1.7470])
+drawnow
 end
+
 
 
 function [x1, x2] = PhiBar2(zbar,TinOd,sigmaSquared)

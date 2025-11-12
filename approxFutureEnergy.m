@@ -6,8 +6,8 @@ function [w, K] = approxFutureEnergy(f, g, h, eta, degree, verbose)
 %   Inputs:
 %       f,g,h   - cell arrays containing the polynomial coefficients
 %                 for the drift, input, and output.
-%                   • f must contain at least a linear drift (A matrix)
-%                   • g must contain at least a linear input (B matrix)
+%                   • f must contain at least a linear drift  (A matrix)
+%                   • g must contain at least a linear input  (B matrix)
 %                   • h must contain at least a linear output (C matrix)
 %       eta     - η=1-1/γ², where γ is the H∞ gain parameter. For open-loop
 %                 balancing, use eta=0. For closed-loop (HJB) balancing, use

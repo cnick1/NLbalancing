@@ -1,7 +1,7 @@
-function runExample23_balancingTransformation(degree,scaling,reduction)
-%runExample23_balancingTransformation Runs the Otto 3D example to compare linear vs nonlinear balancing.
+function runExample23_newtonIteration(degree,scaling,reduction)
+%runExample23_newtonIteration Runs the Otto 3D example to compare linear vs nonlinear balancing.
 %
-%   Usage:  runExample23_balancingTransformation(degree,reduction,scaling)
+%   Usage:  runExample23_newtonIteration(degree,reduction,scaling)
 %
 %   Inputs:
 %       degree    - desired degree of the energy function approximation

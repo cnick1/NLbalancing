@@ -31,8 +31,8 @@ function [fbal,gbal,hbal] = getBalancedRealization(f,g,h,nvp)
 %   Description: For a control affine dynamical system, we wish to compute a
 %   balanced realization also in control-affine form via the balancing
 %   transformation  x = ̅Φ(z̄):
-%            ẋ = f(x) + g(x) u,     ->     ż̄ = f̃(z̄) + g̃(z̄) u
-%            y = h(x).              ->     y = h̃(z̄)
+%            ẋ = f(x) + g(x) u,      ->       ż̄ = f̃(z̄) + g̃(z̄) u
+%            y = h(x).               ->       y = h̃(z̄)
 %   The balanced realization is computed in three steps using helper functions:
 %       1) Compute the balancing energy functions
 %       2) Compute the balancing transformation
