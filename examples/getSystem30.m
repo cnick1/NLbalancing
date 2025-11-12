@@ -38,8 +38,8 @@ function [E, f, g, h, xg] = getSystem30(numElements, p, q)
 %
 %   Any of the boundary conditions can be set to zero for an insulated boundary.
 %   We assume γ(x,u)=1 for now and polynomial forms for p(x,u) and q(x,u):
-%       p(x,u) = p₁(x) u + p₂(x) u^2 + p₃ u^3,
-%       q(x,u) = q₁(x) u + q₂(x) u^2 + q₃ u^3,
+%       p(x,u) = p₁(x) u + p₂(x) u² + p₃ u³,
+%       q(x,u) = q₁(x) u + q₂(x) u² + q₃ u³,
 %   so the function inputs are the cell arrays p = {p₁, p₂, p₃} and q = {q₁, q₂, q₃}.
 %   After finite element discretization, the finite element equations for the
 %   reaction-diffusion problem can be written as

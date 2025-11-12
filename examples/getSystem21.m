@@ -1,10 +1,10 @@
 function [f, g, Q, D2, y] = getSystem21(eps, n)
 %getSystem21 Cubic Reaction-Diffusion model with Neumann BCs using Chebychev discretization.
 %
-%   Usage:  [f,g,Q,D,y] = getSystem9Neumann(eps, N, y0)
+%   Usage:  [f,g,Q,D,y] = getSystem21(eps, N, y0)
 %
 %   Background: Consider the following reaction diffision system:
-%                   uₜ = eps*uₓₓ+u-u^3, uₓ(-1)=0, uₓ(1)=0
+%                   uₜ = eps*uₓₓ+u-u³, uₓ(-1)=0, uₓ(1)=0
 %       The spatial domain is discretized using Chebychev points, and the
 %       spatial derivative becomes uₓ = D*u with differentiation matrix D.
 %       The spatial domain x and differentiation matrix D are given by the
@@ -14,7 +14,7 @@ function [f, g, Q, D2, y] = getSystem21(eps, n)
 %       also form equilibrium solutions.
 %
 %       Upon discretization, the model is
-%                   uₜ = eps*D²*u+u-u^3
+%                   uₜ = eps*D²*u+u-u³
 %
 %           -> A = eps*D² + I
 %       The equilibrium at the origin is the unstable u(x)=0, so we seek to

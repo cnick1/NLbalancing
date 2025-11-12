@@ -8,12 +8,12 @@ function runExample31_newtonIteration(degree,lim)
 %
 %   Description: We consider the pendulum as described in [1-3] by
 %
-%             ẍ + G/L sin(x) + k / m L^2 x + b/mL^2 ẋ = 1/mL^2 u(t)
+%             ẍ + G/L sin(x) + k / m L² x + b/mL² ẋ = 1/mL² u(t)
 %
 %   This can be put in first-order form with x₁ = x, x₂ = ẋ as
 %
 %             ẋ₁ = x₂
-%      (1)    ẋ₂ = -G/L sin(x₁) - k / m L^2 x₁ - b/mL^2 x₂ + u(t)
+%      (1)    ẋ₂ = -G/L sin(x₁) - k / m L² x₁ - b/mL² x₂ + u(t)
 %              y = x₁
 %
 %   and sin(x₁) can be approximated as
