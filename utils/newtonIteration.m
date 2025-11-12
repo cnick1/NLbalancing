@@ -89,4 +89,14 @@ if options.verbose; fprintf(['\n         -> Initial condition: z0 = [', repmat('
 if options.verbose; fprintf('       error: %2.2e \n', norm(g(z)-x)); end
 if ~converged; warning('Newton iteration failed to converge to desired tolerance in %i iterations; final error is %2.2e \n', options.maxIter, norm(g(z)-x)); end
 
+
+% Assign output
+if nargout <= 1
+    varargout{1} = z;
+else
+    if nargout ~= length(z); error('Insufficient number of outputs from right hand side of equal sign to satisfy assignment.'); end
+    Zcell = num2cell(z);
+    [varargout{1:nargout}] = deal(Zcell{:});
+end
+
 end
