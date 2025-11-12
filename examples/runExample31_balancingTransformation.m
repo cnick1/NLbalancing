@@ -1,7 +1,7 @@
-function runExample31_newtonIteration(degree,lim)
-%runExample31_newtonIteration Runs the 2D pendulum example to visualize the nonlinear balancing transformations.
+function runExample31_balancingTransformation(degree,lim)
+%runExample31_balancingTransformation Runs the 2D pendulum example to visualize the nonlinear balancing transformations.
 %
-%   Usage:  runExample31_newtonIteration(degree,lim)
+%   Usage:  runExample31_balancingTransformation(degree,lim)
 %
 %   Inputs:    degree - desired degree of the energy function approximation
 %                 lim - the size of the grid in the z coordinates
@@ -53,39 +53,52 @@ end
 %% Get system dynamics
 [f, g, h, FofXU] = getSystem31(degree-1);
 
-%%  Compute the energy functions
-fprintf(" ~~~~~~~~~~~~~~~~~~~~~~~~~ Computing energy functions:  ~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
-eta = 0;
-[v] = approxPastEnergy(f, g, h, eta, degree, false);
-[w] = approxFutureEnergy(f, g, h, eta, degree, false);
+%% Compute balanced realization
+[fbal,gbal,hbal,Tbal] = getBalancedRealization(f,g,h,eta=0,degree=degree-1);
+TbalInv = transformationInverse(Tbal);
 
-%% Compute the input-normal/output-diagonal transformation approximation, also giving the squared singular value functions
-fprintf("\n ~~~~~~~~~~~ Computing transformation and singular value functions:  ~~~~~~~~~~~~ \n")
-[sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);
+%% Compute input-normal/output-diagonal realization
+[v] = approxPastEnergy(f, g, h, 0, degree);
+[w] = approxFutureEnergy(f, g, h, 0, degree);
+[~, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree-1);
+[finOd,ginOd,hinOd] = transformDynamics(f,g,h,TinOd);
+[vbal, wbal] = transformEnergyFunctions(v,w,Tbal);
+[vinOd, winOd] = transformEnergyFunctions(v,w,TinOd);
+
+fprintf("\n  - FOM dynamics:\n\n")
+dispKronPoly(f)
+
+fprintf("\n  - Balanced dynamics:\n\n")
+dispKronPoly(fbal,degree=degree)
+
+fprintf("\n  - Energy Functions:\n\n")
+dispKronPoly(v,n=2),dispKronPoly(w,n=2)
+
+fprintf("\n  - Input-normal/output-diagonal energy Functions:\n\n")
+dispKronPoly(vinOd,n=2),dispKronPoly(winOd,n=2)
+
+fprintf("\n  - Balanced energy Functions:\n\n")
+dispKronPoly(vbal,n=2),dispKronPoly(wbal,n=2)
 
 %% Plot grid transformations
 % Parameters
 numLines = 41; numPoints = 201;
 
 % Generate original coordinates
-[xH, yH] = meshgrid(linspace(-lim, lim, numLines), linspace(-2*lim, 2*lim, numPoints)); % Horizontal lines
-[yV, xV] = meshgrid(linspace(-2*lim, 2*lim, numLines), linspace(-lim, lim, numPoints)); % Vertical lines
+[xH, yH] = meshgrid(linspace(-lim, lim, numLines), linspace(-lim, lim, numPoints)); % Horizontal lines
+[yV, xV] = meshgrid(linspace(-lim, lim, numLines), linspace(-lim, lim, numPoints)); % Vertical lines
 
 % Compute transformed coordinates
 xHtr = zeros(size(xH)); yHtr = zeros(size(yH));
 xVtr = zeros(size(xV)); yVtr = zeros(size(yV));
 zxHtr = zeros(size(xH)); zyHtr = zeros(size(yH));
 zxVtr = zeros(size(xV)); zyVtr = zeros(size(yV));
-[xHtr(1), yHtr(1)] = PhiBar([xH(1);yH(1)],TinOd,sigmaSquared);
-[xVtr(1), yVtr(1)] = PhiBar([xV(1);yV(1)],TinOd,sigmaSquared);
-[zxHtr(1), zyHtr(1)] = PhiBarInv2([xH(1);yH(1)],TinOd,sigmaSquared,[0;0]);
-[zxVtr(1), zyVtr(1)] = PhiBarInv2([xV(1);yV(1)],TinOd,sigmaSquared,[0;0]);
-for i=2:length(xH(:))
-    [xHtr(i), yHtr(i)] = PhiBar([xH(i);yH(i)],TinOd,sigmaSquared);
-    [xVtr(i), yVtr(i)] = PhiBar([xV(i);yV(i)],TinOd,sigmaSquared);
+for i=1:length(xH(:))
+    [xHtr(i), yHtr(i)] = kronPolyEval(Tbal,[xH(i);yH(i)]);
+    [xVtr(i), yVtr(i)] = kronPolyEval(Tbal,[xV(i);yV(i)]);
     
-    [zxHtr(i), zyHtr(i)] = PhiBarInv2([xH(i);yH(i)],TinOd,sigmaSquared,[zxHtr(i-1); zyHtr(i-1)]);
-    [zxVtr(i), zyVtr(i)] = PhiBarInv2([xV(i);yV(i)],TinOd,sigmaSquared,[zxVtr(i-1); zyVtr(i-1)]);
+    [zxHtr(i), zyHtr(i)] = kronPolyEval(TbalInv,[xH(i);yH(i)]);
+    [zxVtr(i), zyVtr(i)] = kronPolyEval(TbalInv,[xV(i);yV(i)]);
 end
 
 % Generate figure
@@ -122,13 +135,15 @@ axis equal;
 
 %% Simulate dynamics
 % Compare original dynamics with transformed dynamics
-F = @(x) FofXU(x,0);
-Ft = @(z) PhiBarJacobian(z,TinOd,sigmaSquared)\FofXU(PhiBar(z,TinOd,sigmaSquared),0);
+F = @(x) kronPolyEval(f, x);
+Ft = @(x) kronPolyEval(fbal, x);
 
-x0 = [1 1].'*(0.25*lim);
+x0 = [1 1].'*(0.5*lim);
 
 % Solve for z0 initial condition with a Newton type iteration
-z0 = newtonIteration(x0, @(z) PhiBar(z,TinOd,sigmaSquared), @(z) PhiBarJacobian(z,TinOd,sigmaSquared),maxIter=100,verbose=true);
+z0 = kronPolyEval(TbalInv,x0);
+fprintf(['\n         -> Initial condition: z0 = [', repmat('%2.2e ', 1, numel(z0)), '], '], z0)
+fprintf('       error: %2.2e \n', norm(kronPolyEval(Tbal,z0)-x0))
 
 % Simulate both systems
 [~, X1] = ode45(@(t, x) F(x), [0, 5], x0);
@@ -143,22 +158,16 @@ plot(Z(:,1),Z(:,2),'r--','LineWidth',1.5)
 nexttile(4)
 plot(Z(:,1),Z(:,2),'r--','LineWidth',1.5)
 
-
 %% Transform Z trajectory into X coordinates to compare
 X2 = zeros(size(Z));
 for i = 1:length(Z)
-    X2(i,:) = PhiBar(Z(i,:).',TinOd,sigmaSquared);
+    X2(i,:) = kronPolyEval(Tbal,Z(i,:).');
 end
 
 nexttile(1)
 plot(X2(:,1),X2(:,2),'r--','LineWidth',1.5)
 nexttile(3)
 plot(X2(:,1),X2(:,2),'r--','LineWidth',1.5)
-end
-
-function [zbar1, zbar2] = PhiBarInv2(x,TinOd,sigmaSquared,zinit)
-zbar = newtonIteration(x, @(z) PhiBar(z,TinOd,sigmaSquared,maxIter=1000,tol=1e-12), ...
-    @(z) PhiBarJacobian(z,TinOd,sigmaSquared,maxIter=1000,tol=1e-12),maxIter=1000,tol=1e-12,z0=zinit);
-zbar1 = zbar(1); zbar2 = zbar(2);
+drawnow
 end
 

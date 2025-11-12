@@ -44,7 +44,6 @@ end
 
 %% Get system dynamics
 [f, g, h] = getSystem2(true);  % Kawano model
-% f = {f{1},0*f{2}};
 
 %%  Compute the energy functions
 fprintf(" ~~~~~~~~~~~~~~~~~~~~~~~~~ Computing energy functions:  ~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
@@ -70,8 +69,8 @@ xVtr = zeros(size(xV)); yVtr = zeros(size(yV));
 zxHtr = zeros(size(xH)); zyHtr = zeros(size(yH));
 zxVtr = zeros(size(xV)); zyVtr = zeros(size(yV));
 for i=1:length(xH(:))
-    [xHtr(i), yHtr(i)] = PhiBar2([xH(i);yH(i)],TinOd,sigmaSquared);
-    [xVtr(i), yVtr(i)] = PhiBar2([xV(i);yV(i)],TinOd,sigmaSquared);
+    [xHtr(i), yHtr(i)] = PhiBar([xH(i);yH(i)],TinOd,sigmaSquared);
+    [xVtr(i), yVtr(i)] = PhiBar([xV(i);yV(i)],TinOd,sigmaSquared);
     
     [zxHtr(i), zyHtr(i)] = PhiBarInv2([xH(i);yH(i)],TinOd,sigmaSquared);
     [zxVtr(i), zyVtr(i)] = PhiBarInv2([xV(i);yV(i)],TinOd,sigmaSquared);
@@ -149,13 +148,6 @@ plot(X2(:,1),X2(:,2),'r--','LineWidth',1.5)
 xlim([-1.4616    2.1246])
 ylim([-1.9309    1.7470])
 drawnow
-end
-
-
-
-function [x1, x2] = PhiBar2(zbar,TinOd,sigmaSquared)
-x = PhiBar(zbar,TinOd,sigmaSquared);
-x1 = x(1); x2 = x(2);
 end
 
 function [zbar1, zbar2] = PhiBarInv2(x,TinOd,sigmaSquared)

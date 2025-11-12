@@ -1,7 +1,7 @@
-function runExample12_newtonIteration(degree,lim)
-%runExample12_newtonIteration Runs the 2D Fujimoto/Scherpen example to visualize the nonlinear balancing transformations.
+function runExample12_balancingTransformation(degree,lim)
+%runExample12_balancingTransformation Runs the 2D Fujimoto/Scherpen example to visualize the nonlinear balancing transformations.
 %
-%   Usage:  runExample12_newtonIteration(degree,lim)
+%   Usage:  runExample12_balancingTransformation(degree,lim)
 %
 %   Inputs:    degree - desired degree of the energy function approximation
 %                 lim - the size of the grid in the z coordinates
@@ -54,17 +54,9 @@ end
 
 %% Get system dynamics
 [f, g, h] = getSystem12(degree - 1, false);  % Scherpen model
-f{1} = full(f{1}); g{1} = full(g{1}); h{1} = full(h{1});
 
-%%  Compute the energy functions
-fprintf(" ~~~~~~~~~~~~~~~~~~~~~~~~~ Computing energy functions:  ~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
-eta = 0;
-[v] = approxPastEnergy(f, g, h, eta, degree, false);
-[w] = approxFutureEnergy(f, g, h, eta, degree, false);
-
-%% Compute the input-normal/output-diagonal transformation approximation, also giving the squared singular value functions
-fprintf(" ~~~~~~~~~~~ Computing balancing transformation:  ~~~~~~~~~~~~ \n")
-Tbal = balancingTransformation(v, w, degree - 1, true);
+%% Compute balanced realization
+[fbal,gbal,hbal,Tbal] = getBalancedRealization(f,g,h,eta=0,degree=degree-1);
 TbalInv = transformationInverse(Tbal);
 
 %% Plot grid transformations
@@ -81,11 +73,11 @@ xVtr = zeros(size(xV)); yVtr = zeros(size(yV));
 zxHtr = zeros(size(xH)); zyHtr = zeros(size(yH));
 zxVtr = zeros(size(xV)); zyVtr = zeros(size(yV));
 for i=1:length(xH(:))
-    [xHtr(i), yHtr(i)] = PhiBar2([xH(i);yH(i)],Tbal);
-    [xVtr(i), yVtr(i)] = PhiBar2([xV(i);yV(i)],Tbal);
+    [xHtr(i), yHtr(i)] = kronPolyEval(Tbal,[xH(i);yH(i)]);
+    [xVtr(i), yVtr(i)] = kronPolyEval(Tbal,[xV(i);yV(i)]);
     
-    [zxHtr(i), zyHtr(i)] = PhiBarInv2([xH(i);yH(i)],TbalInv);
-    [zxVtr(i), zyVtr(i)] = PhiBarInv2([xV(i);yV(i)],TbalInv);
+    [zxHtr(i), zyHtr(i)] = kronPolyEval(TbalInv,[xH(i);yH(i)]);
+    [zxVtr(i), zyVtr(i)] = kronPolyEval(TbalInv,[xV(i);yV(i)]);
 end
 
 % Generate figure
@@ -123,18 +115,14 @@ axis equal;
 %% Simulate dynamics
 % Compare original dynamics with transformed dynamics
 F = @(x) kronPolyEval(f, x);
-% Ft = @(z) jcbn(Tbal,z)\kronPolyEval(f, kronPolyEval(Tbal,z));
-Ft = @(z) jcbn(TbalInv,z)*kronPolyEval(f, kronPolyEval(Tbal,z));
+Ft = @(x) kronPolyEval(fbal, x);
 
 x0 = [1 1].'*(0.2*lim);
 
 % Solve for z0 initial condition with a Newton type iteration
-z0 = newtonIteration(x0, @(z) kronPolyEval(Tbal,z), @(z) jcbn(Tbal,z),maxIter=100,verbose=true);
-
-% Solve for z0 initial condition using transformationInverse()
-z02 = kronPolyEval(TbalInv,x0);
-fprintf(['\n         -> Initial condition: z0 = [', repmat('%2.2e ', 1, numel(z02)), '], '], z02)
-fprintf('       error: %2.2e \n', norm(kronPolyEval(Tbal,z02)-x0))
+z0 = kronPolyEval(TbalInv,x0);
+fprintf(['\n         -> Initial condition: z0 = [', repmat('%2.2e ', 1, numel(z0)), '], '], z0)
+fprintf('       error: %2.2e \n', norm(kronPolyEval(Tbal,z0)-x0))
 
 % Simulate both systems
 [~, X1] = ode45(@(t, x) F(x), [0, 5], x0);
@@ -160,16 +148,5 @@ nexttile(1)
 plot(X2(:,1),X2(:,2),'r--','LineWidth',1.5)
 nexttile(3)
 plot(X2(:,1),X2(:,2),'r--','LineWidth',1.5)
-end
-
-
-function [x1, x2] = PhiBar2(zbar,Tbal)
-x = kronPolyEval(Tbal,zbar);
-x1 = x(1); x2 = x(2);
-end
-
-function [zbar1, zbar2] = PhiBarInv2(x,TbalInv)
-% zbar = newtonIteration(x, @(z) kronPolyEval(Tbal,z), @(z) jcbn(Tbal,z),maxIter=100);
-zbar = kronPolyEval(TbalInv,x);
-zbar1 = zbar(1); zbar2 = zbar(2);
+drawnow
 end

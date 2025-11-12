@@ -55,18 +55,21 @@ fsym = [-x(1) + 100*x(3);
 gsym = [1;1;1];
 hsym = x(1)+x(2)+x(3);
 
-[f, g, h] = approxPolynomialDynamics(fsym, gsym, hsym, x, 3);
+[f, g, h] = approxPolynomialDynamics(fsym, gsym, hsym, x, 1);
 
 if nvp.transform
-% The balanced realization is a 2D plane in a 3D space for this linear
-% system. Imagine curving that 2D plane into a manifold; that is what we
-% will do here. To start, let's compute that 2D balanced subspace 
-L = lyapchol(f{1},g{1}); R = lyapchol(f{1}.',h{1}.');
-[U,S,V] = svd(L*R.');
-T = {invertibleMatrix(L.' * U / S.^(1/2), S.^(1/2) \ V.' * R)};
+    % The balanced realization is a 2D plane in a 3D space for this linear
+    % system. Imagine curving that 2D plane into a manifold; that is what we
+    % will do here. To start, let's compute that balanced realization.
+    [fbal,gbal,hbal,Tbal] = getBalancedRealization(f,g,h,eta=0,degree=1);
 
+    % Now we will transform by the coordinate transformation 
+    %        x = 𝟁(z) = [z₁;   z₂;   z₃ + z₁² + z₂² + z₁³]
 
-[ft, gt, ht] = transformDynamics(f, g, h, T);
+    a = 1; z = sym('z', [1, n]).'; 
+    [Tnl,~,~] = approxPolynomialDynamics([z(1); z(2); z(3) + a*(z(1)^2 + z(2)^2) + a*(z(1)^3)], gsym, z(1), z, 6);
+    
+    [f,g,h] = transformDynamics(fbal,gbal,hbal,Tnl);
 
 end
 

@@ -84,8 +84,8 @@ xVtr = zeros(size(xV)); yVtr = zeros(size(yV));
 zxHtr = zeros(size(xH)); zyHtr = zeros(size(yH));
 zxVtr = zeros(size(xV)); zyVtr = zeros(size(yV));
 for i=1:length(xH(:))
-    [xHtr(i), yHtr(i)] = PhiBar2([xH(i);yH(i)],TinOd,sigmaSquared);
-    [xVtr(i), yVtr(i)] = PhiBar2([xV(i);yV(i)],TinOd,sigmaSquared);
+    [xHtr(i), yHtr(i)] = PhiBar([xH(i);yH(i)],TinOd,sigmaSquared);
+    [xVtr(i), yVtr(i)] = PhiBar([xV(i);yV(i)],TinOd,sigmaSquared);
     
     [zxHtr(i), zyHtr(i)] = PhiBarInv2([xH(i);yH(i)],TinOd,sigmaSquared);
     [zxVtr(i), zyVtr(i)] = PhiBarInv2([xV(i);yV(i)],TinOd,sigmaSquared);
@@ -157,12 +157,6 @@ nexttile(1)
 plot(X2(:,1),X2(:,2),'r--','LineWidth',1.5)
 nexttile(3)
 plot(X2(:,1),X2(:,2),'r--','LineWidth',1.5)
-end
-
-
-function [x1, x2] = PhiBar2(zbar,TinOd,sigmaSquared)
-x = PhiBar(zbar,TinOd,sigmaSquared);
-x1 = x(1); x2 = x(2);
 end
 
 function [zbar1, zbar2] = PhiBarInv2(x,TinOd,sigmaSquared)
