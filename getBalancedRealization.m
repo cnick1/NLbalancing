@@ -126,7 +126,7 @@ end
 %        ż̄ = f̃(z̄) + g̃(z̄) u, y = h̃(z̄)
 % The function transformDynamics() computes an approximate polynomial expansion
 % for the transformed dynamics without inverting the nonlinear Jacobian.
-[fbal,gbal,hbal] = transformDynamics(f,g,h,Tbal);
+[fbal,gbal,hbal] = transformDynamics(f,g,h,Tbal,degree=nvp.degree);
 
 if nvp.verbose
     fprintf("\n  - Transformed Drift Dynamics:\n\n")

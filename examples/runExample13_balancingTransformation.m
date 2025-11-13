@@ -57,7 +57,7 @@ fprintf("\n  - FOM dynamics:\n\n")
 dispKronPoly(f)
 
 fprintf("\n  - Balanced dynamics:\n\n")
-dispKronPoly(fbal,degree=4)
+dispKronPoly(fbal,degree=degree-1)
 
 fprintf("\n  - Energy Functions:\n\n")
 dispKronPoly(v,n=2),dispKronPoly(w,n=2)

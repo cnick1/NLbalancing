@@ -1,4 +1,4 @@
-function runExample32_balancingTransformation(degree,lim)
+function runExample32_balancingTransformation(degree,lim,reduction)
 %runExample32_balancingTransformation Runs the 2D pendulum example to visualize the nonlinear balancing transformations.
 %
 %   Usage:  runExample32_balancingTransformation(degree,lim)
@@ -37,16 +37,15 @@ function runExample32_balancingTransformation(degree,lim)
 %   Part of the NLbalancing repository.
 %%
 % close all;
+arguments
+    degree = 4
+    lim = 1
+    reduction = true
+end
 set(groot,'defaultLineLineWidth',1,'defaultTextInterpreter','TeX')
 
 fprintf('Running Example 32\n')
 
-if nargin < 2
-    lim = 3.25;
-    if nargin < 1
-        degree = 4;
-    end
-end
 
 %% Get system dynamics
 [f, g, h] = getSystem32(transform=true);
@@ -59,15 +58,15 @@ TbalInv = transformationInverse(Tbal);
 [v] = approxPastEnergy(f, g, h, 0, degree);
 [w] = approxFutureEnergy(f, g, h, 0, degree);
 [~, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree-1);
-[finOd,ginOd,hinOd] = transformDynamics(f,g,h,TinOd);
+[finOd,ginOd,hinOd] = transformDynamics(f,g,h,TinOd,degree=degree-1);
 [vbal, wbal] = transformEnergyFunctions(v,w,Tbal);
 [vinOd, winOd] = transformEnergyFunctions(v,w,TinOd);
 
 fprintf("\n  - FOM dynamics:\n\n")
-dispKronPoly(f)
+dispKronPoly(f,degree=degree-1)
 
 fprintf("\n  - Balanced dynamics:\n\n")
-dispKronPoly(fbal,degree=degree)
+dispKronPoly(fbal,degree=degree-1)
 
 fprintf("\n  - Energy Functions:\n\n")
 dispKronPoly(v,n=3),dispKronPoly(w,n=3)
@@ -79,5 +78,92 @@ fprintf("\n  - Balanced energy Functions:\n\n")
 dispKronPoly(vbal,n=3),dispKronPoly(wbal,n=3)
 
 
+%% Simulate dynamics
+% Compare original dynamics with transformed dynamics
+F = @(x) kronPolyEval(f, x);
+Fbal = @(z) kronPolyEval(fbal, z);
+x0 = [1 1 1].'*.05*lim;
+
+%% Simulate original and transformed systems; same input should give same output
+% Solve for z0 initial condition with a Newton type iteration
+z0 = kronPolyEval(TbalInv,x0);
+fprintf(['\n         -> Initial condition: z0 = [', repmat('%2.2e ', 1, numel(z0)), '], '], z0)
+fprintf('       error: %2.2e \n', norm(kronPolyEval(Tbal,z0)-x0))
+
+%% Apply reduction by eliminating z3 (set it and its derivative to zero)
+if reduction
+    z0 = [z0(1:2); 0];
+    Fbaltemp = @(z) kronPolyEval(fbal, z);
+    Ir = eye(3); Ir(end) = 0;
+    Fbal = @(z) Ir*Fbaltemp(z);
 end
 
+% Simulate both systems
+[t1, X1] = ode45(@(t, x) F(x), [0, 5], x0);
+[t2, Z2] = ode45(@(t, z) Fbal(z), [0, 5], z0);
+
+% Convert z trajectories to x coordinates
+X2 = zeros(size(Z2));
+for i=1:length(t2)
+    X2(i,:) = kronPolyEval(Tbal,Z2(i,:).');
+end
+
+% Compute the output for the two trajectories
+y1 = zeros(size(t1));
+for i=1:length(t1)
+    y1(i) = kronPolyEval(h,X1(i,:).');
+end
+y2 = zeros(size(t2));
+for i=1:length(t2)
+    y2(i) = kronPolyEval(hbal,Z2(i,:).');
+end
+
+% Plot state trajectories
+figure('Position', [827 220 560 420]);
+subplot(2,1,1); hold on;
+plot(t1,X1)
+plot(t2,X2,'--')
+
+title('Reconstructed state trajectories'); xlabel('Time t')
+ylabel('x_i(t)')
+legend('FOM x_1','FOM x_2','FOM x_3','ROM x_1','ROM x_2','ROM x_3')
+
+% Plot outputs
+subplot(2,1,2); hold on;
+plot(t1,y1)
+plot(t2,y2,'--')
+
+title('Model output'); xlabel('Time t')
+ylabel('y(t)')
+legend('FOM output','ROM output')
+
+fprintf('The output error is: %f \n', norm(interp1(t2, y2, 0:.1:5) - interp1(t1, y1, 0:.1:5)))
+
+%% Manifold figure plot 
+dx = 0.05; lim = 2;
+[z1,z2,z3] = meshgrid(-lim:dx:lim,-lim:dx:lim,0);
+x1 = zeros(size(z1)); x2 = x1; x3 = x1;
+for i=1:numel(z1) 
+    [x1(i), x2(i), x3(i)] = kronPolyEval(Tbal,[z1(i);z2(i);z3(i)]);
+end
+
+figure; 
+surf(z1,z2,z3)
+figure; 
+surf(x1,x2,x3)
+drawnow 
+return
+%% 
+global T0; opts = odeset(OutputFcn=@odeprog); T0 = tic;
+[T, Z] = ode45(@(t, z) (Az*z + Bz*randn(1)), [0, 50], [0;0;0],opts);
+X = zeros(size(Z)); Z = 100*Z;
+for i=1:length(T)
+    X(i,:) = [Z(i,1), Z(i,2), Z(i,3) - a*(Z(i,1)^2 + Z(i,2)^2) - a*Z(i,1)^3];
+end
+
+hold on;
+plot3(X(:,1),X(:,2),X(:,3),'r')
+xlabel('x_1'); ylabel('x_2'); zlabel('x_3')
+title('Balanced manifold and white noise response')
+
+function status = odeprog(t, y, flag)

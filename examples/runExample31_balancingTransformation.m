@@ -69,7 +69,7 @@ fprintf("\n  - FOM dynamics:\n\n")
 dispKronPoly(f)
 
 fprintf("\n  - Balanced dynamics:\n\n")
-dispKronPoly(fbal,degree=degree)
+dispKronPoly(fbal,degree=degree-1)
 
 fprintf("\n  - Energy Functions:\n\n")
 dispKronPoly(v,n=2),dispKronPoly(w,n=2)
@@ -85,8 +85,8 @@ dispKronPoly(vbal,n=2),dispKronPoly(wbal,n=2)
 numLines = 41; numPoints = 201;
 
 % Generate original coordinates
-[xH, yH] = meshgrid(linspace(-lim, lim, numLines), linspace(-lim, lim, numPoints)); % Horizontal lines
-[yV, xV] = meshgrid(linspace(-lim, lim, numLines), linspace(-lim, lim, numPoints)); % Vertical lines
+[xH, yH] = meshgrid(linspace(-lim, lim, numLines), linspace(-2*lim, 2*lim, numPoints)); % Horizontal lines
+[yV, xV] = meshgrid(linspace(-2*lim, 2*lim, numLines), linspace(-lim, lim, numPoints)); % Vertical lines
 
 % Compute transformed coordinates
 xHtr = zeros(size(xH)); yHtr = zeros(size(yH));
@@ -138,7 +138,7 @@ axis equal;
 F = @(x) kronPolyEval(f, x);
 Ft = @(x) kronPolyEval(fbal, x);
 
-x0 = [1 1].'*(0.5*lim);
+x0 = [1 1].'*(0.25*lim);
 
 % Solve for z0 initial condition with a Newton type iteration
 z0 = kronPolyEval(TbalInv,x0);

@@ -29,13 +29,14 @@ runExample12_newtonIteration(4)
 % This example is actually nice because the balanced realization is linear;
 % we can probably work out what the original model was that they
 % transformed using a nonlinear transformation. In fact, the balancing
-% transformation computes the precise transformation we need :) 
+% transformation computes the precise transformation we need ☺
 runExample13_balancingTransformation(2)
 runExample13_balancingTransformation(4)
 runExample13_newtonIteration(4)
 
 % Double pendulum gradient system
-runExample14_newtonIteration(2)
+runExample14_balancingTransformation(2)
+runExample14_balancingTransformation(4)
 runExample14_newtonIteration(4)
 
 % Stable damped pendulum (this one is nice)

@@ -67,9 +67,9 @@ if nvp.transform
     %        x = 𝟁(z) = [z₁;   z₂;   z₃ + z₁² + z₂² + z₁³]
 
     a = 1; z = sym('z', [1, n]).'; 
-    [Tnl,~,~] = approxPolynomialDynamics([z(1); z(2); z(3) + a*(z(1)^2 + z(2)^2) + a*(z(1)^3)], gsym, z(1), z, 6);
+    [Tnl,~,~] = approxPolynomialDynamics([z(1); z(2); z(3) + a*(z(1)^2 + z(2)^2) + a*(z(1)^3)], gsym, z(1), z, 3);
     
-    [f,g,h] = transformDynamics(fbal,gbal,hbal,Tnl);
+    [f,g,h] = transformDynamics(fbal,gbal,hbal,Tnl,degree=5);
 
 end
 
