@@ -1,5 +1,6 @@
 function [Tout] = composeTransformations(T1,T2,varargin)
 %composeTransformations Combines polynomial transformations into one: x = Tᵒᵘᵗ(z) = T₁(T₂(...Tₙ(z)))
+% DEPRECATED; replace with composePolynomials instead
 %
 %   Usage: [Tout] = composeTransformations(T1,T2)
 %
@@ -55,7 +56,7 @@ function [Tout] = composeTransformations(T1,T2,varargin)
 %
 %   Authors: Nick Corbin, UCSD
 %
-
+error('This function is deprecated, use <a href="matlab:open composePolynomials">composePolynomials</a> instead.')
 ld = length(T1);
 n = length(T1{1});
 

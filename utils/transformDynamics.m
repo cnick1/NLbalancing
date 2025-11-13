@@ -1,4 +1,4 @@
-function [ft, gt, ht] = transformDynamics(f, g, h, T)
+function [ft, gt, ht] = transformDynamics(f, g, h, T, nvp)
 %transformDynamics Transform the control-affine dynamic model given by f, g, h by transformation T.
 %   This function returns the expansions for the transformed dynamics in the form
 %       ż = f̃(z) + g̃(z) u, y = h̃(z)
@@ -16,16 +16,13 @@ function [ft, gt, ht] = transformDynamics(f, g, h, T)
 %                  for the transformed drift, input, and output.
 %
 %   Description: Given a transformation x = Φ(z), we seek to represent the
-%   dynamics for the control-affine system
-%        ẋ = f(x) + g(x) u
-%        y = h(x)
-%   in the new coordinates as
-%        ż = f̃(z) + g̃(z) u
-%        y = h̃(z)
+%   dynamics for the control-affine system in the new coordinates as
+%            ẋ = f(x) + g(x) u,      ->       ż = f̃(z) + g̃(z) u,
+%            y = h(x),               ->       y = h̃(z).
 %   In general, it may not be possible to do this exactly. Applying the
 %   transformation yields
-%        ∂Φ(z)/∂z ż = f(Φ(z)) + g(Φ(z)) u
-%                 y = h(Φ(z))
+%           ∂Φ(z)/∂z ż = f(Φ(z)) + g(Φ(z)) u                         (1)
+%                    y = h(Φ(z))
 %   and we do not in general have an exact way to write [∂Φ(z)/∂z]⁻¹. In this
 %   function, we will approximate the functions f̃(z), g̃(z), h̃(z) by computing
 %   their Taylor expansions. This can be done exactly for linear transformations
@@ -35,9 +32,37 @@ function [ft, gt, ht] = transformDynamics(f, g, h, T)
 %   only ever have to invert T₁, which we may have a closed-form analytical
 %   expression for.
 %
-%   Inserting the expansions for f̃(z) and g̃(z), we can proceed to collect
-%   terms of the same degree, leading to the formulas for the coefficients for
-%   f̃(z) & g̃(z).
+%   Inserting ż = f̃(z) + g̃(z) u into (1), we obtain
+%           ∂Φ(z)/∂z (f̃(z) + g̃(z) u) = f(Φ(z)) + g(Φ(z)) u           (2)
+%                                  y = h(Φ(z))
+%   From here, we can expand everything as polynomials and match terms of
+%   the same degree:
+%           ∂Φ(z)/∂z f̃(z) = f(Φ(z)),
+%           ∂Φ(z)/∂z g̃(z) = g(Φ(z)),
+%                    h̃(z) = h(Φ(z)).
+%   The polynomial expansions for these quantities are 
+%           ∂Φ(z)/∂z = T₁ + 2T₂(I⊗x) + ... + d Td(I...⊗x)
+%           f̃(z)     = F̃₁x + F̃₂(z⊗z) + ... + F̃d(z...⊗z)
+%           f(Φ(z))  = F₁z + F₂(z⊗z) + ... + Fd(z...⊗z)
+%           g̃(z)     = G̃₁x + G̃₂(z⊗z) + ... + G̃d(z...⊗z)
+%           g(Φ(z))  = G₁z + G₂(z⊗z) + ... + Gd(z...⊗z)
+%           h̃(z) = h(Φ(z)) = H₁z + H₂(z⊗z) + ... + Hd(z...⊗z)
+%
+%   After matching the terms of the same degree, the following expressions
+%   are found for the coefficients F̃ₖ and G̃ₖ:
+%                __________________________________
+%               |                ₖ                 |
+%               |   F̃ₖ = T⁻¹(Fₖ - ∑ Tᵢℒᵢ(F̃ₖ₋ᵢ₋₁)   |                  (3)
+%         ->    |_______________ⁱ⁼²_______________|
+%               |               ₖ₊₁                |
+%               |   G̃ₖ = T⁻¹(Gₖ - ∑ Tᵢℒᵢ(G̃ₖ₋ᵢ₋₁)   |                  (4)
+%               |_______________ⁱ⁼²_______________|
+%
+%   The procedure is therefore:
+%       Step 1) Compute f(Φ(z)), g(Φ(z)), h(Φ(z)) as the compositions
+%               of polynomials; after this, we already have h̃(z)
+%       Step 2) Compute the coefficients of f̃(z), g̃(z) by matching
+%               terms on the left and right
 %
 %   Authors: Nick Corbin, UCSD
 %
@@ -48,74 +73,75 @@ arguments
     g
     h
     T
+    nvp.degree = []
 end
 vec = @(X) X(:);
 
 ld = length(T);
-[n,m] = size(g{1}); [p,n] = size(h{1});
+[n,m] = size(g{1});
 
-lf = length(f); lg = length(g); lh = length(h);
-ft = cell(size(f)); gt = cell(size(g)); ht = cell(size(h));
+lf = length(f); lg = length(g);
 
-%% Transform drift f(x)
-for i = 1:lf*ld
-    ft{i} = sparseIJV(n,n^i);
-    % See Lemma 1 in my SCL paper: Ptilde_i = sum_j^i Pj cT_j,i
-    % Note: index backwards so that if you only have e.g. T1 you can move on
-    for j=flip(1:i)
-        if j > lf; continue; end % skip if requesting fj that doesn't exist
-        if (i-j)-ld>=0; break; end % skip if requesting T that doesn't exist
-        ft{i} = ft{i} + calTTv(T, j, i, f{j}.').';
+%% Step 1) Compute transformed f(Φ(z)), g(Φ(z)), h̃(z) = h(Φ(z))
+% Transform drift f(x)
+ft = composePolynomials(f,T,degree=nvp.degree);
+
+% Transform input map g(x)
+gt = cell(1,max(max(1,lg-1)*ld,lf*ld));
+gt{1} = g{1}; % B is not state dependent
+
+if lg > 1 % If g(x) = B, we're done
+    % Convert g(x) to ∑ gᵢ(x)
+    g_i = cell(m,lg*ld);
+    for i=1:m
+        for j=1:(lg-1)
+            g_i{i,j+1} = g{j+1}(:,i:m:end);
+        end
     end
-end
 
-%% Transform input map g(x)
-% Instead of dealing with g(x) matrix directly, deal with g_i(x) vectors so
-% I can use the same code as for f(x). So loop over m input channels, use gttemp,
-% and convert to gt after
-gttemp = cell(length(g),m);
-for k = 1:m
-    for i = 1:(lg-1) % This internal code block is just above for f(x)
-        gttemp{i+1,k} = zeros(n,n^i);
-        for j=flip(1:i)  % See Lemma 1 in my SCL paper: Ptilde_i = sum_j^i Pj cT_j,i
-            if (i-j)-ld>=0; break; end
-            gttemp{i+1,k} = gttemp{i+1,k} + calTTv(T, j, i, g{j+1}(:,k:m:end).').'; % k:m:end needed for converting from g(x)u to sum g_i(x) u_i
+    % Transform gᵢ(x)
+    for i=1:m
+        gtemp = composePolynomials(g_i(i,2:lg),T,degree=nvp.degree);
+        g_i(i,2:length(gtemp)+1) = gtemp;
+    end
+
+    % Now convert transformed ∑ gᵢ(x) vectors back to g(x) matrix
+    for j=1:min((lg-1),nvp.degree)
+        gt{j+1} = zeros(n,m*n^j);
+        for i=1:m
+            gt{j+1}(:,i:m:end) = g_i{i,j+1};
         end
     end
 end
 
-% Now convert from g_i(x) vectors back to g(x) matrix
-gt{1} = g{1}; % B is not state dependent
-for i=1:(lg-1)
-    gt{i+1} = zeros(n,m*n^i);
-    for kk=1:m
-        gt{i+1}(:,kk:m:end) = gttemp{i+1,kk};
+% Transform output map h(x)
+ht = composePolynomials(h,T,degree=nvp.degree);
+
+%% Step 2) Compute f̃(z), g̃(z)
+% Rather than multiply by the inverse of the Jacobian, we do a coefficient
+% matching that leads to the following sets of terms that need to be combined.
+%  Note: If the analytical inverse of T{1} is known, use the invertibleMatrix
+%  class to pass it, which overloads the matrix inversion
+
+% Decide on the order of the dynamics
+if isempty(nvp.degree)
+    nvp.degree = lf; % The transformed ft, gt above are already this high
+    % nvp.degree = max(lf*ld, (lg-1)*ld); % The transformed ft, gt above are already this high
+    % nvp.degree = max(lf*ld*ld, (lg-1)*ld*ld); % It is known that the degree can be at least this high
+    if nvp.degree > 1
+        warning('Polynomial truncation degree set automatically; there may be neglected higher-order terms. ')
     end
 end
-
-%% Transform output map h(x)
-for i = 1:lh
-    ht{i} = zeros(p,n^i);
-    for j=flip(1:i)  % See Lemma 1 in my SCL paper: Ptilde_i = sum_j^i Pj cT_j,i
-        if (i-j)-ld>=0; break; end
-        ht{i} = ht{i} + calTTv(T, j, i, h{j}.').';
-    end
-end
-
-%% Need to multiply state equation by "inverse of Jacobian", i.e. projection
-% In practice we do not actually multiply by the inverse of the Jacobian,
-% we do a coefficient matching that leads to the following sets of terms
-% that need to be combined.
-
-% If the analytical inverse of T{1} is known, use the invertibleMatrix
-% class to pass it and overload the matrix inversion
 
 % Drift f(x)
-for k = 1:lf
+for k = 1:nvp.degree
+    if k > length(ft) || isempty(ft{k})
+        ft{k} = sparse(n,n^k);
+    end
     for i = flip(2:k)                                       % Theoretical sum limits for F_p's; index backwards in i so that p indexes forwards
-        p = k + 1 - i;
+        p = k - i + 1;
         if i > ld; continue; end                            % Only run if Ti exists
-        if p > lf; break; end                               % Only run while we have F_p's left
+        if p > length(ft); break; end                       % Only run while we have F_p's left
         %%% Naive
         for ii=1:n
             ft{k}(ii,:) = ft{k}(ii,:) - LyapProduct(ft{p}.', T{i}(ii,:).', i).';
@@ -125,12 +151,15 @@ for k = 1:lf
 end
 
 % Input map g(x)
-for k = 0:lg-1                                              % 0:lg-1 to deal with zero indexing of Gs
+for k = 0:nvp.degree-1                                      % lg-1 to deal with zero indexing of Gs
+    if k+1 > length(gt) || isempty(gt{k+1})
+        gt{k+1} = sparse(n,m*n^k);
+    end
     for i = flip(2:k+1)                                     % Theoretical sum limits for G_p's; index backwards in i so that p indexes forwards
         for jj=1:m
-            p = k + 1 - i +1;                                   % Additional +1 to deal with zero indexing of Gs
-            if i > ld; continue; end                            % Only run if Ti exists
-            if p > lg; break; end                               % Only run while we have G_p's left
+            p = k - i + 1 +1;                               % Additional +1 to deal with zero indexing of Gs
+            if i > ld; continue; end                        % Only run if Ti exists
+            if p > length(gt); break; end                   % Only run while we have G_p's left
             %%% Naive
             for ii=1:n
                 gt{k+1}(ii,jj:m:end) = gt{k+1}(ii,jj:m:end) - LyapProduct(gt{p}(:,jj:m:end).', T{i}(ii,:).', i).';
@@ -142,4 +171,10 @@ end
 
 % output equation does not get this treatment
 
+%% Truncate to the desired degree
+% Could probably avoid computing anything higher than the desired degree if
+% it is provided
+ft = ft(1:min(nvp.degree,length(ft)));
+gt = gt(1:min(nvp.degree,length(gt)));
+ht = ht(1:min(nvp.degree,length(ht)));
 end
