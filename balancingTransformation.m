@@ -54,7 +54,7 @@ function [Tbal] = balancingTransformation(v, w, degree, verbose)
 %
 %   Part of the NLbalancing repository.
 %
-%   See also: approxPastEnergy, approxFutureEnergy, inputNormalOutputDiagonalTransformation, composeTransformations
+%   See also: approxPastEnergy, approxFutureEnergy, inputNormalOutputDiagonalTransformation, composePolynomials
 %%
 arguments
     v
@@ -65,7 +65,7 @@ end
 
 [sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree, verbose);
 [Tscal, TscalInv] = scalingTransformation(sigmaSquared, degree);
-Tbal = composeTransformations(TinOd, Tscal);
+Tbal = composePolynomials(TinOd, Tscal);
 
 end
 

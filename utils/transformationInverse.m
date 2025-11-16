@@ -18,7 +18,7 @@ function P = transformationInverse(T)
 %          Φ⁻¹(x)  =  P₁x + P₂(x⊗x) + ... + Pₖ(x...⊗x)                   (2)
 %
 %   By the definition of the inverse, Φ⁻¹(Φ(z)) = z, so by following a similar
-%   procedure to that described in composeTransformations, we can derive the
+%   procedure to that described in composePolynomials, we can derive the
 %   expressions for the inverse transformation coefficients P₁, P₂,..., Pₖ. The
 %   result of equating sets of terms of the same degree is
 %         O(z):   I = P₁𝓣₁,₁ = P₁T₁       ->   P₁ = T₁⁻¹

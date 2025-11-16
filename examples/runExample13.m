@@ -72,7 +72,7 @@ z = sym('z', [1, 2]).'; syms(z);
 Tin2 = {[1 0; 0 1], [0 0 0 -1; 0 0 0 0], zeros(2, 2 ^ 3)};
 TinOd2 = {[1, -1; 1, 1] ./ sqrt(2), zeros(2, 2 ^ 2), zeros(2, 2 ^ 3)};
 
-TGray = composeTransformations(Tin2, TinOd2);
+TGray = composePolynomials(Tin2, TinOd2);
 
 fprintf("    > The transformation supposed to be in Gray/Scherpen 2001 is: \n\n         𝚽(z) = ")
 % fprintf('%s \n', char(Tsym))

@@ -107,10 +107,10 @@ fprintf("                             ->  Example 3 results match.\n\n")
 ourFullTransformation = TinOd;
 
 % [ft, gt, ht] = transformDynamics(f, g, h, TinOd);
-% 
+%
 % for i=1:length(ft); ft{i}(abs(ft{i}) < 1e-14) = 0; end
 % disp(vpa(kronPolyEval(ft, sym('z', [1, 2]).',5), 2))
-% 
+%
 % for i=1:length(TinOd); ourFullTransformation{i}(abs(TinOd{i}) < 1e-14) = 0; end
 % vpa(kronPolyDerivEval(ourFullTransformation, sym('z', [1, 2]).',1), 2)
 
@@ -169,7 +169,7 @@ Tsym = [3 / sqrt(9 + (z1 ^ 2 + z2 ^ 2) ^ 2) * z1 - z2 * (z1 ^ 2 + z2 ^ 2) / sqrt
 [T1, ~, ~] = approxPolynomialDynamics(Tsym, [1; 1], z1, z, 5);
 T2 = TinOd;
 
-fujimotoFullTransformation = composeTransformations(T1, T2);
+fujimotoFullTransformation = composePolynomials(T1, T2);
 
 fprintf("    > Fujimoto/Scherpen 2010's full input-normal/output-diagonal transformation is: \n\n         𝚽(z) = ")
 disp(vpa(kronPolyEval(fujimotoFullTransformation, sym('z', [1, 2]).'), 4))
@@ -206,7 +206,7 @@ disp(vpa(kronPolyEval(what, sym('x', [1, 2]).'), 8))
 
 
 % [ft, gt, ht] = transformDynamics(f, g, h, TinOd);
-% 
+%
 % for i=1:length(ft); ft{i}(abs(ft{i}) < 1e-14) = 0; end
 % disp(vpa(kronPolyEval(ft, sym('z', [1, 2]).',5), 2))
 
