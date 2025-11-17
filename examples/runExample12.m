@@ -169,7 +169,7 @@ Tsym = [3 / sqrt(9 + (z1 ^ 2 + z2 ^ 2) ^ 2) * z1 - z2 * (z1 ^ 2 + z2 ^ 2) / sqrt
 [T1, ~, ~] = approxPolynomialDynamics(Tsym, [1; 1], z1, z, 5);
 T2 = TinOd;
 
-fujimotoFullTransformation = composePolynomials(T1, T2);
+fujimotoFullTransformation = composePolynomials(T1, T2, degree = degree-1);
 
 fprintf("    > Fujimoto/Scherpen 2010's full input-normal/output-diagonal transformation is: \n\n         𝚽(z) = ")
 disp(vpa(kronPolyEval(fujimotoFullTransformation, sym('z', [1, 2]).'), 4))

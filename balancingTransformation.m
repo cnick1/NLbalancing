@@ -65,7 +65,7 @@ end
 
 [sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree, verbose);
 [Tscal, TscalInv] = scalingTransformation(sigmaSquared, degree);
-Tbal = composePolynomials(TinOd, Tscal);
+Tbal = composePolynomials(TinOd, Tscal, degree=degree);
 
 end
 

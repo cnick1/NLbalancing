@@ -66,6 +66,7 @@ arguments (Repeating)
     varargin
 end
 arguments
+    % nvp.degree = length(P)
     nvp.degree = length(P) * length(T)
 end
 
