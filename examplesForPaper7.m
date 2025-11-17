@@ -44,3 +44,7 @@ runExample31_balancingTransformation(2)
 runExample31_balancingTransformation(4)
 runExample31_newtonIteration(4)
 
+% Holmes 3D model w/ nonlinear transformation
+runExample32_balancingTransformation(2)
+runExample32_balancingTransformation(4)
+runExample32_newtonIteration(4)

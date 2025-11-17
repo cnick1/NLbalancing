@@ -31,7 +31,19 @@ function [f, g, h] = getSystem32(nvp)
 %   As a linear model, this example can be used to validate that the
 %   nonlinear balanicng algorithms reduce to the established linear methods
 %   when applied to linear systems. However, we can also apply a nonlinear
-%   transformation to this model in order to produce a nonlinear model. 
+%   transformation to this model in order to produce a nonlinear model.
+%   Consider the following coordinate transformation, which we apply to the
+%   balanced realization of the model:
+%
+%           x = 𝟁(z) = [z₁;   z₂;   z₃ + z₁² + z₂² + z₁³]
+%
+%   The dynamics in the z coordinates are then
+%
+%   ż₁ = -0.739 z₁ + 1.57 z₂ - 0.172 z₃ - 0.172 z₁² - 0.172 z₂² - 0.172 z₁³ + 5.09 u
+%   ż₂ = -1.57 z₁ - 6.26 z₂ + 1.72 z₃ + 1.72 z₁² + 1.72 z₂² + 1.72 z₁³ + 4.82 u
+%   ż₃ = -0.172 z₁ - 1.72 z₂ - 1.0 z₃ + 0.343 z₁z₃ - 3.43 z₂z₃ + 0.476 z₁² + 11.5 z₂² + 0.343 z₁z₂² - 8.13 z₁²z₂ + 0.515 z₁²z₃ + 1.56 z₁³ - 3.43 z₂³ + 0.515 z₁²z₂² - 3.43 z₁³z₂ + 0.859 z₁⁴ + 0.515 z₁⁵ + (0.598 - 15.3 z₁² - 10.2 z₁ - 9.64 z₂) u
+%    y = 5.09 z₁ - 4.82 z₂ +0.598 z₃ + 0.597 z₁³ + 0.597 z₁² + 0.597 z₂²
+%
 %   The balanced realization should still be the same linear balanced
 %   realization, so the nonlinear balancing algorithm should in effect
 %   "undo" the nonlinear transformation we apply. 
@@ -44,7 +56,7 @@ function [f, g, h] = getSystem32(nvp)
 %   See also: getSystem23
 %%
 arguments
-    nvp.transform = false
+    nvp.transform = true
 end
 
 n = 3; x = sym('x', [1, n]).'; 
@@ -55,7 +67,7 @@ fsym = [-x(1) + 100*x(3);
 gsym = [1;1;1];
 hsym = x(1)+x(2)+x(3);
 
-[f, g, h] = approxPolynomialDynamics(fsym, gsym, hsym, x, 1);
+[f, g, h] = approxPolynomialDynamics(fsym, gsym, hsym, x, 3);
 
 if nvp.transform
     % The balanced realization is a 2D plane in a 3D space for this linear
@@ -70,6 +82,7 @@ if nvp.transform
     [Tnl,~,~] = approxPolynomialDynamics([z(1); z(2); z(3) + a*(z(1)^2 + z(2)^2) + a*(z(1)^3)], gsym, z(1), z, 3);
     
     [f,g,h] = transformDynamics(fbal,gbal,hbal,Tnl,degree=5);
+    % [f,g,h] = transformDynamics(f,g,h,transformationInverse(Tbal),degree=5); % Can also reverse the linear transformation
 
 end
 

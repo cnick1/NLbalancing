@@ -132,6 +132,7 @@ for k = 3:degree + 1
         temp = temp + vec(Tod{j}.' * V2tilde * Tod{i});
     end
     for i = 3:k
+        if i > length(vtilde); break; end
         temp = temp + calTTv(Tod, i, k, vtilde{i}); % TODO: Accelerate this
     end
     RHS = [RHS; -Nk * temp];
@@ -145,6 +146,7 @@ for k = 3:degree + 1
         temp = temp + vec(Tod{j}.' * W2tilde * Tod{i});
     end
     for i = 3:k
+        if i > length(wtilde); break; end
         temp = temp + calTTv(Tod, i, k, wtilde{i}); % TODO: Accelerate this
     end
     RHS = [RHS; -Nkhat * temp];
@@ -193,6 +195,7 @@ end
 
 sigmaSquared = zeros(n, degree);
 for k = 2:degree + 1
+    if k > length(wbar); break; end
     if verbose
         [N] = equivalenceClassIndices(n, k);
         

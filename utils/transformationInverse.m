@@ -51,7 +51,7 @@ P = cell(size(T)); % default to producing an expansion the same size as T
 
 n = size(T{1}, 1);
 
-P{1} = invertibleMatrix(inv(T{1}), T{1}); % See invertibleMatrix; if T{1} is an invertibleMatrix already, inv() does not actually have to compute it
+P{1} = invertibleMatrix(inv(T{1}), double(T{1})); % See invertibleMatrix; if T{1} is an invertibleMatrix already, inv() does not actually have to compute it
 for i=2:length(T)
     P{i} = zeros(size(T{i}));
     for j = 1:(i-1) % Compute the sum ∑ Pⱼ 𝓣ⱼ,ᵢ

@@ -13,12 +13,23 @@ function [fbal,gbal,hbal,Tbal] = getBalancedRealization(f,g,h,nvp)
 %                 coefficients ( ̅Φ(z̄) )
 %
 %   Optional name/value pair inputs:
-%        degree - desired degree of polynomial transformation. Ex. for linear
+%        degree - desired degree of the balanced realization. Ex. for linear
 %                 dynamics, choosing degree=1 will produce quadratic
 %                 approximations for the energy functions, linear approximations
 %                 for the transformations, and the output will be a linear
 %                 balanced realization. The default will be the degree of the
-%                 drift term f(x) in the dynamics.
+%                 drift term f(x) in the dynamics, i.e. we will balance
+%                 everything available, no more and no less.
+%        energyFunctionDegree - desired degree of energy functions.
+%                 Generally, this should be determined by the degree of
+%                 balanced realization desired, i.e. the degree of the
+%                 transformation through the option "degree". However, this
+%                 additional option permits the user to override and for
+%                 example use a linear transformation while producing a
+%                 nonlinear transformed model. The most likely use case
+%                 therefore corresponds to using energyFunctionDegree=2 to
+%                 compute quadratic energy functions and a linear
+%                 transformation.
 %           eta - η=1-1/γ², where γ is the H∞ gain parameter.
 %                  • For open-loop balancing, use eta=0.
 %                  • For closed-loop (HJB) balancing, use eta=1.
@@ -73,8 +84,12 @@ arguments
     g
     h
     nvp.degree = length(f)
+    nvp.energyFunctionDegree = []
     nvp.eta = 0
     nvp.verbose = false
+end
+if isempty(nvp.energyFunctionDegree)
+    nvp.energyFunctionDegree = nvp.degree+1;
 end
 n = length(f{1});
 
@@ -92,8 +107,8 @@ end
 % balancing is achieved with η = 1. The functions approxPastEnergy() and
 % approxFutureEnergy() compute polynomial approximations to the energy functions
 % in Kronecker product form.
-[v] = approxPastEnergy(f, g, h, nvp.eta, nvp.degree+1, nvp.verbose);
-[w] = approxFutureEnergy(f, g, h, nvp.eta, nvp.degree+1, nvp.verbose);
+[v] = approxPastEnergy(f, g, h, nvp.eta, nvp.energyFunctionDegree, nvp.verbose);
+[w] = approxFutureEnergy(f, g, h, nvp.eta, nvp.energyFunctionDegree, nvp.verbose);
 
 if nvp.verbose
     fprintf("\n  - Energy functions:\n\n")
