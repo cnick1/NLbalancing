@@ -85,7 +85,7 @@ for iter = 1:options.maxIter
     end
 end
 
-if options.verbose; fprintf(['\n         -> Initial condition: z0 = [', repmat('%2.2e ', 1, numel(z)), '], '], z); end
+if options.verbose; fprintf(['\n         -> Solution: z0 = [', repmat('%2.2e ', 1, numel(z)), '], '], z); end
 if options.verbose; fprintf('       error: %2.2e \n', norm(g(z)-x)); end
 if ~converged; warning('Newton iteration failed to converge to desired tolerance in %i iterations; final error is %2.2e \n', options.maxIter, norm(g(z)-x)); end
 

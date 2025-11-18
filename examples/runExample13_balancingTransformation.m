@@ -42,7 +42,7 @@ end
 [f, g, h] = getSystem13();
 
 %% Compute balanced realization
-[fbal,gbal,hbal,Tbal] = getBalancedRealization(f,g,h,eta=0,degree=degree-1);
+[fbal,gbal,hbal,Tbal] = getBalancedRealization(f,g,h,eta=0,transformationDegree=degree-1);
 TbalInv = transformationInverse(Tbal);
 
 %% Compute input-normal/output-diagonal realization

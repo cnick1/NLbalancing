@@ -24,7 +24,7 @@ end
 degree = 4;
 
 %% Get model and compute energy functions
-[f, g, h] = getSystem2(true);
+[f, g, h] = getSystem2(kawano=true);
 fprintf('Running Example 2\n')
 
 eta = 0; % values should be between -\infty and 1.

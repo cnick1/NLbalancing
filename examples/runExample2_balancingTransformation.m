@@ -33,7 +33,7 @@ function runExample2_balancingTransformation(degree,lim)
 % close all;
 set(groot,'defaultLineLineWidth',1,'defaultTextInterpreter','TeX')
 
-fprintf('Running Example 2\n')
+fprintf('Running Example 2, polynomial balanced realization...\n')
 
 if nargin < 2
     lim = 1;
@@ -43,13 +43,14 @@ if nargin < 2
 end
 
 %% Get system dynamics
-[f, g, h] = getSystem2(true);  % Kawano model
+[f, g, h] = getSystem2(kawano=true);  % Kawano model
 
 %% Compute balanced realization
-[fbal,gbal,hbal,Tbal] = getBalancedRealization(f,g,h,eta=0,degree=degree-1);
+[fbal,gbal,hbal,Tbal] = getBalancedRealization(f,g,h,eta=0,transformationDegree=degree-1);
 TbalInv = transformationInverse(Tbal);
 
 %% Plot grid transformations
+fprintf('   Plotting coordinate grids under the balancing transformation...\n')
 % Parameters
 numLines = 41; numPoints = 201;
 
@@ -111,8 +112,9 @@ x0 = [1 1].'*(0.5*lim);
 
 % Solve for z0 initial condition with a Newton type iteration
 z0 = kronPolyEval(TbalInv,x0);
-fprintf(['\n         -> Initial condition: z0 = [', repmat('%2.2e ', 1, numel(z0)), '], '], z0)
-fprintf('       error: %2.2e \n', norm(kronPolyEval(Tbal,z0)-x0))
+fprintf(['   Simulating the system in the original vs transformed coordinates for initial condition x0 = [', repmat('%2.2e ', 1, numel(x0)), '], ...\n'], x0)
+fprintf(['   ... the transformed initial condition is z0 = [', repmat('%2.2e ', 1, numel(z0)), '] '], z0)
+fprintf(' (error: %2.2e). \n', norm(kronPolyEval(Tbal,z0)-x0))
 
 % Simulate both systems
 [~, X1] = ode45(@(t, x) F(x), [0, 5], x0);
@@ -140,6 +142,8 @@ plot(X2(:,1),X2(:,2),'r--','LineWidth',1.5)
 xlim([-1.4616    2.1246])
 ylim([-1.9309    1.7470])
 drawnow
+
+fprintf('    -> The figure confirms that the solution trajectories are identical in the original vs transformed coordinates.\n')
 end
 
 

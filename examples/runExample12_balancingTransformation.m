@@ -56,10 +56,11 @@ end
 [f, g, h] = getSystem12(degree - 1, false);  % Scherpen model
 
 %% Compute balanced realization
-[fbal,gbal,hbal,Tbal] = getBalancedRealization(f,g,h,eta=0,degree=degree-1);
+[fbal,gbal,hbal,Tbal] = getBalancedRealization(f,g,h,eta=0,transformationDegree=degree-1);
 TbalInv = transformationInverse(Tbal);
 
 %% Plot grid transformations
+fprintf('   Plotting coordinate grids under the balancing transformation...\n')
 % Parameters
 numLines = 41; numPoints = 201;
 
@@ -121,8 +122,9 @@ x0 = [1 1].'*(0.2*lim);
 
 % Solve for z0 initial condition with a Newton type iteration
 z0 = kronPolyEval(TbalInv,x0);
-fprintf(['\n         -> Initial condition: z0 = [', repmat('%2.2e ', 1, numel(z0)), '], '], z0)
-fprintf('       error: %2.2e \n', norm(kronPolyEval(Tbal,z0)-x0))
+fprintf(['   Simulating the system in the original vs transformed coordinates for initial condition x0 = [', repmat('%2.2e ', 1, numel(x0)), '], ...\n'], x0)
+fprintf(['   ... the transformed initial condition is z0 = [', repmat('%2.2e ', 1, numel(z0)), '] '], z0)
+fprintf(' (error: %2.2e). \n', norm(kronPolyEval(Tbal,z0)-x0))
 
 % Simulate both systems
 [~, X1] = ode45(@(t, x) F(x), [0, 5], x0);
@@ -149,4 +151,6 @@ plot(X2(:,1),X2(:,2),'r--','LineWidth',1.5)
 nexttile(3)
 plot(X2(:,1),X2(:,2),'r--','LineWidth',1.5)
 drawnow
+
+fprintf('    -> The figure confirms that the solution trajectories are identical in the original vs transformed coordinates.\n')
 end

@@ -94,7 +94,7 @@ end
 n = length(f{1});
 
 if nvp.verbose
-    fprintf("\n  - Drift Dynamics:\n\n")
+    fprintf("    Drift Dynamics:\n      ")
     dispKronPoly(f)
 end
 
@@ -111,8 +111,8 @@ end
 [w] = approxFutureEnergy(f, g, h, nvp.eta, nvp.transformationDegree+1, nvp.verbose);
 
 if nvp.verbose
-    fprintf("\n  - Energy functions:\n\n")
-    dispKronPoly(v,n=n)
+    fprintf("    Energy functions:\n      ")
+    dispKronPoly(v,n=n), fprintf("\b")
     dispKronPoly(w,n=n)
 end
 
@@ -129,7 +129,7 @@ end
 Tbal = balancingTransformation(v, w, nvp.degree, nvp.verbose);
 
 if nvp.verbose
-    fprintf("\n  - Balancing transformation:\n\n")
+    fprintf("    Balancing transformation:\n      ")
     dispKronPoly(Tbal)
 end
 
@@ -144,8 +144,8 @@ end
 [fbal,gbal,hbal] = transformDynamics(f,g,h,Tbal,degree=nvp.degree);
 
 if nvp.verbose
-    fprintf("\n  - Transformed Drift Dynamics:\n\n")
-    dispKronPoly(ft)
+    fprintf("    Transformed Drift Dynamics:\n      ")
+    dispKronPoly(fbal)
 end
 
 end

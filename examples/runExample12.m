@@ -60,14 +60,11 @@ for i = 2:2:length(Lo)
         i, norm(w{i} - kronMonomialSymmetrize(full(Lo{i}), 2, i), 'inf')) % Should be zero
 end
 
-thresh = 1e-16;
-v{3}(abs(v{3}) < thresh) = 0; v{4}(abs(v{4}) < thresh) = 0; v{5}(abs(v{5}) < thresh) = 0; v{6}(abs(v{6}) < thresh) = 0; v{7}(abs(v{7}) < thresh) = 0; v{8}(abs(v{8}) < thresh) = 0;
-w{3}(abs(w{3}) < thresh) = 0; w{4}(abs(w{4}) < thresh) = 0; w{5}(abs(w{5}) < thresh) = 0; w{6}(abs(w{6}) < thresh) = 0; w{7}(abs(w{7}) < thresh) = 0; w{8}(abs(w{8}) < thresh) = 0;
-
 fprintf("\n    Controllability energy: \n        Lc = 1/2 *(")
-disp(vpa(kronPolyEval(v, sym('x', [1, 2]).'), 2))
+dispKronPoly(v,n=2,degree=8)
+
 fprintf("    Observability energy: \n        Lo = 1/2 *(")
-disp(vpa(kronPolyEval(w, sym('x', [1, 2]).'), 8))
+dispKronPoly(w,n=2,degree=8)
 
 fprintf("                             ->  Example 1 results match.\n\n")
 
@@ -93,7 +90,7 @@ sigmaSquared(abs(sigmaSquared) < 1e-12) = 0;
 syms z
 fprintf("\n         𝜎_1^2(z) = tau_1(z,0) = ")
 disp(vpa(poly2sym(flip(sigmaSquared(1, :)), z), 2))
-fprintf("         𝜎_2^2(z) = tau_2(0,z) = ")
+fprintf("\b\b         𝜎_2^2(z) = tau_2(0,z) = ")
 disp(vpa(poly2sym(flip(sigmaSquared(2, :)), z), 2))
 
 fprintf("                             ->  Example 3 results match.\n\n")
@@ -134,7 +131,7 @@ fprintf("\n  - Comparing our singular value functions with Fujimoto/Scherpen 201
 
 syms z
 for i = 1:2
-    fprintf("         𝜎_%i^2(z) = tau_%i(z e_i) = ", i, i)
+    fprintf("\b         𝜎_%i^2(z) = tau_%i(z e_i) = ", i, i)
     disp(vpa(poly2sym(flip(sigmaSquared(i, :)), z), 3))
 end
 
@@ -142,14 +139,10 @@ fprintf("                     ->  Squared singular value functions match.\n\n")
 
 %% Compare transformation
 fprintf("\n  - Comparing our partial transformation with Fujimoto/Scherpen 2010 Example 5:\n")
-
-TinOd{3}(abs(TinOd{3}) < 1e-14) = 0; TinOd{5}(abs(TinOd{5}) < 1e-14) = 0;
-
 fprintf("    > The input-normal/output-diagonal transformation is: \n\n         𝚽(y) = ")
-disp(vpa(kronPolyEval(TinOd(1:5), sym('y', [1, 2]).'), 4))
+dispKronPoly(TinOd,degree=5)
 
 fprintf("                     ->  Partial transformation matches.\n\n")
-
 fprintf("                             ->  Example 5 results match.\n\n")
 
 %% Compare Fujimoto/Scherpen full transformation
@@ -172,26 +165,19 @@ T2 = TinOd;
 fujimotoFullTransformation = composePolynomials(T1, T2, degree = degree-1);
 
 fprintf("    > Fujimoto/Scherpen 2010's full input-normal/output-diagonal transformation is: \n\n         𝚽(z) = ")
-disp(vpa(kronPolyEval(fujimotoFullTransformation, sym('z', [1, 2]).'), 4))
+dispKronPoly(fujimotoFullTransformation,degree=5)
 
-for i = 1:length(ourFullTransformation)
-    ourFullTransformation{i}(abs(ourFullTransformation{i}) < 1e-14) = 0;
-end
 fprintf("    > Our full input-normal/output-diagonal transformation is: \n\n         𝚽(z) = ")
-disp(vpa(kronPolyEval(ourFullTransformation(1:5), sym('z', [1, 2]).'), 4))
+dispKronPoly(ourFullTransformation,degree=5)
 
 thresh = 1e-13;
 
 [vhat, what] = transformEnergyFunctions(v(1:6), w(1:6), fujimotoFullTransformation, false); % combined
 
-for i = 2:length(vhat)
-    vhat{i}(abs(vhat{i}) < thresh) = 0; what{i}(abs(what{i}) < thresh) = 0;
-end
-
 fprintf("\n    Controllability energy: \n        Lc = 1/2 *(")
-disp(vpa(kronPolyEval(vhat, sym('x', [1, 2]).'), 2))
+dispKronPoly(vhat,n=2)
 fprintf("    Observability energy: \n        Lo = 1/2 *(")
-disp(vpa(kronPolyEval(what, sym('x', [1, 2]).'), 8))
+dispKronPoly(what,n=2)
 
 [vhat, what] = transformEnergyFunctions(v(1:6), w(1:6), ourFullTransformation, false); % combined
 
@@ -200,9 +186,9 @@ for i = 2:length(vhat)
 end
 
 fprintf("\n    Controllability energy: \n        Lc = 1/2 *(")
-disp(vpa(kronPolyEval(vhat, sym('x', [1, 2]).'), 2))
+dispKronPoly(vhat,n=2)
 fprintf("    Observability energy: \n        Lo = 1/2 *(")
-disp(vpa(kronPolyEval(what, sym('x', [1, 2]).'), 8))
+dispKronPoly(what,n=2)
 
 
 % [ft, gt, ht] = transformDynamics(f, g, h, TinOd);

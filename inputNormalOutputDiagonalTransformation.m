@@ -117,7 +117,7 @@ Tod{1} = speye(n);
 
 % Compute the higher-order terms according to Corollary 1 [1]
 for k = 3:degree + 1
-    fprintf("    Computing degree %i coefficient... ", k - 1); tic
+    if verbose; fprintf("    Computing degree %i coefficient... ", k - 1); tic; end
     
     [Nk, Nkhat] = equivalenceClassIndices(n, k);
     
@@ -179,7 +179,7 @@ for k = 3:degree + 1
     Tod{k-1}(indices) = CoeffMatrix \ RHS;                     % Method 1: matlab uses sparse QR from SuiteSparseQR
     % Tod{k - 1}(indices) = lsqminnorm(CoeffMatrix, RHS);      % Method 2: minimum norm solution
     
-    fprintf("completed in %f seconds. \n", toc)
+    if verbose; fprintf("completed in %f seconds. \n", toc); end
 end
 
 %% Combine transformation with linear input-normal transformation

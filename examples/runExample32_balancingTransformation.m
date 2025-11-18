@@ -175,8 +175,8 @@ for i=1:numel(z1)
     [x1(i), x2(i), x3(i)] = kronPolyEval(Tbal,[z1(i);z2(i);z3(i)]);
 end
 
-figure;
-surf(z1,z2,z3)
+% figure;
+% surf(z1,z2,z3)
 figure;
 surf(x1,x2,x3)
 drawnow
