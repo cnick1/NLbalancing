@@ -48,7 +48,7 @@ fprintf('Running Example 12, polynomial balanced realization...\n')
 if nargin < 2
     lim = 3;
     if nargin < 1
-        degree = 4;
+        degree = 8;
     end
 end
 
@@ -59,6 +59,21 @@ end
 [fbal,gbal,hbal,Tbal] = getBalancedRealization(f,g,h,eta=0,transformationDegree=degree-1);
 TbalInv = transformationInverse(Tbal);
 
+fprintf('  - The balanced realization for the nonlinear model is:\n')
+dispKronPoly(fbal)
+dispKronPoly(gbal)
+
+
+[v] = approxPastEnergy(f,g,h, 0, degree);
+[w] = approxFutureEnergy(f,g,h, 0, degree);
+dispKronPoly(v,n=2),fprintf('\b'),dispKronPoly(w,n=2)
+
+[sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree-1,true);
+[ft,gt,ht] = transformDynamics(f,g,h,TinOd,degree=degree-1);
+
+[vt] = approxPastEnergy(ft,gt,ht, 0, degree);
+[wt] = approxFutureEnergy(ft,gt,ht, 0, degree);
+dispKronPoly(vt,n=2),fprintf('\b'),dispKronPoly(wt,n=2)
 %% Plot grid transformations
 fprintf('   Plotting coordinate grids under the balancing transformation...\n')
 % Parameters
