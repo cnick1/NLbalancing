@@ -1,4 +1,4 @@
-function [Tbal] = balancingTransformation(v, w, degree, verbose)
+function [Tbal, sigmaSquared] = balancingTransformation(v, w, degree, verbose)
 %balancingTransformation Return a polynomial balancing transformation x = ̅Φ(z̄) = Φ(𝝋(z̄))
 %
 %   Usage:  Tbal = balancingTransformation(TinOd, Tscal)
@@ -12,6 +12,7 @@ function [Tbal] = balancingTransformation(v, w, degree, verbose)
 %
 %   Outputs:     Tbal - cell array containing balancing transformation
 %                       coefficients                              ( ̅Φ(z̄) )
+%        sigmaSquared - squared singular value functions
 %
 %   Description: The nonlinear balancing transformation x = ̅Φ(z̄) = Φ(𝝋(z̄))
 %   is the composition of the input-normal/output-diagonal transformation

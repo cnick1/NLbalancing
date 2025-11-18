@@ -1,7 +1,7 @@
-function [fbal,gbal,hbal,Tbal] = getBalancedRealization(f,g,h,nvp)
+function [fbal,gbal,hbal,Tbal,sigmaSquared] = getBalancedRealization(f,g,h,nvp)
 %getBalancedRealization Returns a balanced realization for f,g,h in Kronecker polynomial form
 %
-%   Usage: [fbal,gbal,hbal,Tbal] = getBalancedRealization(f,g,h)
+%   Usage: [fbal,gbal,hbal,Tbal,sigmaSquared] = getBalancedRealization(f,g,h)
 %
 %   Inputs:
 %       f,g,h   - cell arrays containing the polynomial coefficients
@@ -40,6 +40,9 @@ function [fbal,gbal,hbal,Tbal] = getBalancedRealization(f,g,h,nvp)
 %   Output:
 %       fbal,gbal,hbal - cell arrays containing the polynomial coefficients for
 %                        the drift, input, and output.
+%       Tbal           - cell array containing the polynomial coefficients
+%                        for the balancing transformation.
+%       sigmaSquared   - squared singular value functions
 %
 %   Description: For a control affine dynamical system, we wish to compute a
 %   balanced realization also in control-affine form via the balancing
@@ -126,7 +129,7 @@ end
 % where Σ(z̄) is the diagonal matrix of singular value functions ̅σᵢ(z̄ᵢ). The
 % function balancingTransformation() computes an approximate polynomial
 % expansion for the balancing transformation.
-Tbal = balancingTransformation(v, w, nvp.degree, nvp.verbose);
+[Tbal, sigmaSquared] = balancingTransformation(v, w, nvp.degree, nvp.verbose);
 
 if nvp.verbose
     fprintf("    Balancing transformation:\n      ")
