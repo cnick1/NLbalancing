@@ -43,7 +43,7 @@ function runExample12_newtonIteration(degree,lim)
 % close all;
 set(groot,'defaultLineLineWidth',1,'defaultTextInterpreter','TeX')
 
-fprintf('Running Example 12\n')
+fprintf('Running Example 12, balanced realization via Newton iterations...\n')
 
 if nargin < 2
     lim = 3;
@@ -57,22 +57,21 @@ end
 f{1} = full(f{1}); g{1} = full(g{1}); h{1} = full(h{1});
 
 %%  Compute the energy functions
-fprintf(" ~~~~~~~~~~~~~~~~~~~~~~~~~ Computing energy functions:  ~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
 eta = 0;
 [v] = approxPastEnergy(f, g, h, eta, degree, false);
 [w] = approxFutureEnergy(f, g, h, eta, degree, false);
 
 %% Compute the input-normal/output-diagonal transformation approximation, also giving the squared singular value functions
-fprintf(" ~~~~~~~~~~~ Computing transformation and singular value functions:  ~~~~~~~~~~~~ \n")
-[sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);
+[sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, false);
 
 %% Plot grid transformations
+fprintf('   Plotting coordinate grids under the balancing transformation...\n')
 % Parameters
 numLines = 41; numPoints = 201;
 
 % Generate original coordinates
-[xH, yH] = meshgrid(linspace(-2*lim, 2*lim, numLines), linspace(-lim, lim, numPoints)); % Horizontal lines
-[yV, xV] = meshgrid(linspace(-lim, lim, numLines), linspace(-2*lim, 2*lim, numPoints)); % Vertical lines
+[xH, yH] = meshgrid(linspace(-lim, lim, numLines), linspace(-lim, lim, numPoints)); % Horizontal lines
+[yV, xV] = meshgrid(linspace(-lim, lim, numLines), linspace(-lim, lim, numPoints)); % Vertical lines
 
 % Compute transformed coordinates
 xHtr = zeros(size(xH)); yHtr = zeros(size(yH));
@@ -127,7 +126,10 @@ Ft = @(z) PhiBarJacobian(z,TinOd,sigmaSquared)\kronPolyEval(f, PhiBar(z,TinOd,si
 x0 = [1 1].'*(0.2*lim);
 
 % Solve for z0 initial condition with a Newton type iteration
-z0 = newtonIteration(x0, @(z) PhiBar(z,TinOd,sigmaSquared), @(z) PhiBarJacobian(z,TinOd,sigmaSquared),maxIter=100,verbose=true);
+z0 = newtonIteration(x0, @(z) PhiBar(z,TinOd,sigmaSquared), @(z) PhiBarJacobian(z,TinOd,sigmaSquared));
+fprintf(['   Simulating the system in the original vs transformed coordinates for initial condition x0 = [', repmat('%2.2e ', 1, numel(x0)), '], ...\n'], x0)
+fprintf(['   ... the transformed initial condition is z0 = [', repmat('%2.2e ', 1, numel(z0)), '] '], z0)
+fprintf(' (error: %2.2e). \n', norm(PhiBar(z0,TinOd,sigmaSquared)-x0))
 
 % Simulate both systems
 [~, X1] = ode45(@(t, x) F(x), [0, 5], x0);
@@ -153,6 +155,10 @@ nexttile(1)
 plot(X2(:,1),X2(:,2),'r--','LineWidth',1.5)
 nexttile(3)
 plot(X2(:,1),X2(:,2),'r--','LineWidth',1.5)
+drawnow
+
+fprintf('    -> The figure confirms that the polynomial balanced realization is very close to the approach using Newton iterations <a href="matlab:nexttile(4), xlim([-4 4])">locally</a>.\n')
+
 end
 
 function [zbar1, zbar2] = PhiBarInv2(x,TinOd,sigmaSquared)

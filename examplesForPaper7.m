@@ -24,7 +24,6 @@ runExample12_balancingTransformation(2)
 runExample12_balancingTransformation(4)
 runExample12_newtonIteration(4)
 
-
 % Gray/Scherpen model
 % This example is actually nice because the balanced realization is linear;
 % we can probably work out what the original model was that they
@@ -33,6 +32,7 @@ runExample12_newtonIteration(4)
 runExample13_balancingTransformation(2)
 runExample13_balancingTransformation(4)
 runExample13_newtonIteration(4)
+
 
 % Double pendulum gradient system
 runExample14_balancingTransformation(2)

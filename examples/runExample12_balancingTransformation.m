@@ -43,7 +43,7 @@ function runExample12_balancingTransformation(degree,lim)
 % close all;
 set(groot,'defaultLineLineWidth',1,'defaultTextInterpreter','TeX')
 
-fprintf('Running Example 12\n')
+fprintf('Running Example 12, polynomial balanced realization...\n')
 
 if nargin < 2
     lim = 3;
@@ -65,8 +65,8 @@ fprintf('   Plotting coordinate grids under the balancing transformation...\n')
 numLines = 41; numPoints = 201;
 
 % Generate original coordinates
-[xH, yH] = meshgrid(linspace(-2*lim, 2*lim, numLines), linspace(-lim, lim, numPoints)); % Horizontal lines
-[yV, xV] = meshgrid(linspace(-lim, lim, numLines), linspace(-2*lim, 2*lim, numPoints)); % Vertical lines
+[xH, yH] = meshgrid(linspace(-lim, lim, numLines), linspace(-lim, lim, numPoints)); % Horizontal lines
+[yV, xV] = meshgrid(linspace(-lim, lim, numLines), linspace(-lim, lim, numPoints)); % Vertical lines
 
 % Compute transformed coordinates
 xHtr = zeros(size(xH)); yHtr = zeros(size(yH));
@@ -152,5 +152,6 @@ nexttile(3)
 plot(X2(:,1),X2(:,2),'r--','LineWidth',1.5)
 drawnow
 
-fprintf('    -> The figure confirms that the solution trajectories are identical in the original vs transformed coordinates.\n')
+fprintf('    -> The figure confirms that the solution trajectories are identical in the original vs transformed coordinates <a href="matlab:nexttile(4), xlim([-4 4])">locally</a>.\n')
+
 end

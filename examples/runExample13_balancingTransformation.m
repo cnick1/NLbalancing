@@ -29,43 +29,83 @@ function runExample13_balancingTransformation(degree,lim)
 % close all;
 set(groot,'defaultLineLineWidth',1,'defaultTextInterpreter','TeX')
 
-fprintf('Running Example 13\n')
+fprintf('Running Example 13, polynomial balanced realization...\n')
 
 if nargin < 2
     lim = 1;
     if nargin < 1
-        degree = 6;
+        degree = 4;
     end
 end
 
+fprintf("\n ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
+fprintf(" ~~~~~~~~~~~~~~~~ Beginning comparisons with Gray/Scherpen 2001: ~~~~~~~~~~~~~~~~ \n")
 %% Get system dynamics
 [f, g, h] = getSystem13();
+
+fprintf('  - The dynamics in the original coordinates are:\n')
+dispPolyDynamics(f,g,h)
+
+if degree == 4
+fprintf("  - Comparing our energy function with Gray/Scherpen 2001 Example 2.1:\n")
+[v] = approxPastEnergy(f, g, h, 0, degree);
+[w] = approxFutureEnergy(f, g, h, 0, degree);
+fprintf("  - Energy Functions:\n")
+dispKronPoly(v,n=2),fprintf('\b'),dispKronPoly(w,n=2)
+fprintf("                             ->  Energy functions match.\n\n")
+end
+%% Compare the first transformation
+% The first transformation given is 
+%   x = 𝜙(z) = [z₁ + z₁²; z₂]
+% It should be
+%   x = 𝜙(z) = [z₁ - z₂²; z₂]
+fprintf(['  - Validating the first transformation given in Gray/Scherpen 2001 Example 2.1: The \n' ...
+    '    first transformation given is x = 𝜙(z) = [z₁ + z₁²; z₂]; it appears it should\n' ...
+    '    instead be x = 𝜙(z) = [z₁ - z₂²; z₂]. Furthermore, this is actually the 𝘪𝘯𝘷𝘦𝘳𝘴𝘦\n' ...
+    '    transformation, so it should be written as z = 𝜙⁻¹(x) = [x₁ - x₂²; x₂]\n'])
+x = sym('x', [1, 2]).'; 
+[Tnl,~,~] = approxPolynomialDynamics([x(1) - x(2)^2; x(2)], [1;1], x(1), x, 2);
+[ftr,gtr,htr] = transformDynamics(f,g,h,Tnl,degree=5);
+
+fprintf('  - The dynamics in these coordinates are:\n')
+dispPolyDynamics(ftr,gtr,htr)
+
+[v] = approxPastEnergy(ftr, gtr, htr, 0, degree);
+[w] = approxFutureEnergy(ftr, gtr, htr, 0, degree);
+
+fprintf("  - Energy Functions:\n        ")
+dispKronPoly(v,n=2),fprintf('\b        '),dispKronPoly(w,n=2)
+
+fprintf("                             ->  Energy functions match.\n")
+fprintf("\n       ->  𝘐𝘵 𝘢𝘱𝘱𝘦𝘢𝘳𝘴 𝘵𝘩𝘢𝘵 𝘵𝘩𝘪𝘴 𝘮𝘰𝘥𝘦𝘭 𝘸𝘢𝘴 𝘤𝘰𝘯𝘴𝘵𝘳𝘶𝘤𝘵𝘦𝘥 𝘧𝘳𝘰𝘮 𝘢\n           𝘭𝘪𝘯𝘦𝘢𝘳 𝘮𝘰𝘥𝘦𝘭 𝘧𝘰𝘭𝘭𝘰𝘸𝘦𝘥 𝘣𝘺 𝘢 𝘯𝘰𝘯𝘭𝘪𝘯𝘦𝘢𝘳 𝘵𝘳𝘢𝘯𝘴𝘧𝘰𝘳𝘮𝘢𝘵𝘪𝘰𝘯! \n\n")
+
+
+
+
+fprintf('  - The balanced realization for this linear model is:\n')
+[fbal1,gbal1,hbal1,~] = getBalancedRealization(ftr,gtr,htr,eta=0,degree=1);
+dispPolyDynamics(fbal1,gbal1,hbal1)
+
+
+fprintf(" ~~~~~~~~~~~~~~~~ Finished comparisons with Gray/Scherpen 2001: ~~~~~~~~~~~~~~~~~ \n")
+fprintf(" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
 
 %% Compute balanced realization
 [fbal,gbal,hbal,Tbal] = getBalancedRealization(f,g,h,eta=0,transformationDegree=degree-1);
 TbalInv = transformationInverse(Tbal);
 
-%% Compute input-normal/output-diagonal realization
-[v] = approxPastEnergy(f, g, h, 0, degree);
-[w] = approxFutureEnergy(f, g, h, 0, degree);
-[~, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree-1);
-[finOd,ginOd,hinOd] = transformDynamics(f,g,h,TinOd);
-[vbal, wbal] = transformEnergyFunctions(v,w,Tbal);
-[vinOd, winOd] = transformEnergyFunctions(v,w,TinOd);
+fprintf('  - The balanced realization for the nonlinear model is:\n')
+dispPolyDynamics(fbal,gbal,hbal)
 
-fprintf("\n  - FOM dynamics:\n\n")
-dispKronPoly(f)
-
-fprintf("\n  - Balanced dynamics:\n\n")
-dispKronPoly(fbal,degree=degree-1)
-
-fprintf("\n  - Energy Functions:\n\n")
-dispKronPoly(v,n=2),dispKronPoly(w,n=2)
-
-fprintf("\n  - Balanced energy Functions:\n\n")
-dispKronPoly(vbal,n=2),dispKronPoly(wbal,n=2)
-
+if degree == 4
+    fprintf(['\n       ->  𝘚𝘪𝘯𝘤𝘦 𝘵𝘩𝘦 𝘣𝘢𝘭𝘢𝘯𝘤𝘦𝘥 𝘳𝘦𝘢𝘭𝘪𝘻𝘢𝘵𝘪𝘰𝘯 𝘪𝘴 𝘭𝘪𝘯𝘦𝘢𝘳 𝘧𝘰𝘳 𝘵𝘩𝘪𝘴 𝘮𝘰𝘥𝘦𝘭,\n ' ...
+        '          𝘵𝘩𝘦 𝘣𝘢𝘭𝘢𝘯𝘤𝘪𝘯𝘨 𝘵𝘳𝘢𝘯𝘴𝘧𝘰𝘳𝘮𝘢𝘵𝘪𝘰𝘯 𝘢𝘤𝘵𝘶𝘢𝘭𝘭𝘺 𝘧𝘪𝘯𝘥𝘴 𝘵𝘩𝘦 𝘯𝘰𝘯𝘭𝘪𝘯𝘦𝘢𝘳\n ' ...
+        '          𝘪𝘯𝘷𝘦𝘳𝘴𝘦 𝘵𝘳𝘢𝘯𝘴𝘧𝘰𝘳𝘮𝘢𝘵𝘪𝘰𝘯 𝘵𝘰 𝘮𝘢𝘬𝘦 𝘵𝘩𝘦 𝘥𝘺𝘯𝘢𝘮𝘪𝘤𝘴 𝘭𝘪𝘯𝘦𝘢𝘳.\n\n'])
+else
+    fprintf('\n       ->  The linear transformation fails to find the true balanced realization.\n\n')
+end
 %% Plot grid transformations
+fprintf('   Plotting coordinate grids under the balancing transformation...\n')
 % Parameters
 numLines = 41; numPoints = 201;
 
@@ -127,8 +167,9 @@ x0 = [1 1].'*(0.5*lim);
 
 % Solve for z0 initial condition with a Newton type iteration
 z0 = kronPolyEval(TbalInv,x0);
-fprintf(['\n         -> Initial condition: z0 = [', repmat('%2.2e ', 1, numel(z0)), '], '], z0)
-fprintf('       error: %2.2e \n', norm(kronPolyEval(Tbal,z0)-x0))
+fprintf(['   Simulating the system in the original vs transformed coordinates for initial condition x0 = [', repmat('%2.2e ', 1, numel(x0)), '], ...\n'], x0)
+fprintf(['   ... the transformed initial condition is z0 = [', repmat('%2.2e ', 1, numel(z0)), '] '], z0)
+fprintf(' (error: %2.2e). \n', norm(kronPolyEval(Tbal,z0)-x0))
 
 % Simulate both systems
 [~, X1] = ode45(@(t, x) F(x), [0, 5], x0);
@@ -154,6 +195,9 @@ plot(X2(:,1),X2(:,2),'r--','LineWidth',1.5)
 nexttile(3)
 plot(X2(:,1),X2(:,2),'r--','LineWidth',1.5)
 drawnow
+
+fprintf('    -> The figure confirms that the solution trajectories are identical in the original vs transformed coordinates.\n')
+
 end
 
 

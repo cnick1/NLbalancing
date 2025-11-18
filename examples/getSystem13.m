@@ -1,19 +1,21 @@
 function [f, g, h] = getSystem13()
-%getSystem13  Generates a polynomial approximation to the 2D model from Gray and Scherpen 2001 [1]
+%getSystem13 Returns the 2D model from Gray and Scherpen 2001 [1]
 %
 %   Usage:  [f,g,h] = getSystem13()
 %
 %   Outputs:     f,g,h - Cell arrays containing the polynomial coefficients
 %                        for the drift, input, and output
 %
-%   Description: The output is a polynomial approximation to the system given by
+%   Description: The output is the polynomial control-affine system given
+%   by
 %           f(x) = -[α² x₁ + 2 α x₂ + (α² - 2)x₂²;
 %                                x₂              ]
 %           g(x) = √2[α - 2 x₂;
 %                        1    ]
 %           h(x) = 1/√3 [3 α (x₁ + x₂²) + (α - 2√2)x₂]
 %
-%    where α = (√3 + √2)(√3 + 2)
+%   where α = (√3 + √2)(√3 + 2). This system is already polynomial, so this
+%   is an exact representation.
 %
 %   References: [1] W. S. Gray and J. M. A. Scherpen, “On the nonuniqueness
 %               of singular value functions and balanced nonlinear
