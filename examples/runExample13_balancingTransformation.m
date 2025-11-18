@@ -47,15 +47,15 @@ fprintf('  - The dynamics in the original coordinates are:\n')
 dispPolyDynamics(f,g,h)
 
 if degree == 4
-fprintf("  - Comparing our energy function with Gray/Scherpen 2001 Example 2.1:\n")
-[v] = approxPastEnergy(f, g, h, 0, degree);
-[w] = approxFutureEnergy(f, g, h, 0, degree);
-fprintf("  - Energy Functions:\n")
-dispKronPoly(v,n=2),fprintf('\b'),dispKronPoly(w,n=2)
-fprintf("                             ->  Energy functions match.\n\n")
+    fprintf("  - Comparing our energy function with Gray/Scherpen 2001 Example 2.1:\n")
+    [v] = approxPastEnergy(f, g, h, eta=0, degree=degree);
+    [w] = approxFutureEnergy(f, g, h, eta=0, degree=degree);
+    fprintf("  - Energy Functions:\n")
+    dispKronPoly(v,n=2),fprintf('\b'),dispKronPoly(w,n=2)
+    fprintf("                             ->  Energy functions match.\n\n")
 end
 %% Compare the first transformation
-% The first transformation given is 
+% The first transformation given is
 %   x = 𝜙(z) = [z₁ + z₁²; z₂]
 % It should be
 %   x = 𝜙(z) = [z₁ - z₂²; z₂]
@@ -63,15 +63,15 @@ fprintf(['  - Validating the first transformation given in Gray/Scherpen 2001 Ex
     '    first transformation given is x = 𝜙(z) = [z₁ + z₁²; z₂]; it appears it should\n' ...
     '    instead be x = 𝜙(z) = [z₁ - z₂²; z₂]. Furthermore, this is actually the 𝘪𝘯𝘷𝘦𝘳𝘴𝘦\n' ...
     '    transformation, so it should be written as z = 𝜙⁻¹(x) = [x₁ - x₂²; x₂]\n'])
-x = sym('x', [1, 2]).'; 
+x = sym('x', [1, 2]).';
 [Tnl,~,~] = approxPolynomialDynamics([x(1) - x(2)^2; x(2)], [1;1], x(1), x, 2);
 [ftr,gtr,htr] = transformDynamics(f,g,h,Tnl,degree=5);
 
 fprintf('  - The dynamics in these coordinates are:\n')
 dispPolyDynamics(ftr,gtr,htr)
 
-[v] = approxPastEnergy(ftr, gtr, htr, 0, degree);
-[w] = approxFutureEnergy(ftr, gtr, htr, 0, degree);
+[v] = approxPastEnergy(ftr, gtr, htr, eta=0, degree=degree);;
+[w] = approxFutureEnergy(ftr, gtr, htr, eta=0, degree=degree);
 
 fprintf("  - Energy Functions:\n        ")
 dispKronPoly(v,n=2),fprintf('\b        '),dispKronPoly(w,n=2)

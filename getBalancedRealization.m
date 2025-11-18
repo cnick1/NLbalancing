@@ -9,10 +9,13 @@ function [fbal,gbal,hbal,Tbal,sigmaSquared] = getBalancedRealization(f,g,h,nvp)
 %                   • f must contain at least a linear drift  (A matrix)
 %                   • g must contain at least a linear input  (B matrix)
 %                   • h must contain at least a linear output (C matrix)
-%          Tbal - cell array containing balancing transformation 
-%                 coefficients ( ̅Φ(z̄) )
 %
 %   Optional name/value pair inputs:
+%           eta - η=1-1/γ², where γ is the H∞ gain parameter.
+%                  • For open-loop balancing, use eta=0.
+%                  • For closed-loop (HJB) balancing, use eta=1.
+%                 Any other value between -1 and ∞ corresponds to H∞
+%                 balancing. The default is 0 for open-loop balancing.
 %        degree - desired degree of the balanced realization. Ex. for linear
 %                 dynamics, choosing degree=1 will produce quadratic
 %                 approximations for the energy functions, linear approximations
@@ -30,11 +33,6 @@ function [fbal,gbal,hbal,Tbal,sigmaSquared] = getBalancedRealization(f,g,h,nvp)
 %                 therefore corresponds to using transformationDegree=1 to
 %                 compute quadratic energy functions and a linear
 %                 transformation.
-%           eta - η=1-1/γ², where γ is the H∞ gain parameter.
-%                  • For open-loop balancing, use eta=0.
-%                  • For closed-loop (HJB) balancing, use eta=1.
-%                 Any other value between -1 and ∞ corresponds to H∞
-%                 balancing. The default is 0 for open-loop balancing.
 %       verbose - optional argument to print runtime information
 %
 %   Output:
@@ -110,8 +108,8 @@ end
 % balancing is achieved with η = 1. The functions approxPastEnergy() and
 % approxFutureEnergy() compute polynomial approximations to the energy functions
 % in Kronecker product form.
-[v] = approxPastEnergy(f, g, h, nvp.eta, nvp.transformationDegree+1, nvp.verbose);
-[w] = approxFutureEnergy(f, g, h, nvp.eta, nvp.transformationDegree+1, nvp.verbose);
+[v] = approxPastEnergy(f, g, h, eta=nvp.eta, degree=nvp.transformationDegree+1, verbose=nvp.verbose);
+[w] = approxFutureEnergy(f, g, h, eta=nvp.eta, degree=nvp.transformationDegree+1, verbose=nvp.verbose);
 
 if nvp.verbose
     fprintf("    Energy functions:\n      ")
@@ -129,7 +127,7 @@ end
 % where Σ(z̄) is the diagonal matrix of singular value functions ̅σᵢ(z̄ᵢ). The
 % function balancingTransformation() computes an approximate polynomial
 % expansion for the balancing transformation.
-[Tbal, sigmaSquared] = balancingTransformation(v, w, nvp.degree, nvp.verbose);
+[Tbal, sigmaSquared] = balancingTransformation(v, w, degree=nvp.degree, verbose=nvp.verbose);
 
 if nvp.verbose
     fprintf("    Balancing transformation:\n      ")

@@ -68,7 +68,7 @@ for d = ds
     
     [f, g, h] = getSystem8(numEl);
     
-    [w] = approxFutureEnergy(f, g, h, eta, d);
+    [w] = approxFutureEnergy(f, g, h, eta=eta, degree=d);
     
     % Initial condition from Mark Embree's talk
     L = 30; x = linspace(0, L, numEl + 1).';

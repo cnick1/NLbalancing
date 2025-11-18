@@ -37,12 +37,12 @@ lim=.1;
 
 %%  Compute the energy functions
 fprintf(" ~~~~~~~~~~~~~~~~~~~~~~~~~ Computing energy functions:  ~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
-[v] = approxPastEnergy(f, g, h, eta, degree, false);
-[w] = approxFutureEnergy(f, g, h, eta, degree, false);
+[v] = approxPastEnergy(f, g, h, eta=eta, degree=degree);
+[w] = approxFutureEnergy(f, g, h, eta=eta, degree=degree);;
 
 %% Compute the input-normal/output-diagonal transformation approximation, also giving the squared singular value functions
 fprintf(" ~~~~~~~~~~~ Computing transformation and singular value functions:  ~~~~~~~~~~~~ \n")
-[sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);
+[sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree=degree-1, verbose=true);
 
 % Plot the squared singular value functions
 z = linspace(- 1, 1, 51);

@@ -1,14 +1,20 @@
-function [sigmaSquared, TinOd, vbar, wbar] = inputNormalOutputDiagonalTransformation(v, w, degree, verbose)
+function [sigmaSquared, TinOd, vbar, wbar] = inputNormalOutputDiagonalTransformation(v, w, nvp)
 %inputNormalOutputDiagonalTransformation Return a polynomial input-normal/output-diagonal transformation x = Φ(z).
 %
-%   Usage: [sigmaSquared,Tbar] = outputDiagonalTransformation(v, w, Tin, Sigma, degree)
+%   Usage: [sigmaSquared,Tbar] = inputNormalOutputDiagonalTransformation(v, w)
 %
 %   Inputs:
-%       v,w     - cell arrays containing the polynomial energy function
-%                 coefficients; these should already be in input-normal form.
-%       degree  - desired degree of the computed transformation (default =
-%                 degree of energy functions - 1).
-%       verbose - optional argument to print runtime information.
+%       v,w     - cell arrays containing the polynomial energy function coefficients.
+%
+%   Optional name/value pair inputs:
+%        degree - desired degree of the balanced realization. Ex. for linear
+%                 dynamics, choosing degree=1 will produce quadratic
+%                 approximations for the energy functions, linear approximations
+%                 for the transformations, and the output will be a linear
+%                 balanced realization. The default will be on less than the
+%                 degree of the v, i.e. we will balance everything available, no
+%                 more and no less.
+%       verbose - optional argument to print runtime information
 %
 %   Outputs:
 %       sigmaSquared - an n×degree-1 matrix containing the coefficients of
@@ -69,12 +75,12 @@ function [sigmaSquared, TinOd, vbar, wbar] = inputNormalOutputDiagonalTransforma
 arguments
     v cell
     w cell
-    degree = length(v) - 1
-    verbose = false
+    nvp.degree = length(v) - 1
+    nvp.verbose = false
 end
 vec = @(X) X(:); % Create a vec function for readability
-if verbose
-    fprintf('Computing the degree %d input-normal/output-diagonal balancing transformation...\n', degree)
+if nvp.verbose
+    fprintf('Computing the degree %d input-normal/output-diagonal balancing transformation...\n', nvp.degree)
 end
 
 n = sqrt(numel(v{2}));
@@ -112,12 +118,12 @@ W2tilde = sparse(diag(diag(Xi))) .^ 2; wtilde{2} = vec(W2tilde);
 
 %% Step 2: Compute the higher-order terms in the second transformation
 % Preallocate the cell array, the first term is identity
-Tod = cell(1, degree);
+Tod = cell(1, nvp.degree);
 Tod{1} = speye(n);
 
 % Compute the higher-order terms according to Corollary 1 [1]
-for k = 3:degree + 1
-    if verbose; fprintf("    Computing degree %i coefficient... ", k - 1); tic; end
+for k = 3:nvp.degree + 1
+    if nvp.verbose; fprintf("    Computing degree %i coefficient... ", k - 1); tic; end
     
     [Nk, Nkhat] = equivalenceClassIndices(n, k);
     
@@ -179,13 +185,13 @@ for k = 3:degree + 1
     Tod{k-1}(indices) = CoeffMatrix \ RHS;                     % Method 1: matlab uses sparse QR from SuiteSparseQR
     % Tod{k - 1}(indices) = lsqminnorm(CoeffMatrix, RHS);      % Method 2: minimum norm solution
     
-    if verbose; fprintf("completed in %f seconds. \n", toc); end
+    if nvp.verbose; fprintf("completed in %f seconds. \n", toc); end
 end
 
 %% Combine transformation with linear input-normal transformation
-TinOd = cell(1,degree);
+TinOd = cell(1,nvp.degree);
 TinOd{1} = Tin;
-for k = 2:degree
+for k = 2:nvp.degree
     TinOd{k} = Tin * Tod{k};
     TinOd{k} = kronMonomialSymmetrize(TinOd{k}, n, k); % Symmetrize the transformation rows
 end
@@ -193,10 +199,10 @@ end
 %% Pluck out the singular value function coefficients
 [vbar, wbar] = transformEnergyFunctions(v, w, TinOd, true); % Could transform just the observability; could probably even just compute the diagonal entries
 
-sigmaSquared = zeros(n, degree);
-for k = 2:degree + 1
+sigmaSquared = zeros(n, nvp.degree);
+for k = 2:nvp.degree + 1
     if k > length(wbar); break; end
-    if verbose
+    if nvp.verbose
         [N] = equivalenceClassIndices(n, k);
         
         fprintf("      - The largest entry in v%i is %.1e; ", k, max(abs(N * vbar{k}))) % Should be zero, other than the first time which is one
@@ -209,7 +215,7 @@ for k = 2:degree + 1
     end
 end
 
-if verbose
+if nvp.verbose
     % Plot the squared singular value functions
     z = linspace(- 1, 1, 101);
     figure; hold on; title("Singular value functions")

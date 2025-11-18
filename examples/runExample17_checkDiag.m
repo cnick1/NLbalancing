@@ -23,11 +23,11 @@ degree = 4;
 [f, g, h] = getSystem17(degree - 1, n / 2);
 
 % Compute the energy functions
-[v] = approxPastEnergy(f, g, h, eta, degree, true);
-[w] = approxFutureEnergy(f, g, h, eta, degree, true);
+[v] = approxPastEnergy(f, g, h, eta=eta, degree=degree, verbose=true);
+[w] = approxFutureEnergy(f, g, h, eta=eta, degree=degree, verbose=true);
 
 % Compute the input-normal/output-diagonal transformation approximation, also giving the squared singular value functions
-[sigmaSquared, TinOd, vbar, wbar] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);
+[sigmaSquared, TinOd, vbar, wbar] = inputNormalOutputDiagonalTransformation(v, w, degree=degree-1, verbose=true);
 
 %% Compute norms to evaluate diagonalization performance
 % Save to file

@@ -88,8 +88,8 @@ end
 % since eta = 1 - 1/gamma^2;
 
 %  Compute the polynomial approximations to the past future energy function
-[v] = approxPastEnergy(f, g(1:numGTermsApprox), h, eta, degree, true);
-[w] = approxFutureEnergy(f, g(1:numGTermsApprox), h, eta, degree, true);
+[v] = approxPastEnergy(f, g(1:numGTermsApprox), h, eta=eta, degree=degree, verbose=true);
+[w] = approxFutureEnergy(f, g(1:numGTermsApprox), h, eta=eta, degree=degree, verbose=true);
 
 %% Plot the past and future energy functions
 if (plotEnergy || plotBalancing)

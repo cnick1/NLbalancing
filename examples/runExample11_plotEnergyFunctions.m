@@ -50,7 +50,7 @@ gravity = 9.81;
 fprintf('Running Example 11\n')
 
 %  Compute the polynomial approximations to the past future energy function
-% [v] = approxPastEnergy(f, N, g, h, eta, degree, true);
+% [v] = approxPastEnergy(f, g, h, eta=eta, degree=degree, verbose=true);
 options.verbose = true;
 [w] = ppr(f, g, h2q(h), eta, degree, options);
 

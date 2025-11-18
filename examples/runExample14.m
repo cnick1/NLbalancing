@@ -31,8 +31,8 @@ degree = 4;
 [f, g, h] = getSystem14(degree - 1, 1);
 
 %  Compute the energy functions
-[v] = approxPastEnergy(f, g, h, eta, degree, true);
-[w] = approxFutureEnergy(f, g, h, eta, degree, true);
+[v] = approxPastEnergy(f, g, h, eta=eta, degree=degree, verbose=true);
+[w] = approxFutureEnergy(f, g, h, eta=eta, degree=degree, verbose=true);
 
 fprintf("\n  - Comparing our energy function with Scherpen/Gray 2000:\n")
 
@@ -51,8 +51,8 @@ degree = 4;
 [f, g, h] = getSystem14(degree - 1, 2);
 
 %  Compute the energy functions
-[v] = approxPastEnergy(f, g, h, eta, degree, true);
-[w] = approxFutureEnergy(f, g, h, eta, degree, true);
+[v] = approxPastEnergy(f, g, h, eta=eta, degree=degree, verbose=true);
+[w] = approxFutureEnergy(f, g, h, eta=eta, degree=degree, verbose=true);
 
 fprintf("\n  - Comparing our energy function with Fujimoto/Scherpen 2005:\n")
 
@@ -67,7 +67,7 @@ fprintf("\n                             ->  Energy functions match.\n\n")
 fprintf("\n  - Comparing our squared singular value functions with Fujimoto/Scherpen 2005:\n")
 
 tic
-[sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);
+[sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree=degree-1, verbose=true);
 fprintf("Input-normal/output-diagonal transformation took %f seconds. \n", toc)
 
 fprintf("\n  - Squared singular value functions:\n\n")

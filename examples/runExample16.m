@@ -17,14 +17,14 @@ degree = 4;
 [f, g, h] = getSystem16(degree - 1);
 
 %  Compute the energy functions
-[v] = approxPastEnergy(f, g, h, eta, degree, false);
-[w] = approxFutureEnergy(f, g, h, eta, degree, false);
+[v] = approxPastEnergy(f, g, h, eta=eta, degree=degree);
+[w] = approxFutureEnergy(f, g, h, eta=eta, degree=degree);;
 
 fprintf("Beginning comparisons with Krener 2008:\n")
 
 %% Compute the input-normal/output-diagonal transformation approximation, also giving the squared singular value functions
 tic
-[sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);
+[sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree=degree-1, verbose=true);
 fprintf("Input-normal/output-diagonal transformation took %f seconds. \n", toc)
 
 fprintf("\n  - Comparing our Hankel singular values with Krener 2008:\n\n    ")

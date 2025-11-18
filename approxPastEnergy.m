@@ -1,7 +1,7 @@
-function v = approxPastEnergy(f, g, h, eta, degree, verbose)
+function v = approxPastEnergy(f, g, h, nvp)
 %approxPastEnergy  Compute the past energy function for a polynomial control-affine dynamical system.
 %
-%   Usage: v = approxPastEnergy(f,g,h,eta,d,verbose)
+%   Usage: v = approxPastEnergy(f,g,h)
 %
 %   Inputs:
 %       f,g,h   - cell arrays containing the polynomial coefficients
@@ -9,11 +9,14 @@ function v = approxPastEnergy(f, g, h, eta, degree, verbose)
 %                   • f must contain at least a linear drift  (A matrix)
 %                   • g must contain at least a linear input  (B matrix)
 %                   • h must contain at least a linear output (C matrix)
-%       eta     - η=1-1/γ², where γ is the H∞ gain parameter. For open-loop
-%                 balancing, use eta=0. For closed-loop (HJB) balancing, use
-%                 eta=1. Any other value between -1 and ∞ corresponds to
-%                 H∞ balancing.
-%       degree  - desired degree of the computed energy function. A degree d
+%
+%   Optional name/value pair inputs:
+%           eta - η=1-1/γ², where γ is the H∞ gain parameter.
+%                  • For open-loop balancing, use eta=0.
+%                  • For closed-loop (HJB) balancing, use eta=1.
+%                 Any other value between -1 and ∞ corresponds to H∞
+%                 balancing. The default is 0 for open-loop balancing.
+%        degree - desired degree of the computed energy function. A degree d
 %                 energy function uses information from f,g,h up-to degree d-1.
 %                 The default choice of d is lf+1, where lf is the degree of
 %                 the drift.
@@ -84,31 +87,31 @@ function v = approxPastEnergy(f, g, h, eta, degree, verbose)
 %
 %   See also: ppr
 %%
-
-if (nargin < 6)
-    verbose = false;
-    if (nargin < 5)
-        degree = length(f);
-    end
+arguments
+    f
+    g
+    h
+    nvp.eta = 0
+    nvp.degree = length(f)
+    nvp.verbose = false
 end
 
 % Print what type of energy function is being computed
-if eta == 0
-    message = sprintf('Computing open-loop balancing controllability energy function (η=%g ↔ γ=%g)', eta, 1 / sqrt(1 - eta));
+if nvp.eta == 0
+    message = sprintf('Computing open-loop balancing controllability energy function (η=%g ↔ γ=%g)', nvp.eta, 1 / sqrt(1 - nvp.eta));
     q = 0;
-elseif eta == 1
-    message = sprintf('Computing closed-loop balancing past energy function (η=%g ↔ γ=%g)', eta, 1 / sqrt(1 - eta));
+elseif nvp.eta == 1
+    message = sprintf('Computing closed-loop balancing past energy function (η=%g ↔ γ=%g)', nvp.eta, 1 / sqrt(1 - nvp.eta));
     q = cellfun(@(x) x * (-1), h2q(h), 'un', 0);
 else
-    message = sprintf('Computing 𝓗∞ balancing past energy function (η=%g ↔ γ=%g)', eta, 1 / sqrt(1 - eta));
-    q = cellfun(@(x) x * (-eta), h2q(h), 'un', 0);
+    message = sprintf('Computing 𝓗∞ balancing past energy function (η=%g ↔ γ=%g)', nvp.eta, 1 / sqrt(1 - nvp.eta));
+    q = cellfun(@(x) x * (-nvp.eta), h2q(h), 'un', 0);
 end
-if verbose
+if nvp.verbose
     disp(message)
 end
 
-% Rewritten by N Corbin to use ppr()
-options.verbose = verbose;
-[v] = ppr(f, g, q, -1, degree, options);
+options.verbose = nvp.verbose;
+[v] = ppr(f, g, q, -1, nvp.degree, options);
 
 end

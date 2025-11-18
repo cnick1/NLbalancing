@@ -34,8 +34,8 @@ fprintf('Running Example 2\n')
 eta = 0; % values should be between -\infty and 1.
 
 %  Compute the polynomial approximations to the past future energy function
-[v] = approxPastEnergy(f, g, h, eta, degree, true);
-[w] = approxFutureEnergy(f, g, h, eta, degree, true);
+[v] = approxPastEnergy(f, g, h, eta=eta, degree=degree, verbose=true);
+[w] = approxFutureEnergy(f, g, h, eta=eta, degree=degree, verbose=true);
 
 %% Plot the past and future energy functions
 N = 301;

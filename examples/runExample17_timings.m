@@ -52,15 +52,15 @@ for n=ns
     
     %  Compute the energy functions
     fprintf("Computing energy functions for n=%i, d=%i ... ", n, degree); tic
-    [v] = approxPastEnergy(f, g, h, eta, degree, false);
-    [w] = approxFutureEnergy(f, g, h, eta, degree, false);
+    [v] = approxPastEnergy(f, g, h, eta=eta, degree=degree);
+    [w] = approxFutureEnergy(f, g, h, eta=eta, degree=degree);;
     energyTimings = [energyTimings, toc];
     fprintf("completed in %f seconds. \n", energyTimings(end))
     
     clear f g h % save some ram
     %% Compute the input-normal/output-diagonal transformation approximation, also giving the squared singular value functions
     tic
-    [sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);
+    [sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree=degree-1, verbose=true);
     transformationTimings = [transformationTimings, toc];
     fprintf("\n    -> Transformation computed in %f seconds. \n\n", transformationTimings(end))
     

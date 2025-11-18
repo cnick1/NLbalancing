@@ -59,8 +59,8 @@ though a scalable implementation has not been provided until this work.
 
 For a given set of polynomial dynamics defined by the cell arrays `f,g,h` and a permissible value of `eta`, the functions `approxFutureEnergy()` and `approxPastEnergy()` will return the energy function polynomial coefficients $\mathbf{v}_i$ and $\mathbf{w}_i$ up to degree $d=$`degree`:
 ```
->>  [w] = approxFutureEnergy(f,g,h,eta,degree);
->>  [v] = approxPastEnergy(f,g,h,eta,degree);
+>>  [w] = approxFutureEnergy(f, g, h, eta=eta, degree=degree)
+>>  [v] = approxPastEnergy(f, g, h, eta=eta, degree=degree);
 ```
 `approxFutureEnergy()` and `approxPastEnergy()` correspond to Algorithm 1 in reference [1] or [6].
 The variables `f,g,h` are cell arrays containing the polynomial coefficients for the dynamics, i.e. 

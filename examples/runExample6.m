@@ -43,7 +43,7 @@ for i=1:numTestCases
     
     % Compute energy functions and CPU time
     [f, g, h, IC] = getSystem6(numEls(i), 2);
-    tic; for j = 1:nTest(i), [w] = approxFutureEnergy(f, g, h, eta, degree); end, tt = toc / nTest(i);
+    tic; for j = 1:nTest(i), [w] = approxFutureEnergy(f, g, h, eta=eta, degree=degree); end, tt = toc / nTest(i);
     
     % Evaluate energy function at x0 corresponding to nodes having linear
     % displacement but no rotation or initial velocity
@@ -85,7 +85,7 @@ for i=1:numTestCases
     
     % Compute energy functions and CPU time
     [f, g, h, IC] = getSystem6(numEls(i), 2);
-    tic; for j = 1:nTest(i), [w] = approxFutureEnergy(f, g, h, eta, degree); end, tt = toc / nTest(i);
+    tic; for j = 1:nTest(i), [w] = approxFutureEnergy(f, g, h, eta=eta, degree=degree); end, tt = toc / nTest(i);
     
     % Evaluate energy function at x0 corresponding to nodes having linear
     % displacement but no rotation or initial velocity
@@ -127,7 +127,7 @@ futureTimes = zeros(size(degrees)); futureEnergies = zeros(size(degrees));
 if exportData, numTestCases = 5; else, numTestCases = 3; end
 for i=1:numTestCases
     % Compute Future energy function
-    tic; for j = 1:nTest(i), [w] = approxFutureEnergy(f, g, h, eta, degrees(i)); end, tt = toc / nTest(i);
+    tic; for j = 1:nTest(i), [w] = approxFutureEnergy(f, g, h, eta=eta, degree=degrees(i)); end, tt = toc / nTest(i);
     
     wzInit = 0.5 * kronPolyEval(w, initialCondition, degrees(i));
     

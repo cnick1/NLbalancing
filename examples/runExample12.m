@@ -40,8 +40,8 @@ end
 [f, g, h] = getSystem12(degree - 1, false);
 
 %  Compute the energy functions
-[v] = approxPastEnergy(f, g, h, eta, degree, false);
-[w] = approxFutureEnergy(f, g, h, eta, degree, false);
+[v] = approxPastEnergy(f, g, h, eta=eta, degree=degree);
+[w] = approxFutureEnergy(f, g, h, eta=eta, degree=degree);;
 
 fprintf("\n ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
 fprintf(" ~~~~~~~~~~~ Beginning comparisons with Fujimoto/Scherpen 2001/2005:  ~~~~~~~~~~~ \n")
@@ -70,7 +70,7 @@ fprintf("                             ->  Example 1 results match.\n\n")
 
 %% Compute the input-normal/output-diagonal transformation approximation, also giving the squared singular value functions
 tic
-[sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);
+[sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree=degree-1, verbose=true);
 fprintf("Input-normal/output-diagonal transformation took %f seconds. \n", toc)
 
 fprintf("\n  - Comparing our singular value functions with Fujimoto/Scherpen 2001/2005 Example 3:\n")
@@ -119,12 +119,12 @@ fprintf("     Note: in this paper, they start from an intermediate transformed s
 [f, g, h] = getSystem12(degree - 1, true);
 
 %  Compute the energy functions
-[v] = approxPastEnergy(f, g, h, eta, degree, false);
-[w] = approxFutureEnergy(f, g, h, eta, degree, false);
+[v] = approxPastEnergy(f, g, h, eta=eta, degree=degree);
+[w] = approxFutureEnergy(f, g, h, eta=eta, degree=degree);;
 
 %% Compute the input-normal/output-diagonal transformation approximation, also giving the squared singular value functions
 tic
-[sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);
+[sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree=degree-1, verbose=true);
 fprintf("Input-normal/output-diagonal transformation took %f seconds. \n", toc)
 
 fprintf("\n  - Comparing our singular value functions with Fujimoto/Scherpen 2010 Example 5:\n\n")
@@ -152,8 +152,8 @@ fprintf(" ~~~~~~~~~~~~~~~~~~~~ Now compare the entire transformation: ~~~~~~~~~~
 [f, g, h] = getSystem12(degree - 1, false);
 
 %  Compute the energy functions
-[v] = approxPastEnergy(f, g, h, eta, degree, false);
-[w] = approxFutureEnergy(f, g, h, eta, degree, false);
+[v] = approxPastEnergy(f, g, h, eta=eta, degree=degree);
+[w] = approxFutureEnergy(f, g, h, eta=eta, degree=degree);;
 
 z = sym('z', [1, 2]).'; syms(z);
 % The transformation provided in Fujimoto 2005; the one in 2001 has a typo

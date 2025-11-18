@@ -1,14 +1,20 @@
-function [Tbal, sigmaSquared] = balancingTransformation(v, w, degree, verbose)
+function [Tbal, sigmaSquared] = balancingTransformation(v, w, nvp)
 %balancingTransformation Return a polynomial balancing transformation x = ̅Φ(z̄) = Φ(𝝋(z̄))
 %
-%   Usage:  Tbal = balancingTransformation(TinOd, Tscal)
+%   Usage:  Tbal = balancingTransformation(v, w)
 %
 %   Inputs:
-%       v,w     - cell arrays containing the polynomial energy function
-%                 coefficients; these should already be in input-normal form.
-%       degree  - desired degree of the computed transformation (default =
-%                 degree of energy functions - 1).
-%       verbose - optional argument to print runtime information.
+%       v,w     - cell arrays containing the polynomial energy function coefficients.
+%
+%   Optional name/value pair inputs:
+%        degree - desired degree of the balanced realization. Ex. for linear
+%                 dynamics, choosing degree=1 will produce quadratic
+%                 approximations for the energy functions, linear approximations
+%                 for the transformations, and the output will be a linear
+%                 balanced realization. The default will be on less than the
+%                 degree of the v, i.e. we will balance everything available, no
+%                 more and no less.
+%       verbose - optional argument to print runtime information
 %
 %   Outputs:     Tbal - cell array containing balancing transformation
 %                       coefficients                              ( ̅Φ(z̄) )
@@ -58,19 +64,19 @@ function [Tbal, sigmaSquared] = balancingTransformation(v, w, degree, verbose)
 %   See also: approxPastEnergy, approxFutureEnergy, inputNormalOutputDiagonalTransformation, composePolynomials
 %%
 arguments
-    v
-    w
-    degree = length(v) - 1
-    verbose = false
+    v cell
+    w cell
+    nvp.degree = length(v) - 1
+    nvp.verbose = false
 end
 
-[sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree, verbose);
-[Tscal, TscalInv] = scalingTransformation(sigmaSquared, degree);
-Tbal = composePolynomials(TinOd, Tscal, degree=degree);
+[sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree=nvp.degree, verbose=nvp.verbose);
+[Tscal, TscalInv] = scalingTransformation(sigmaSquared, degree=nvp.degree);
+Tbal = composePolynomials(TinOd, Tscal, degree=nvp.degree);
 
 end
 
-function [Tscal, TscalInv] = scalingTransformation(sigmaSquared, d)
+function [Tscal, TscalInv] = scalingTransformation(sigmaSquared, nvp)
 %scalingTransformation Return polynomial expansions for z = 𝝋(z̄) and ̄z = 𝝋⁻¹(z)
 % i.e. scaling transformation and its inverse
 %
@@ -115,7 +121,7 @@ function [Tscal, TscalInv] = scalingTransformation(sigmaSquared, d)
 %%
 arguments
     sigmaSquared
-    d = size(sigmaSquared, 2)
+    nvp.degree = size(sigmaSquared, 2)
 end
 
 [n,nd] = size(sigmaSquared);
@@ -143,11 +149,11 @@ A = [1./a(:,1),...
     1./a(:,1).^15.*(-429.*a(:,2).^7+1287.*a(:,1).*a(:,2).^5.*a(:,3)-495.*a(:,1).^2.*a(:,2).^4.*a(:,4)+165.*a(:,1).^2.*a(:,2).^3.*(-6.*a(:,3).^2+a(:,1).*a(:,5))-45.*a(:,1).^3.*a(:,2).^2.*(-11.*a(:,3).*a(:,4)+a(:,1).*a(:,6))+3.*a(:,1).^3.*a(:,2).*(55.*a(:,3).^3-30.*a(:,1).*a(:,3).*a(:,5)+3.*a(:,1).*(-5.*a(:,4).^2+a(:,1).*a(:,7)))+a(:,1).^4.*(-45.*a(:,3).^2.*a(:,4)+9.*a(:,1).*a(:,3).*a(:,6)+a(:,1).*(9.*a(:,4).*a(:,5)-a(:,1).*a(:,8)))),...
     1/a(:,1).^17.*(1430.*a(:,2).^8-5005.*a(:,1).*a(:,2).^6.*a(:,3)+2002.*a(:,1).^2.*a(:,2).^5.*a(:,4)-715.*a(:,1).^2.*a(:,2).^4.*(-7.*a(:,3).^2+a(:,1).*a(:,5))+220.*a(:,1).^3.*a(:,2).^3.*(-13.*a(:,3).*a(:,4)+a(:,1).*a(:,6))-55.*a(:,1).^3.*a(:,2).^2.*(26.*a(:,3).^3-12.*a(:,1).*a(:,3).*a(:,5)+a(:,1).*(-6.*a(:,4).^2+a(:,1).*a(:,7)))+10.*a(:,1).^4.*a(:,2).*(66.*a(:,3).^2.*a(:,4)-11.*a(:,1).*a(:,3).*a(:,6)+a(:,1).*(-11.*a(:,4).*a(:,5)+a(:,1).*a(:,8)))+a(:,1).^4.*(55.*a(:,3).^4-55.*a(:,1).*a(:,3).^2.*a(:,5)+5.*a(:,1).*a(:,3).*(-11.*a(:,4).^2+2.*a(:,1).*a(:,7))+a(:,1).^2.*(5.*a(:,5).^2+10.*a(:,4).*a(:,6)-a(:,1).*a(:,9))))];
 
-Tscal = cell(1,d);
-TscalInv = cell(1,d);
+Tscal = cell(1,nvp.degree);
+TscalInv = cell(1,nvp.degree);
 TscalInv{1} = invertibleMatrix(diag(a(:,1)),diag(A(:,1)));
 Tscal{1} = invertibleMatrix(diag(A(:,1)),diag(a(:,1)));
-for i=2:d
+for i=2:nvp.degree
     TscalInv{i} = reshape(sparse(linspace(1,n^(i+1),n),1,a(:,i)),n,[]);
     Tscal{i}    = reshape(sparse(linspace(1,n^(i+1),n),1,A(:,i)),n,[]);
 end

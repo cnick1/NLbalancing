@@ -18,8 +18,8 @@ eta = 0;
 
 degree = 4;
 %  Compute the energy functions
-[v] = approxPastEnergy(f, g, h, eta, degree, true);
-[w] = approxFutureEnergy(f, g, h, eta, degree, true);
+[v] = approxPastEnergy(f, g, h, eta=eta, degree=degree, verbose=true);
+[w] = approxFutureEnergy(f, g, h, eta=eta, degree=degree, verbose=true);
 
 fprintf("\n ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
 fprintf(" ~~~~~~~~~~~~~~~~ Beginning comparisons with Gray/Scherpen 2001: ~~~~~~~~~~~~~~~~ \n")
@@ -38,7 +38,7 @@ fprintf("                             ->  Energy functions match.\n\n")
 
 %% Compute the input-normal/output-diagonal transformation approximation, also giving the squared singular value functions
 tic
-[sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);
+[sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree=degree-1, verbose=true);
 fprintf("Input-normal/output-diagonal transformation took %f seconds. \n", toc)
 
 fprintf("\n  - Comparing our singular value functions with Gray/Scherpen 2001 Example 2.1:\n\n")

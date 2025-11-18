@@ -54,7 +54,7 @@ for n = [8, 16, 32, 64]
     [f, g, h, zInit] = getSystem3(n, m, p, epsilon, alpha);
     zInit = z_factor * zInit;
     
-    tic; for i = 1:nTest, [w] = approxFutureEnergy(f, g, h, eta, degree); end, tt = toc / nTest;
+    tic; for i = 1:nTest, [w] = approxFutureEnergy(f, g, h, eta=eta, degree=degree); end, tt = toc / nTest;
     fprintf('%10.4e & ', length(w{degree}))
     fprintf('%8.2e & ', tt)
     
@@ -73,7 +73,7 @@ for n = [128, 256, 512, 1024]
     [f, g, h, zInit] = getSystem3(n, m, p, epsilon, alpha);
     zInit = z_factor * zInit;
     
-    tic; for i = 1:nTest, [w] = approxFutureEnergy(f, g, h, eta, degree); end, tt = toc / nTest;
+    tic; for i = 1:nTest, [w] = approxFutureEnergy(f, g, h, eta=eta, degree=degree); end, tt = toc / nTest;
     fprintf('%10.4e & ', length(w{degree}))
     fprintf('%8.2e & ', tt)
     
@@ -99,7 +99,7 @@ for n = [8, 16, 32, 64, 128]
     [f, g, h, zInit] = getSystem3(n, m, p, epsilon, alpha);
     zInit = z_factor * zInit;
     
-    tic; for i = 1:nTest, [w] = approxFutureEnergy(f, g, h, eta, degree); end, tt = toc / nTest;
+    tic; for i = 1:nTest, [w] = approxFutureEnergy(f, g, h, eta=eta, degree=degree); end, tt = toc / nTest;
     fprintf('%10.4e & ', length(w{degree}))
     fprintf('%8.2e & ', tt)
     
@@ -123,12 +123,12 @@ zInit = z_factor * zInit;
 for degree = [2, 3, 4, 5, 6, 7, 8]
     fprintf('%d & ', degree)
     
-    [v] = approxPastEnergy(f, g, h, eta, degree);
+    [v] = approxPastEnergy(f, g, h, eta=eta, degree=degree);
     for d = 2:degree, v{d} = v{d}.'; end
     vzInit = 0.5 * kronPolyEval(v, zInit, degree);
     fprintf('%12.6e & ', vzInit)
     
-    [w] = approxFutureEnergy(f, g, h, eta, degree);
+    [w] = approxFutureEnergy(f, g, h, eta=eta, degree=degree);
     for d = 2:degree, w{d} = w{d}.'; end
     wzInit = 0.5 * kronPolyEval(w, zInit, degree);
     fprintf('%12.6e \\\\ \n', wzInit)

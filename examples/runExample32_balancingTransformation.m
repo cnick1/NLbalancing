@@ -64,25 +64,25 @@ x0 = [x0(1);x0(2);-x0(1)^2-x0(1)^3-x0(2)^2];
 TbalInv = transformationInverse(Tbal);
 
 %% Compute input-normal/output-diagonal realization
-% [v] = approxPastEnergy(f, g, h, 0, degree);
-% [w] = approxFutureEnergy(f, g, h, 0, degree);
-% [~, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree-1);
+% [v] = approxPastEnergy(f, g, h, eta=0, degree=degree);
+% [w] = approxFutureEnergy(f, g, h, eta=0, degree=degree);
+% [~, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree=degree-1);
 % [finOd,ginOd,hinOd] = transformDynamics(f,g,h,TinOd,degree=degree-1);
 % [vbal, wbal] = transformEnergyFunctions(v,w,Tbal);
 % [vinOd, winOd] = transformEnergyFunctions(v,w,TinOd);
 
 % fprintf("  - FOM dynamics:\n")
 % dispKronPoly(f,degree=5)
-% 
+%
 % fprintf("  - Balanced dynamics:\n")
 % dispKronPoly(fbal,degree=3)
-% 
+%
 % fprintf("  - Energy Functions:\n")
 % dispKronPoly(v,n=3),fprintf("\b"),dispKronPoly(w,n=3)
-% 
+%
 % fprintf("  - Input-normal/output-diagonal energy Functions:\n")
 % dispKronPoly(vinOd,n=3),fprintf("\b"),dispKronPoly(winOd,n=3)
-% 
+%
 % fprintf("  - Balanced energy Functions:\n")
 % dispKronPoly(vbal,n=3),fprintf("\b"),dispKronPoly(wbal,n=3)
 
@@ -187,14 +187,14 @@ drawnow
 if false && reduction
     [fl, gl, hl] = getSystem32(transform=false);
     [fl, gl, hl] = getBalancedRealization(fl,gl,hl,eta=0,degree=1);
-
+    
     global T0; opts = odeset(OutputFcn=@odeprog); T0 = tic;
     [T, Z] = ode45(@(t, z) (fl{1}*z + gl{1}*randn(1)), [0, 10], [0;0;0],opts);
     X = zeros(size(Z)); Z = 100*Z; % Scale the output to better see the manifold
     for i=1:length(T)
         X(i,:) = [Z(i,1), Z(i,2), Z(i,3) - Z(i,1)^2 - Z(i,2)^2 - Z(i,1)^3]; % Apply the inverse transformation to get the nonlinear solution
     end
-
+    
     hold on;
     plot3(X(:,1),X(:,2),X(:,3),'r')
     xlabel('x_1'); ylabel('x_2'); zlabel('x_3')
@@ -219,7 +219,7 @@ switch flag
         lastPct = -1;
         lastUpdateTime = 0;
         fprintf(' |%s|  (elapsed: %5i s, remaining: ----- s)', repmat(' ',1,nSteps), round(elapsed));
-
+        
     case ''
         % ODE solver step
         if isempty(t), return; end
@@ -230,7 +230,7 @@ switch flag
         eta = (elapsed / max(tNow,eps)) * (T1 - tNow); % avoid divide-by-zero
         needsUpdate = pct - lastPct >= 2 || block == nSteps;
         timeSinceLast = elapsed - lastUpdateTime;
-
+        
         if needsUpdate || timeSinceLast >= 1
             bar = [repmat('-',1,block), repmat(' ',1,nSteps-block)];
             fprintf(repmat('\b',1,93));
@@ -240,7 +240,7 @@ switch flag
             end
             lastUpdateTime = elapsed;
         end
-
+        
     case 'done'
         % Finalize
         % elapsed = toc(T0);

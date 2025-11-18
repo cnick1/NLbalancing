@@ -64,15 +64,15 @@ dispKronPoly(fbal)
 dispKronPoly(gbal)
 
 
-[v] = approxPastEnergy(f,g,h, 0, degree);
+[v] = approxPastEnergy(f, g, h, eta=0, degree=degree);;
 [w] = approxFutureEnergy(f,g,h, 0, degree);
 dispKronPoly(v,n=2),fprintf('\b'),dispKronPoly(w,n=2)
 
-[sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree-1,true);
+[sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree=degree-1, verbose=true);
 [ft,gt,ht] = transformDynamics(f,g,h,TinOd,degree=degree-1);
 
-[vt] = approxPastEnergy(ft,gt,ht, 0, degree);
-[wt] = approxFutureEnergy(ft,gt,ht, 0, degree);
+[vt] = approxPastEnergy(ft, gt, ht, eta=0, degree=degree);;
+[wt] = approxFutureEnergy(ft, gt, ht, eta=0, degree=degree)
 dispKronPoly(vt,n=2),fprintf('\b'),dispKronPoly(wt,n=2)
 %% Plot grid transformations
 fprintf('   Plotting coordinate grids under the balancing transformation...\n')

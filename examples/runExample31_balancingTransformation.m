@@ -58,9 +58,9 @@ end
 TbalInv = transformationInverse(Tbal);
 
 %% Compute input-normal/output-diagonal realization
-[v] = approxPastEnergy(f, g, h, 0, degree);
-[w] = approxFutureEnergy(f, g, h, 0, degree);
-[~, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree-1);
+[v] = approxPastEnergy(f, g, h, eta=0, degree=degree);
+[w] = approxFutureEnergy(f, g, h, eta=0, degree=degree);
+[~, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree=degree-1);
 [finOd,ginOd,hinOd] = transformDynamics(f,g,h,TinOd);
 [vbal, wbal] = transformEnergyFunctions(v,w,Tbal);
 [vinOd, winOd] = transformEnergyFunctions(v,w,TinOd);

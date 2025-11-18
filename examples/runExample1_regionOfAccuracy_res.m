@@ -24,7 +24,7 @@ eta = 0.5; % values should be between -\infty and 1.
 
 %  Compute the polynomial approximations to the future energy function
 d = 8;
-[v] = approxPastEnergy(f, g, h, eta, d);
+[v] = approxPastEnergy(f, g, h, eta=eta, degree=d);
 
 RES2 = computeResidualPastHJB(f, g, h, eta, v, 2, 6, 250);
 RES4 = computeResidualPastHJB(f, g, h, eta, v, 4, 6, 250);
@@ -75,7 +75,7 @@ if exportData
     fileName = sprintf('plots/example1_regionOfAccuracy_residual.dat');
     fprintf("Writing data to " + fileName + '\n')
     fileID = fopen(fileName, 'w');
-
+    
     %print the header
     fprintf(fileID, 'intervalSize      & Ep2_errorFun    & Ep4_errorFun    & Ep6_errorFun    & Ep8_errorFun        \n');
     for i = 1:length(intervalSize)

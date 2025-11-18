@@ -43,11 +43,11 @@ end
 
 %%  Compute the energy functions
 eta = 0;
-[v] = approxPastEnergy(f, g, h, eta, degree, false);
-[w] = approxFutureEnergy(f, g, h, eta, degree, false);
+[v] = approxPastEnergy(f, g, h, eta=eta, degree=degree);
+[w] = approxFutureEnergy(f, g, h, eta=eta, degree=degree);;
 
 %% Compute the input-normal/output-diagonal transformation approximation, also giving the squared singular value functions
-[sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree - 1, true);
+[sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree=degree-1, verbose=true);
 
 %% Plot grid transformations
 fprintf('   Plotting coordinate grids under the balancing transformation...\n')

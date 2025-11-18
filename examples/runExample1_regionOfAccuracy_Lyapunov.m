@@ -20,7 +20,7 @@ eta = 0.5; % values should be between -\infty and 1.
 
 %  Compute the polynomial approximations to the future energy function
 d = 8;
-[w] = approxFutureEnergy(f, g, h, eta, d);
+[w] = approxFutureEnergy(f, g, h, eta=eta, degree=d);
 
 w2 = w{2}; w3 = w{3}; w4 = w{4}; w5 = w{5}; w6 = w{6}; w7 = w{7}; w8 = w{8};
 
@@ -123,7 +123,7 @@ for i = 1:N ^ n
     % Calculate the indices for each dimension
     indices = mod(floor((i - 1) ./ N .^ (0:(n - 1))), N) + 1;
     x = flip(xn(indices).'); % This is the ith point x in the state-space
-
+    
     if length(g) > 1
         % Polynomial input
         Lie(i) = (0.5 * kronPolyDerivEval(w, x)) * kronPolyEval(f, x) ...
@@ -132,7 +132,7 @@ for i = 1:N ^ n
         % Linear/constant input B
         Lie(i) = (0.5 * kronPolyDerivEval(w, x)) * kronPolyEval(f, x) ...
             - eta * 0.25 * kronPolyDerivEval(w, x) * g{1} * g{1}.' * kronPolyDerivEval(w, x).';
-
+        
     end
 end
 

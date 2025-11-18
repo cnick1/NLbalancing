@@ -31,7 +31,7 @@ function runExample32_newtonIteration(degree,lim,reduction)
 %   composition x = ̅Φ(z̄(z̄) = Φ(𝝋(z̄)). Since the transformation was
 %   applied to the balanced realization, the balancing transformation will
 %   be the inverse of this transformation, which we know analytically to be
-%   
+%
 %
 %   References: [3] P. Holmes, J. L. Lumley, G. Berkooz, and C. W. Rowley,
 %                   Turbulence, coherent structures, dynamical systems and
@@ -58,14 +58,14 @@ fprintf("  - FOM dynamics:\n")
 dispKronPoly(f,degree=degree-1)
 
 %%  Compute the energy functions
-[v] = approxPastEnergy(f, g, h, 0, degree);
-[w] = approxFutureEnergy(f, g, h, 0, degree);
+[v] = approxPastEnergy(f, g, h, eta=0, degree=degree);
+[w] = approxFutureEnergy(f, g, h, eta=0, degree=degree);
 
 fprintf("  - Energy Functions:\n")
 dispKronPoly(v,n=3),fprintf("\b"),dispKronPoly(w,n=3)
 
 %% Compute the input-normal/output-diagonal transformation approximation, also giving the squared singular value functions
-[sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree-1);
+[sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree=degree-1);
 
 %% Simulate dynamics
 % Compare original dynamics with transformed dynamics
@@ -128,19 +128,19 @@ legend('FOM output','ROM output')
 
 fprintf('The output error is: %f \n', norm(interp1(t2, y2, 0:.1:5) - interp1(t1, y1, 0:.1:5)))
 
-%% Manifold figure plot 
+%% Manifold figure plot
 dx = 0.05; lim = 2;
 [z1,z2,z3] = meshgrid(-lim:dx:lim,-lim:dx:lim,0);
 x1 = zeros(size(z1)); x2 = x1; x3 = x1;
-for i=1:numel(z1) 
+for i=1:numel(z1)
     [x1(i), x2(i), x3(i)] = PhiBar([z1(i);z2(i);z3(i)], TinOd, sigmaSquared);
 end
 
-figure; 
+figure;
 surf(z1,z2,z3)
-figure; 
+figure;
 surf(x1,x2,x3)
-drawnow 
+drawnow
 % return
 %% Simulate the system's response to a random noise input
 % Instead of simulating the nonlinear system, it is much faster to simulate
