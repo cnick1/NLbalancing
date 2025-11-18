@@ -91,7 +91,7 @@ function [w, K] = approxFutureEnergy(f, g, h, eta, degree, verbose)
 if (nargin < 6)
     verbose = false;
     if (nargin < 5)
-        degree = length(f{1});
+        degree = length(f);
     end
 end
 
