@@ -20,14 +20,14 @@ function [fbal,gbal,hbal,Tbal] = getBalancedRealization(f,g,h,nvp)
 %                 balanced realization. The default will be the degree of the
 %                 drift term f(x) in the dynamics, i.e. we will balance
 %                 everything available, no more and no less.
-%        energyFunctionDegree - desired degree of energy functions.
+%        transformationDegree - desired degree of balancing transformation.
 %                 Generally, this should be determined by the degree of
 %                 balanced realization desired, i.e. the degree of the
 %                 transformation through the option "degree". However, this
 %                 additional option permits the user to override and for
 %                 example use a linear transformation while producing a
 %                 nonlinear transformed model. The most likely use case
-%                 therefore corresponds to using energyFunctionDegree=2 to
+%                 therefore corresponds to using transformationDegree=1 to
 %                 compute quadratic energy functions and a linear
 %                 transformation.
 %           eta - η=1-1/γ², where γ is the H∞ gain parameter.
@@ -84,12 +84,12 @@ arguments
     g
     h
     nvp.degree = length(f)
-    nvp.energyFunctionDegree = []
+    nvp.transformationDegree = []
     nvp.eta = 0
     nvp.verbose = false
 end
-if isempty(nvp.energyFunctionDegree)
-    nvp.energyFunctionDegree = nvp.degree+1;
+if isempty(nvp.transformationDegree)
+    nvp.transformationDegree = nvp.degree;
 end
 n = length(f{1});
 
@@ -107,8 +107,8 @@ end
 % balancing is achieved with η = 1. The functions approxPastEnergy() and
 % approxFutureEnergy() compute polynomial approximations to the energy functions
 % in Kronecker product form.
-[v] = approxPastEnergy(f, g, h, nvp.eta, nvp.energyFunctionDegree, nvp.verbose);
-[w] = approxFutureEnergy(f, g, h, nvp.eta, nvp.energyFunctionDegree, nvp.verbose);
+[v] = approxPastEnergy(f, g, h, nvp.eta, nvp.transformationDegree+1, nvp.verbose);
+[w] = approxFutureEnergy(f, g, h, nvp.eta, nvp.transformationDegree+1, nvp.verbose);
 
 if nvp.verbose
     fprintf("\n  - Energy functions:\n\n")
