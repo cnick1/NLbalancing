@@ -6,7 +6,7 @@ function [Tbal, sigmaSquared] = balancingTransformation(v, w, nvp)
 %   Inputs:
 %       v,w     - cell arrays containing the polynomial energy function coefficients.
 %
-%   Optional name/value pair inputs:
+%     Optional name/value pair inputs:
 %        degree - desired degree of the balanced realization. Ex. for linear
 %                 dynamics, choosing degree=1 will produce quadratic
 %                 approximations for the energy functions, linear approximations

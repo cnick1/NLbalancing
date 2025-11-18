@@ -10,7 +10,7 @@ function [fbal,gbal,hbal,Tbal,sigmaSquared] = getBalancedRealization(f,g,h,nvp)
 %                   • g must contain at least a linear input  (B matrix)
 %                   • h must contain at least a linear output (C matrix)
 %
-%   Optional name/value pair inputs:
+%     Optional name/value pair inputs:
 %           eta - η=1-1/γ², where γ is the H∞ gain parameter.
 %                  • For open-loop balancing, use eta=0.
 %                  • For closed-loop (HJB) balancing, use eta=1.

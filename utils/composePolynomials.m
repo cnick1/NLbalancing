@@ -11,7 +11,7 @@ function [F] = composePolynomials(P,T,varargin,nvp)
 %       varargin - the function permits passing 2 or more transformations; if
 %                  more than two are passed, the function will compute the
 %                  result using recursion.
-%   Optional name/value pair inputs:
+%     Optional name/value pair inputs:
 %      degree - desired degree of output. By default, we will compute the full
 %               result, which is the degree of p(x) multiplied by the degree of Φ(z)
 %
