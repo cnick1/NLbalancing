@@ -1,15 +1,21 @@
-% Examples for Paper 4 (by N. Corbin, submitted to ACC 2024 Toronto)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%% Main script to run the examples for ACC %%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%% Author: Nicholas Corbin, UCSD           %%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Usage: Run the entire script to generate the examples for the ACC 2024
+%         Toronto paper [1]. 
+% 
+%  Description: The examples used in reference [1] are:
 %
-%  Description: This script runs the example and produces the data for 
-%  reference [1], submitted to ACC 2024 Toronto. The examples are:
-%
-%    - Example 8: a nonlinear heat equation from [2-4]. The dynamics are 
+%      Example 8: a nonlinear heat equation from [2-4]. The dynamics are 
 %      cubic. The model can be made arbitrarily large with finite elements.
 %
 %  Authors:   Nick Corbin, UCSD
 %
 %  Reference: [1] N. A. Corbin and B. Kramer, “Scalable computation of 𝓗_∞
-%             energy functions for polynomial drift nonlinear systems,” 2023.
+%             energy functions for polynomial drift nonlinear systems,” in
+%             2024 American Control Conference (ACC), IEEE, Jul. 2024, pp.
+%             2506–2511. doi: 10.23919/acc60939.2024.10644363.
 %             [2] M. Embree, “Unstable modes in projection-based
 %             reduced-order models: how many can there be, and what do they
 %             tell you?,” Systems & Control Letters, vol. 124, pp. 49–59,

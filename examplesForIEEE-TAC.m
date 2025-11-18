@@ -1,20 +1,27 @@
-% Examples for Paper 3 (by N. Corbin, submitted to IEEE TAC)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%% Main script to run the examples for TAC %%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%% Author: Nicholas Corbin, UCSD           %%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Usage: Run the entire script to generate the examples for the IEEE TAC
+%         paper [1]. 
+% 
+%  Description: The examples used in reference [1] are:
 %
-%  Description: This script runs all of the examples and produces all of
-%  the data for reference [1], submitted to IEEE TAC. The examples are:
-%
-%    - Example 1: a 1-DOF quadratic-polynomial model for which we can
+%      Example 1: 1-DOF quadratic-polynomial model for which we can
 %      analytically plot the energy functions
-%    - Example 2: a 2-DOF quadratic-bilinear model based on
-%      Scherpen/Kawano [2]
-%    - Example 6: a nonlinear (von Karman) Euler-Bernoulli beam with cable
+%
+%      Example 2: 2-DOF quadratic-bilinear model based on Scherpen/Kawano [2]
+%
+%      Example 6: nonlinear (von Karman) Euler-Bernoulli beam with cable
 %      actuation that provides state dependent inputs. The drift and input
 %      dynamics are up-to cubic. The model can be made arbitrarily large.
 %
 %  Authors:   Nick Corbin, UCSD
 % 
 %  Reference: [1] N. A. Corbin and B. Kramer, “Scalable computation of 𝓗_∞
-%             energy functions for polynomial control-affine systems,” 2024.
+%             energy functions for polynomial control-affine systems,” IEEE
+%             Transactions on Automatic Control, vol. 70, no. 5, pp.
+%             3088–3100, May 2025, doi: 10.1109/tac.2024.3494472.
 %             [2] Y. Kawano and J. M. A. Scherpen, “Model reduction by
 %             differential balancing based on nonlinear hankel operators,”
 %             IEEE Transactions on Automatic Control, vol. 62, no. 7,

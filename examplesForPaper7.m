@@ -1,7 +1,10 @@
-% Examples for Paper 7 (balance-and-reduce)
-%
-%  Description: This script runs the example and produces the data for
-%  reference [1].
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%% Main script to run the examples for     %%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%% Author: Nicholas Corbin, UCSD           %%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Usage: Run the entire script to generate the examples (balance-and-reduce)
+% 
+%  Description: The examples used in reference [1] are:
 %
 %  Authors:   Nick Corbin, UCSD
 %
@@ -48,3 +51,5 @@ runExample31_newtonIteration(4)
 runExample32_balancingTransformation(2)
 runExample32_balancingTransformation(4)
 runExample32_newtonIteration(4)
+
+% 
