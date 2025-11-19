@@ -14,6 +14,8 @@ function [Tbal, sigmaSquared] = balancingTransformation(v, w, nvp)
 %                 balanced realization. The default will be on less than the
 %                 degree of the v, i.e. we will balance everything available, no
 %                 more and no less.
+%       r       - reduced-order dimension if computing a balance-and-reduce
+%                 transformation.
 %       verbose - optional argument to print runtime information
 %
 %   Outputs:     Tbal - cell array containing balancing transformation
@@ -67,10 +69,11 @@ arguments
     v cell
     w cell
     nvp.degree = length(v) - 1
+    nvp.r = sqrt(numel(v{2}))
     nvp.verbose = false
 end
 
-[sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree=nvp.degree, verbose=nvp.verbose);
+[sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree=nvp.degree, verbose=nvp.verbose, r=nvp.r);
 [Tscal, TscalInv] = scalingTransformation(sigmaSquared, degree=nvp.degree);
 Tbal = composePolynomials(TinOd, Tscal, degree=nvp.degree);
 

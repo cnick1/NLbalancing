@@ -14,6 +14,8 @@ function [sigmaSquared, TinOd, vbar, wbar] = inputNormalOutputDiagonalTransforma
 %                 balanced realization. The default will be on less than the
 %                 degree of the v, i.e. we will balance everything available, no
 %                 more and no less.
+%       r       - reduced-order dimension if computing a balance-and-reduce
+%                 transformation.
 %       verbose - optional argument to print runtime information
 %
 %   Outputs:
@@ -76,6 +78,7 @@ arguments
     v cell
     w cell
     nvp.degree = length(v) - 1
+    nvp.r = sqrt(numel(v{2}))
     nvp.verbose = false
 end
 vec = @(X) X(:); % Create a vec function for readability
@@ -101,8 +104,7 @@ L = chol(w{2});             % W₂ = "Q"                 = L*Lᵀ
 [V, Xi, U] = svd(Rinv * L); % same as UΣV=LᵀR⁻ᵀ from Theorem 2, just avoids transposing
 
 % Truncate transformation to order r
-% r = 2;
-% Xi = Xi(1:r,1:r); U = U(:,1:r); V = V(:,1:r);
+Xi = Xi(1:nvp.r,1:nvp.r); U = U(:,1:nvp.r); V = V(:,1:nvp.r);
 
 % Construct linear input-normal/output-diagonal transformation and inverse
 Tin = invertibleMatrix(Rinv.'*V,  Xi\U.'*L.');
@@ -113,19 +115,19 @@ Tin = invertibleMatrix(Rinv.'*V,  Xi\U.'*L.');
 % Name Ṽ₂ and W̃₂; in principle they would be the first two entries, but
 % analytically we know what they are
 % V2tilde = reshape(vtilde{2},n,n); W2tilde = reshape(wtilde{2},n,n);
-V2tilde = speye(n); vtilde{2} = vec(V2tilde);
+V2tilde = speye(nvp.r); vtilde{2} = vec(V2tilde);
 W2tilde = sparse(diag(diag(Xi))) .^ 2; wtilde{2} = vec(W2tilde);
 
 %% Step 2: Compute the higher-order terms in the second transformation
 % Preallocate the cell array, the first term is identity
 Tod = cell(1, nvp.degree);
-Tod{1} = speye(n);
+Tod{1} = speye(nvp.r);
 
 % Compute the higher-order terms according to Corollary 1 [1]
 for k = 3:nvp.degree + 1
     if nvp.verbose; fprintf("    Computing degree %i coefficient... ", k - 1); tic; end
     
-    [Nk, Nkhat] = equivalenceClassIndices(n, k);
+    [Nk, Nkhat] = equivalenceClassIndices(nvp.r, k);
     
     %% Form input-normal equations coefficient matrix
     CoeffMatrix = 2 * Nk;
@@ -144,7 +146,7 @@ for k = 3:nvp.degree + 1
     RHS = [RHS; -Nk * temp];
     
     %% Form output-diagonal equations coefficient matrix
-    CoeffMatrix = [CoeffMatrix; 2 * Nkhat * kron(speye(n ^ (k - 1)), W2tilde)]; % TODO: kronecker rules
+    CoeffMatrix = [CoeffMatrix; 2 * Nkhat * kron(speye(nvp.r ^ (k - 1)), W2tilde)]; % TODO: kronecker rules
     
     temp = zeros(size(Nkhat, 2), 1);
     for i = 2:k - 2
@@ -158,10 +160,10 @@ for k = 3:nvp.degree + 1
     RHS = [RHS; -Nkhat * temp];
     
     %% Form `flexibility' equations (Kronecker product repeated entries)
-    [linclassidx] = referenceElementMap(n, k - 1);
+    [linclassidx] = referenceElementMap(nvp.r, k - 1);
     
     linclassidx(linclassidx) = []; % Basically remove the reference element so one is nonzero and the rest we eliminate
-    idxs = vec((n * (linclassidx - 1) + (1:n)).');
+    idxs = vec((nvp.r * (linclassidx - 1) + (1:nvp.r)).');
     
     %% Set extra parameter equation
     % TODO: find best parameters; for now just solve "a" solution with mldivide
@@ -178,10 +180,10 @@ for k = 3:nvp.degree + 1
     CoeffMatrix(:, idxs) = []; % Kronecker flexibility
     
     % Form index set for the nonzero transformation components
-    indices = 1:n^k; indices(idxs) = [];
+    indices = 1:nvp.r^k; indices(idxs) = [];
     
     %% Solve equations
-    Tod{k-1} = zeros(n, n^(k-1));
+    Tod{k-1} = zeros(nvp.r, nvp.r^(k-1));
     Tod{k-1}(indices) = CoeffMatrix \ RHS;                     % Method 1: matlab uses sparse QR from SuiteSparseQR
     % Tod{k - 1}(indices) = lsqminnorm(CoeffMatrix, RHS);      % Method 2: minimum norm solution
     
@@ -193,24 +195,24 @@ TinOd = cell(1,nvp.degree);
 TinOd{1} = Tin;
 for k = 2:nvp.degree
     TinOd{k} = Tin * Tod{k};
-    TinOd{k} = kronMonomialSymmetrize(TinOd{k}, n, k); % Symmetrize the transformation rows
+    TinOd{k} = kronMonomialSymmetrize(TinOd{k}, nvp.r, k); % Symmetrize the transformation rows
 end
 
 %% Pluck out the singular value function coefficients
 [vbar, wbar] = transformEnergyFunctions(v, w, TinOd, true); % Could transform just the observability; could probably even just compute the diagonal entries
 
-sigmaSquared = zeros(n, nvp.degree);
+sigmaSquared = zeros(nvp.r, nvp.degree);
 for k = 2:nvp.degree + 1
     if k > length(wbar); break; end
     if nvp.verbose
-        [N] = equivalenceClassIndices(n, k);
+        [N] = equivalenceClassIndices(nvp.r, k);
         
         fprintf("      - The largest entry in v%i is %.1e; ", k, max(abs(N * vbar{k}))) % Should be zero, other than the first time which is one
-        fprintf("the largest off-diagonal entry in w%i is %.1e\n", k, max(abs(N(n + 1:end, :) * wbar{k}))) % Should be diagonal
+        fprintf("the largest off-diagonal entry in w%i is %.1e\n", k, max(abs(N(nvp.r + 1:end, :) * wbar{k}))) % Should be diagonal
         
-        sigmaSquared(:, k - 1) = N(1:n, :) * wbar{k}; % Since the index set is already computed
+        sigmaSquared(:, k - 1) = N(1:nvp.r, :) * wbar{k}; % Since the index set is already computed
     else
-        indexSet = linspace(1, n ^ k, n);
+        indexSet = linspace(1, nvp.r ^ k, nvp.r);
         sigmaSquared(:, k - 1) = wbar{k}(indexSet);
     end
 end
@@ -219,7 +221,7 @@ if nvp.verbose
     % Plot the squared singular value functions
     z = linspace(- 1, 1, 101);
     figure; hold on; title("Singular value functions")
-    for i = 1:n
+    for i = 1:nvp.r
         plot(z, real(sqrt(polyval(flip(sigmaSquared(i, :)), z))))
     end
     set(gca,'yscale','log')
