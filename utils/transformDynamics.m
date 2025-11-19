@@ -91,7 +91,7 @@ ft = composePolynomials(f,T,degree=nvp.degree);
 gt = cell(1,max(max(1,lg-1)*ld,lf*ld));
 gt{1} = g{1}; % B is not state dependent
 
-if lg > 1 % If g(x) = B, we're done
+if lg > 1 % Else if g(x) = B, we're done
     % Convert g(x) to ∑ gᵢ(x)
     g_i = cell(m,lg*ld);
     for i=1:m
@@ -137,7 +137,7 @@ end
 % Drift f(x)
 for k = 1:nvp.degree
     if k > length(ft) || isempty(ft{k})
-        ft{k} = sparse(n,n^k);
+        ft{k} = sparse(n,nvp.r^k);
     end
     for i = flip(2:k)                                       % Theoretical sum limits for F_p's; index backwards in i so that p indexes forwards
         p = k - i + 1;
@@ -154,7 +154,7 @@ end
 % Input map g(x)
 for k = 0:nvp.degree-1                                      % lg-1 to deal with zero indexing of Gs
     if k+1 > length(gt) || isempty(gt{k+1})
-        gt{k+1} = sparse(n,m*n^k);
+        gt{k+1} = sparse(n,m*nvp.r^k);
     end
     for i = flip(2:k+1)                                     % Theoretical sum limits for G_p's; index backwards in i so that p indexes forwards
         for jj=1:m
