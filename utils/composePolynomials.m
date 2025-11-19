@@ -69,6 +69,7 @@ arguments
     % nvp.degree = length(P)
     nvp.degree = length(P) * length(T)
 end
+if isempty(nvp.degree); nvp.degree = length(P) * length(T); end
 
 [n1,n2] = size(P{1});
 [n2,n3] = size(T{1});

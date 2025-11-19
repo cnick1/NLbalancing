@@ -73,7 +73,8 @@ arguments
     g
     h
     T
-    nvp.degree = []
+    nvp.degree = length(f)
+    nvp.r = size(T{1},2)
 end
 vec = @(X) X(:);
 
@@ -107,7 +108,7 @@ if lg > 1 % If g(x) = B, we're done
 
     % Now convert transformed ∑ gᵢ(x) vectors back to g(x) matrix
     for j=1:min((lg-1),nvp.degree)
-        gt{j+1} = zeros(n,m*n^j);
+        gt{j+1} = zeros(n,m*nvp.r^j); % The final answer is r x mr^j, but that happens after multiplying the Jacobian inverse 
         for i=1:m
             gt{j+1}(:,i:m:end) = g_i{i,j+1};
         end

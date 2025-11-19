@@ -49,11 +49,12 @@ function P = transformationInverse(T)
 %%
 P = cell(size(T)); % default to producing an expansion the same size as T
 
-n = size(T{1}, 1);
+[n,r] = size(T{1});
 
 P{1} = invertibleMatrix(inv(T{1}), double(T{1})); % See invertibleMatrix; if T{1} is an invertibleMatrix already, inv() does not actually have to compute it
 for i=2:length(T)
-    P{i} = zeros(size(T{i}));
+    % P{i} = zeros(size(T{i}));
+    P{i} = zeros(r, r^i); % The final answer is r x n^i, but that happens after multiplying 𝓣ᵢ,ᵢ⁻¹ 
     for j = 1:(i-1) % Compute the sum ∑ Pⱼ 𝓣ⱼ,ᵢ
         % for idx = 1:n
         %     P{i}(idx,:) = P{i}(idx,:) - calTTv(T,j,i,P{j}(idx,:).').';
