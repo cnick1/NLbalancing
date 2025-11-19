@@ -64,15 +64,15 @@ dispKronPoly(fbal)
 dispKronPoly(gbal)
 
 
-[v] = approxPastEnergy(f, g, h, eta=0, degree=degree);;
-[w] = approxFutureEnergy(f,g,h, 0, degree);
+[v] = approxPastEnergy(f, g, h, eta=0, degree=degree);
+[w] = approxFutureEnergy(f, g, h, eta=0, degree=degree);
 dispKronPoly(v,n=2),fprintf('\b'),dispKronPoly(w,n=2)
 
 [sigmaSquared, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree=degree-1, verbose=true);
 [ft,gt,ht] = transformDynamics(f,g,h,TinOd,degree=degree-1);
 
-[vt] = approxPastEnergy(ft, gt, ht, eta=0, degree=degree);;
-[wt] = approxFutureEnergy(ft, gt, ht, eta=0, degree=degree)
+[vt] = approxPastEnergy(ft, gt, ht, eta=0, degree=degree);
+[wt] = approxFutureEnergy(ft, gt, ht, eta=0, degree=degree);
 dispKronPoly(vt,n=2),fprintf('\b'),dispKronPoly(wt,n=2)
 %% Plot grid transformations
 fprintf('   Plotting coordinate grids under the balancing transformation...\n')
@@ -167,6 +167,6 @@ nexttile(3)
 plot(X2(:,1),X2(:,2),'r--','LineWidth',1.5)
 drawnow
 
-fprintf('    -> The figure confirms that the solution trajectories are identical in the original vs transformed coordinates <a href="matlab:nexttile(4), xlim([-4 4])">locally</a>.\n')
+fprintf('    -> The figure confirms that the solution trajectories are identical in the original vs transformed coordinates <a href="matlab:nexttile(4), xlim([-3 3])">locally</a>.\n')
 
 end

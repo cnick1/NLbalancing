@@ -157,7 +157,7 @@ nexttile(3)
 plot(X2(:,1),X2(:,2),'r--','LineWidth',1.5)
 drawnow
 
-fprintf('    -> The figure confirms that the polynomial balanced realization is very close to the approach using Newton iterations <a href="matlab:nexttile(4), xlim([-4 4])">locally</a>.\n')
+fprintf('    -> The figure confirms that the polynomial balanced realization is very close to the approach using Newton iterations <a href="matlab:nexttile(4), xlim([-3 3])">locally</a>.\n')
 
 end
 

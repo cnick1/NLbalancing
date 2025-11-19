@@ -48,44 +48,23 @@ arguments
 end
 set(groot,'defaultLineLineWidth',1,'defaultTextInterpreter','TeX')
 
-fprintf('Running Example 32\n')
+fprintf('Running Example 32, polynomial balanced realization...\n')
 
 % x0 = [1 -1 -3].'*lim;
-rng(1);
-x0 = [rand(1);rand(1);0];
-% x0 = [1;-1;0];
+% rng(1);
+% x0 = [rand(1);rand(1);0];
+x0 = [-1;-2;0];
 x0 = [x0(1);x0(2);-x0(1)^2-x0(1)^3-x0(2)^2];
 
 %% Get system dynamics
 [f, g, h] = getSystem32(transform=true);
 
 %% Compute balanced realization
-[fbal,gbal,hbal,Tbal] = getBalancedRealization(f,g,h,eta=0,degree=3,transformationDegree=degree-1);
+[fbal,gbal,hbal,Tbal,sigmaSquared] = getBalancedRealization(f,g,h,eta=0,degree=3,transformationDegree=degree-1);
 TbalInv = transformationInverse(Tbal);
 
-%% Compute input-normal/output-diagonal realization
-% [v] = approxPastEnergy(f, g, h, eta=0, degree=degree);
-% [w] = approxFutureEnergy(f, g, h, eta=0, degree=degree);
-% [~, TinOd] = inputNormalOutputDiagonalTransformation(v, w, degree=degree-1);
-% [finOd,ginOd,hinOd] = transformDynamics(f,g,h,TinOd,degree=degree-1);
-% [vbal, wbal] = transformEnergyFunctions(v,w,Tbal);
-% [vinOd, winOd] = transformEnergyFunctions(v,w,TinOd);
-
-% fprintf("  - FOM dynamics:\n")
-% dispKronPoly(f,degree=5)
-%
-% fprintf("  - Balanced dynamics:\n")
-% dispKronPoly(fbal,degree=3)
-%
-% fprintf("  - Energy Functions:\n")
-% dispKronPoly(v,n=3),fprintf("\b"),dispKronPoly(w,n=3)
-%
-% fprintf("  - Input-normal/output-diagonal energy Functions:\n")
-% dispKronPoly(vinOd,n=3),fprintf("\b"),dispKronPoly(winOd,n=3)
-%
-% fprintf("  - Balanced energy Functions:\n")
-% dispKronPoly(vbal,n=3),fprintf("\b"),dispKronPoly(wbal,n=3)
-
+fprintf('  - The balanced realization for the nonlinear model is:\n')
+dispPolyDynamics(fbal,gbal,hbal)
 
 %% Simulate dynamics
 % Compare original dynamics with transformed dynamics
@@ -95,8 +74,9 @@ Fbal = @(z) kronPolyEval(fbal, z);
 %% Simulate original and transformed systems; same input should give same output
 % Solve for z0 initial condition
 z0 = kronPolyEval(TbalInv,x0);
-fprintf(['         -> Initial condition: z0 = [', repmat('%2.2e ', 1, numel(z0)), '], '], z0)
-fprintf('       error: %2.2e \n', norm(kronPolyEval(Tbal,z0)-x0))
+fprintf(['   Simulating the system in the original vs transformed coordinates for initial condition x0 = [', repmat('%2.2e ', 1, numel(x0)), '], ...\n'], x0)
+fprintf(['   ... the transformed initial condition is z0 = [', repmat('%2.2e ', 1, numel(z0)), '] '], z0)
+fprintf(' (error: %2.2e). \n', norm(kronPolyEval(Tbal,z0)-x0))
 
 %% Apply reduction by eliminating z3 (set it and its derivative to zero)
 if reduction
@@ -165,7 +145,7 @@ title('Model output'); xlabel('Time t')
 ylabel('y(t)')
 legend('FOM output','ROM output using hbar(z)','ROM output h(x)')
 
-fprintf('The output error is: %f \n', norm(interp1(t2, y2, 0:.1:5) - interp1(t1, y1, 0:.1:5)))
+fprintf('\n   The output error is: ||yᵣ(t)-y(t)||₂ = %f \n\n', norm(interp1(t2, y2, 0:.1:5) - interp1(t1, y1, 0:.1:5)))
 
 %% Manifold figure plot
 dx = 0.05; lim = 2;
@@ -179,8 +159,21 @@ end
 % surf(z1,z2,z3)
 figure;
 surf(x1,x2,x3)
+xlim([-2 3])
+ylim([-2 2])
+zlim([-20 5])
 drawnow
 % return
+
+    hold on;
+    plot3(X1(:,1),X1(:,2),X1(:,3),'g',DisplayName='FOM solution')
+    plot3(X2(:,1),X2(:,2),X2(:,3),'r',DisplayName='ROM solution')
+
+if degree == 2
+    fprintf('    -> The figure confirms that the reduced-order solution trajectories on the linear balanced subspace fail to capture the full dynamics. \n\n')
+else
+    fprintf('    -> The figure confirms that the reduced-order solution trajectories on the balanced manifold produce the same output as the original dynamics. \n\n')
+end
 %% Simulate the system's response to a random noise input
 % Instead of simulating the nonlinear system, it is much faster to simulate
 % the linear system and then transform the solution

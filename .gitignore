@@ -19,3 +19,7 @@ testing*
 *Testing.m
 examples/TwoDWaveEquationTrefethen.m
 functionsForJeff.m
+TODO.txt
+examples/__pycache__/
+examples/example26ExportedControlFunction.py
+examples/rgb.txt
