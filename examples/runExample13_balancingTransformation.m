@@ -83,7 +83,7 @@ fprintf("\n       ->  𝘐𝘵 𝘢𝘱𝘱𝘦𝘢𝘳𝘴 𝘵𝘩𝘢𝘵 �
 
 
 fprintf('  - The balanced realization for this linear model is:\n')
-[fbal1,gbal1,hbal1,~] = getBalancedRealization(ftr,gtr,htr,eta=0,degree=1);
+[fbal1,gbal1,hbal1,~] = getBalanceThenReduceRealization(ftr,gtr,htr,eta=0,degree=1);
 dispPolyDynamics(fbal1,gbal1,hbal1)
 
 
@@ -91,7 +91,7 @@ fprintf(" ~~~~~~~~~~~~~~~~ Finished comparisons with Gray/Scherpen 2001: ~~~~~~~
 fprintf(" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
 
 %% Compute balanced realization
-[fbal,gbal,hbal,Tbal] = getBalancedRealization(f,g,h,eta=0,transformationDegree=degree-1);
+[fbal,gbal,hbal,Tbal] = getBalanceThenReduceRealization(f,g,h,eta=0,transformationDegree=degree-1);
 TbalInv = transformationInverse(Tbal);
 
 fprintf('  - The balanced realization for the nonlinear model is:\n')

@@ -61,7 +61,7 @@ x0 = [x0(1);x0(2);-x0(1)^2-x0(1)^3-x0(2)^2];
 
 %% Compute balanced realization
 [fbal,gbal,hbal,Tbal,sigmaSquared] = getBalanceThenReduceRealization(f,g,h,r=2,eta=0,degree=3,transformationDegree=degree-1,verbose=true);
-% [fbal2,gbal2,hbal2,Tbal2,sigmaSquared2] = getBalanceThenReduceRealizationOLD(f,g,h,r=2,eta=0,degree=3,transformationDegree=degree-1,verbose=true);
+% [fbal2,gbal2,hbal2,Tbal2,sigmaSquared2] = getBalanceAndReduceRealization(f,g,h,r=2,eta=0,degree=3,transformationDegree=degree-1,verbose=true);
 TbalInv = transformationInverse(Tbal);
 
 fprintf('  - The balanced realization for the nonlinear model is:\n')
@@ -160,9 +160,9 @@ zlim([-20 5])
 drawnow
 % return
 
-    hold on;
-    plot3(X1(:,1),X1(:,2),X1(:,3),'g',DisplayName='FOM solution')
-    plot3(X2(:,1),X2(:,2),X2(:,3),'r',DisplayName='ROM solution')
+hold on;
+plot3(X1(:,1),X1(:,2),X1(:,3),'g',DisplayName='FOM solution')
+plot3(X2(:,1),X2(:,2),X2(:,3),'r',DisplayName='ROM solution')
 
 if degree == 2
     fprintf('    -> The figure confirms that the reduced-order solution trajectories on the linear balanced subspace fail to capture the full dynamics. \n\n')
@@ -174,7 +174,7 @@ end
 % the linear system and then transform the solution
 if false && reduction
     [fl, gl, hl] = getSystem32(transform=false);
-    [fl, gl, hl] = getBalancedRealization(fl,gl,hl,eta=0,degree=1);
+    [fl, gl, hl] = getBalanceThenReduceRealization(fl,gl,hl,eta=0,degree=1);
     
     global T0; opts = odeset(OutputFcn=@odeprog); T0 = tic;
     [T, Z] = ode45(@(t, z) (fl{1}*z + gl{1}*randn(1)), [0, 10], [0;0;0],opts);

@@ -139,17 +139,17 @@ drawnow
 %% Simulate the system's response to a random noise input
 % Instead of simulating the nonlinear system, it is much faster to simulate
 % the linear system and then transform the solution
-if false 
+if false
     [fl, gl, hl] = getSystem32(transform=false);
-    [fl, gl, hl] = getBalancedRealization(fl,gl,hl,eta=0,degree=1);
-
+    [fl, gl, hl] = getBalanceThenReduceRealization(fl,gl,hl,eta=0,degree=1);
+    
     global T0; opts = odeset(OutputFcn=@odeprog); T0 = tic;
     [T, Z] = ode45(@(t, z) (fl{1}*z + gl{1}*randn(1)), [0, 10], [0;0;0],opts);
     X = zeros(size(Z)); Z = 100*Z; % Scale the output to better see the manifold
     for i=1:length(T)
         X(i,:) = [Z(i,1), Z(i,2), Z(i,3) - Z(i,1)^2 - Z(i,2)^2 - Z(i,1)^3]; % Apply the inverse transformation to get the nonlinear solution
     end
-
+    
     hold on;
     plot3(X(:,1),X(:,2),X(:,3),'r')
     xlabel('x_1'); ylabel('x_2'); zlabel('x_3')

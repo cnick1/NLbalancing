@@ -54,7 +54,7 @@ end
 [f, g, h, FofXU] = getSystem31(degree-1);
 
 %% Compute balanced realization
-[fbal,gbal,hbal,Tbal] = getBalancedRealization(f,g,h,eta=0,transformationDegree=degree-1);
+[fbal,gbal,hbal,Tbal] = getBalanceThenReduceRealization(f,g,h,eta=0,transformationDegree=degree-1);
 TbalInv = transformationInverse(Tbal);
 
 %% Compute input-normal/output-diagonal realization
