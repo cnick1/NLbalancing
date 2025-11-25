@@ -132,30 +132,12 @@ end
 % where Σ(z̄) is the diagonal matrix of singular value functions ̅σᵢ(z̄ᵢ). The
 % function balancingTransformation() computes an approximate polynomial
 % expansion for the balancing transformation.
-[Tbal, sigmaSquared] = balancingTransformation(v, w, degree=nvp.degree, verbose=nvp.verbose);
+[Tbal, sigmaSquared] = balancingTransformation(v, w, degree=nvp.degree, verbose=nvp.verbose, r=nvp.r);
 
 if nvp.verbose
     fprintf("    Balancing transformation:\n      ")
     dispKronPoly(Tbal)
 end
-
-%% Step 2.5) Reduce the transformation
-% We need to eliminate any entries that correspond to states beyond r; we
-% can do this by logical indexing
-retainedStates = (1:n) <= nvp.r;
-
-% Balancing transformation x = ̅Φ(z̄)
-entries2keep = 1;
-entries2keep = vec(vec(entries2keep) & retainedStates);
-Tbal{1}.M = Tbal{1}.M(:, entries2keep);
-Tbal{1}.Minv = Tbal{1}.Minv(entries2keep, :);
-for i=2:length(Tbal)
-    entries2keep = vec(vec(entries2keep) & retainedStates);
-    Tbal{i} = Tbal{i}(:, entries2keep);
-end
-
-% Squared singular value functions
-sigmaSquared = sigmaSquared(retainedStates,:);
 
 %% Step 3) Compute the transformed dynamics
 % Given the balancing transformation x = ̅Φ(z̄, now we seek to represent the
