@@ -23,3 +23,13 @@ TODO.txt
 examples/__pycache__/
 examples/example26ExportedControlFunction.py
 examples/rgb.txt
+examples/runExample2_tpbvp.m
+examples/runExample12_energyFunctionPlots.m
+examples/runExample1_radialBasisFunctions.m
+examples/runExample24_inputNormalOutputDiagonal.m
+examples/runExample24_largerGrid.m
+examples/runExample24_smallerGrid.m
+examples/runExample27_balancedReduction2.m
+examples/runExample2_tpbvp.m
+examples/runExample6_timeSimulation_generalized.m
+examples/runExample9_balancedReduction2.m
