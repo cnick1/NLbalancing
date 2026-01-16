@@ -33,3 +33,6 @@ examples/runExample27_balancedReduction2.m
 examples/runExample2_tpbvp.m
 examples/runExample6_timeSimulation_generalized.m
 examples/runExample9_balancedReduction2.m
+examples/runExample24_LTI_demo.m
+examples/runExample32.m
+examples/runExample27.m
