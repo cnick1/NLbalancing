@@ -5,24 +5,11 @@
 %  Usage: Run the entire script to generate the examples
 %
 %  Description: The leading examples I plan on using are
+%     Ex. 6  - Cubic FEM beam
 %     Ex. 12 - 2D Scherpen/Fujimoto cooked up example
+%     Ex. 15 - 4D double pendulum
 %     Ex. 31 - 2D stable pendulum (Newman)
 %     Ex. 32 - 3D toy example w/ nonlinear transformation (Holmes)
-%     Ex. 15 - 4D double pendulum
-%   One of:
-%     Ex. 6  - Cubic FEM beam
-%
-%     Ex. 27 - Cubic FEM heat equation
-%     Ex. 17 - Chain of MSD
-%
-%  Other examples which are included at the end are
-%     Ex. 2  - 2D quadratic bilinear example from my first paper
-%     Ex. 9  - Allen-Cahn (1D)
-%     Ex. 13 - 2D Scherpen/Gray cooked up example
-%     Ex. 14 - 2D double pendulum gradient system
-%     Ex. 16 - 6D triple pendulum
-%     Ex. 23 - Sam Otto's 3D model
-%     Ex. 24 - 2D simplification of Ex. 23
 %
 %
 %  Authors:   Nick Corbin, UCSD
@@ -71,7 +58,7 @@ runExample12_nonlinearBalancing()
 % further away showing the benefit of the linear transformation: if it is
 % locally bijective, it is globally bijective, whereas the nonlinear
 % approach-even before truncation-introduces a locality result!
-runExample31_nonlineaBalancing()
+runExample31_nonlinearBalancing()
 
 %% Holmes 3D model w/ nonlinear transformation
 % Until now, none of the examples have considered truncation; this example
@@ -134,22 +121,3 @@ runExample15_balancedReduction(3,3,2,1)
 % In a twist, I've been able to get the beam example to work somewhat satisfactorily. The story is still the same: there is a trade-off between reducibility and numerical conditioning. Therefore, I was unable to use the model with just tip measurements and control. However, if I add control to each note and measurements to each node, the model does become better conditioned and is still moderately reducible. Curiously, I am seeing the behavior where the horizontal measurement is zero for the nonlinear model with linear transformation AFTER reduction... so the nonlinear output information is in certain states in the linear transformation and different states in the nonlinear transformation, such that that information is truncated in one case but not the other. THAT is VERY interesting. I need to revisit the Fujimoto doouble pendulum example!
 runExample6_nonlinearBalancing()
 
-
-%% Other examples
-% Kawano QB model
-runExample2_balancingTransformation(2)
-runExample2_balancingTransformation(4)
-runExample2_newtonIteration(4)
-% Gray/Scherpen model
-% This example is actually nice because the balanced realization is linear;
-% we can probably work out what the original model was that they
-% transformed using a nonlinear transformation. In fact, the balancing
-% transformation computes the precise transformation we need ☺
-runExample13_balancingTransformation(2)
-runExample13_balancingTransformation(4)
-runExample13_newtonIteration(4)
-
-% Double pendulum gradient system
-runExample14_balancingTransformation(2)
-runExample14_balancingTransformation(4)
-runExample14_newtonIteration(4)
