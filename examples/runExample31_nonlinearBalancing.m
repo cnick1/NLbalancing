@@ -473,32 +473,3 @@ exportgraphics(gca, sprintf('plots/example31_sin2_d%i.pdf',degree), 'ContentType
 
 
 end
-
-
-
-function plotPhasePortrait(degree, u)
-
-% Write dynamics to file
-fileID = fopen('examples\example31ExportedControlFunction.py', 'w');
-
-% Define control law function declaration
-funcStr = 'def u(z1, z2):\n    ';
-
-% Now add the return statement where you print the actual control law in z
-syms z1 z2
-funcStr = [funcStr 'return ' char(vpa(u([z1;z2])))];
-
-% Replace all the matlab stuff with python stuff
-funcStr = strrep(funcStr, '^', '**'); % Replace MATLAB's ^ operator with Python's ** operator
-funcStr = strrep(funcStr, 'sin', 'np.sin'); % Replace MATLAB's sin with np.sin
-funcStr = strrep(funcStr, ';', ','); % Replace MATLAB's ; with , for the array
-
-fprintf(fileID, funcStr);
-
-fclose(fileID);
-
-pyenv('ExecutionMode', 'OutOfProcess'); % Optional: You can switch to 'InProcess' mode if needed
-pyrunfile("examples\plotExample31.py", controlDegree=degree-1)
-open('plots/example31_phasePortrait.pdf')
-terminate(pyenv);
-end
