@@ -99,9 +99,13 @@ end
 vec = @(X) X(:); % Create a vec function for readability
 n = length(f{1});
 
+if ~iscell(f); f = {f}; end
+if ~iscell(g); g = {g}; end
+if ~iscell(h); h = {h}; end
+
 if nvp.verbose
-    fprintf("    Drift Dynamics:\n      ")
-    dispKronPoly(f)
+    fprintf('  - The full-order model polynomial dynamics are:\n');
+    dispPolyDynamics(f,g,h)
 end
 
 %% Step 1) Compute the energy functions
@@ -117,9 +121,12 @@ end
 [w] = approxFutureEnergy(f, g, h, eta=nvp.eta, degree=nvp.transformationDegree+1, verbose=nvp.verbose);
 
 if nvp.verbose
-    fprintf("    Energy functions:\n      ")
-    dispKronPoly(v,n=n), fprintf("\b")
+    fprintf("    Energy functions:\n      𝓔⁻(x) = ½ (")
+    dispKronPoly(v,n=n)
+    fprintf("\b\b\b)\n")
+    fprintf("      𝓔⁺(x) = ½ (")
     dispKronPoly(w,n=n)
+    fprintf("\b\b\b)\n")
 end
 
 %% Step 2) Compute the balancing transformation
@@ -132,11 +139,30 @@ end
 % where Σ(z̄) is the diagonal matrix of singular value functions ̅σᵢ(z̄ᵢ). The
 % function balancingTransformation() computes an approximate polynomial
 % expansion for the balancing transformation.
-[Tbal, sigmaSquared] = balancingTransformation(v, w, degree=nvp.degree, verbose=nvp.verbose, r=nvp.r);
+[Tbal, sigmaSquared] = balancingTransformation(v, w, degree=nvp.transformationDegree, verbose=nvp.verbose, r=nvp.r);
 
 if nvp.verbose
-    fprintf("    Balancing transformation:\n      ")
-    dispKronPoly(Tbal)
+    % Print squared singular value functions and plot them
+    fprintf("    Squared singular value functions:\n\n ")
+    sigmaSquaredDisp = sigmaSquared;
+    sigmaSquaredDisp(sigmaSquaredDisp < 1e-14) = 0;
+    syms z
+    for i = 1:nvp.r
+        fprintf("\b\b       𝜎_%i^2(z) = tau_%i(z e_i) = ", i, i)
+        disp(vpa(poly2sym(flip(sigmaSquaredDisp(i, :)), z), 3))
+    end
+    fprintf("\b")
+    
+    plotSingularValueFunctions(sigmaSquared)
+
+    % Display the balancing transformation
+    s = dispKronPoly(Tbal,variable='z');
+    fprintf("    Balancing transformation:\n      x = Φ(z) = [%s\n",s{1})
+    for i=2:length(s)-1
+        fprintf("                    %s\n",s{i})
+    end
+    fprintf("                  %s]\n",s{end})
+
 end
 
 %% Step 3) Compute the transformed dynamics
@@ -150,8 +176,8 @@ end
 [fbal,gbal,hbal] = transformDynamics(f,g,h,Tbal,degree=nvp.degree);
 
 if nvp.verbose
-    fprintf("    Transformed Drift Dynamics:\n      ")
-    dispKronPoly(fbal)
+    fprintf('  - The reduced-order balanced realization is:\n');
+    dispPolyDynamics(fbal,gbal,hbal,variable='z')
 end
 
 end

@@ -1,4 +1,4 @@
-function [sigmaSquared, TinOd, vbar, wbar] = inputNormalOutputDiagonalTransformation(v, w, nvp)
+function [sigmaSquared, TinOd, vbar, wbar, Xi] = inputNormalOutputDiagonalTransformation(v, w, nvp)
 %inputNormalOutputDiagonalTransformation Return a polynomial input-normal/output-diagonal transformation x = Φ(z).
 %
 %   Usage: [sigmaSquared,Tbar] = inputNormalOutputDiagonalTransformation(v, w)
@@ -98,8 +98,13 @@ n = sqrt(numel(v{2}));
 % they are stored as factoredMatrix objects, where we compute directly
 % their Cholesky factors for square-root balancing. Here, we just retreive
 % the square-root factors.
-Rinv = cholinv(v{2});       % V₂ = "P⁻¹" = (R⁻ᵀ*R⁻¹)⁻¹ = R*Rᵀ
-L = chol(w{2});             % W₂ = "Q"                 = L*Lᵀ
+if isa(v{2},'factoredMatrixInverse') && isa(w{2},'factoredMatrix')
+    Rinv = cholinv(v{2});       % V₂ = "P⁻¹" = (R⁻ᵀ*R⁻¹)⁻¹ = R*Rᵀ
+    L = chol(w{2});             % W₂ = "Q"                 = L*Lᵀ
+else % loses the benefits of square-root balancing
+    Rinv = chol(inv(reshape(v{2},n,n)),'upper');
+    L = chol(reshape(w{2},n,n),'lower');
+end
 [V, Xi, U] = svd(Rinv * L); % same as UΣV=LᵀR⁻ᵀ from Theorem 2, just avoids transposing
 
 % Approach 1: Full-order transformation 
@@ -112,7 +117,7 @@ Tin = invertibleMatrix(Rinv.'*V,  Xi\U.'*L.');
 % analytically we know what they are
 % V2tilde = reshape(vtilde{2},n,n); W2tilde = reshape(wtilde{2},n,n);
 V2tilde = speye(n); vtilde{2} = vec(V2tilde);
-W2tilde = sparse(diag(diag(Xi))) .^ 2; wtilde{2} = vec(W2tilde);
+W2tilde = sparse(diag(diag(Xi.^2))) ; wtilde{2} = vec(W2tilde);
 
 %% Step 2: Compute the higher-order terms in the second transformation
 % Preallocate the cell array, the first term is identity
@@ -180,8 +185,8 @@ for k = 3:nvp.degree + 1
     indices = 1:n^k; indices(idxs) = [];
 
     Tod{k-1} = zeros(n, n^(k-1));
-    Tod{k-1}(indices) = CoeffMatrix \ RHS;                     % Method 1: matlab uses sparse QR from SuiteSparseQR
-    % Tod{k - 1}(indices) = lsqminnorm(CoeffMatrix, RHS);      % Method 2: minimum norm solution
+    % Tod{k-1}(indices) = CoeffMatrix \ RHS;                     % Method 1: matlab uses sparse QR from SuiteSparseQR
+    Tod{k - 1}(indices) = lsqminnorm(CoeffMatrix, RHS);      % Method 2: minimum norm solution
 
     if nvp.verbose; fprintf("completed in %f seconds. \n", toc); end
 end
@@ -211,17 +216,6 @@ for k = 2:nvp.degree + 1
         indexSet = linspace(1, n^k, n);
         sigmaSquared(:, k-1) = wbar{k}(indexSet);
     end
-end
-
-if nvp.verbose
-    % Plot the squared singular value functions
-    z = linspace(- 1, 1, 101);
-    figure; hold on; title("Singular value functions")
-    for i = 1:n
-        plot(z, real(sqrt(polyval(flip(sigmaSquared(i, :)), z))))
-    end
-    set(gca,'yscale','log')
-    xlabel('z_i','Interpreter','TeX'); ylabel('\sigma_i','Interpreter','TeX'); legend('\sigma_1','\sigma_2','Interpreter','TeX')
 end
 
 end
