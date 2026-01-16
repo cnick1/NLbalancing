@@ -113,7 +113,7 @@ if (testFutureEnergyFunction)
     end
     fprintf('The integral approximation to (9) is %12.8e\n', integratedOutputEnergy)
     for degree = 2:d
-        approximatedOutputEnergy = 0.5 * kronPolyEval(w, x0, degree);
+        approximatedOutputEnergy = 0.5 * kronPolyEval(w, x0, degree=degree);
         fprintf('The degree %d approximation to (9) is %12.8e\n', degree, approximatedOutputEnergy)
     end
     fprintf('\n\n')
@@ -187,7 +187,7 @@ if (testPastEnergyFunction)
     end
     fprintf('The integral approximation to (8) is %12.8e\n', integratedControlEnergy)
     for degree = 2:d
-        approximatedControlEnergy = 0.5 * kronPolyEval(v, x0, degree);
+        approximatedControlEnergy = 0.5 * kronPolyEval(v, x0, degree=degree);
         fprintf('The degree %d approximation to (8) is %12.8e\n', degree, approximatedControlEnergy)
     end
     fprintf('\n\n')

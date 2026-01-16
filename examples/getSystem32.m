@@ -82,7 +82,10 @@ if nvp.transform
     [Tnl,~,~] = approxPolynomialDynamics([z(1); z(2); z(3) + a*(z(1)^2 + z(2)^2) + a*(z(1)^3)], gsym, z(1), z, 3);
     
     [f,g,h] = transformDynamics(fbal,gbal,hbal,Tnl,degree=5);
-    % [f,g,h] = transformDynamics(f,g,h,transformationInverse(Tbal),degree=5); % Can also reverse the linear transformation
+
+    % We could also reverse the linear transformation; however, it doesn't
+    % clean up the dynamics in a nice way as one might hope
+    % [f,g,h] = transformDynamics(f,g,h,transformationInverse(Tbal),degree=5); 
     
 end
 

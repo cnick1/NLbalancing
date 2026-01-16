@@ -1,12 +1,9 @@
-function [f, g, h, IC] = getSystem6(numElements, actuatorConfig, rotaryInertia)
-%getSystem6  Generates a cubic finite element beam model system for testing
-%            energy functions. The system is a finite element model for a
-%            nonlinear (due to von Karman strains) Euler-Bernoulli Beam.
-%            For a model with numElements elements, the returned
-%            state-space system will have 6*numElements degrees of freedom
-%            (because each element has two nodes, each with 6 degrees of
-%            freedom (3 position, 3 velocity), and the first node is
-%            fixed).
+function [E, f, g, h, IC] = getSystem6(numElements, actuatorConfig, rotaryInertia, generalizedForm)
+%getSystem6  Generates a cubic finite element beam model. The system models a
+% nonlinear (due to von Karman strains) Euler-Bernoulli Beam with numElements
+% elements, returning a state-space system with 6*numElements degrees of freedom
+% (because each element has two nodes, each with 6 degrees of freedom (3
+% position, 3 velocity), and the first node is fixed).
 %
 %   Usage:   [f,g,h] = getSystem6(numElements,actuatorConfig,rotaryInertia)
 %
@@ -20,15 +17,18 @@ function [f, g, h, IC] = getSystem6(numElements, actuatorConfig, rotaryInertia)
 %       rotaryInertia  - Boolean variable to determine if rotary inertia
 %                        is included in the mass matrix; note this breaks
 %                        the symmetry of the mass matrix.
+%     generalizedForm  - Boolean variable to determine whether or not to invert
+%                        the mass matrix to put the model in standard form
 %
-%   Outputs:     f,g,h - Cell arrays containing the polynomial coefficients
-%                        for the drift, input, and output
+%   Outputs:    E - mass matrix for dynamics in generalized form
+%          f,g,h  - Cell arrays containing the polynomial coefficients for
+%                   the drift, input, and output in generalized form
 %
-%   Description: after finite element discretization, the finite element
-%   equations for the beam can be written as
+%   Description: After discretization, the finite element equations for the beam
+%   can be written as
 %
-%     M q̈ + D q̇ + K(q) q = B(q) u,
-%     y = C₁ q̇ + C₂ q.
+%           M q̈ + D q̇ + K(q) q = B(q) u,
+%           y = C₁ q̇ + C₂ q.
 %
 %   The terms K(q) and B(q) can be approximated with Taylor series
 %   expansions, which leads to the Kronecker product representation
@@ -51,29 +51,20 @@ function [f, g, h, IC] = getSystem6(numElements, actuatorConfig, rotaryInertia)
 %
 %   Part of the NLbalancing repository.
 %%
-
-% TODO: Add standard LU if using rotary inertia
-% TODO: Consider "change of variables" instead of inverting M
-
-vec = @(X) X(:);
-
-if nargin < 3
-      if nargin < 2
-            if nargin < 1
-                  numElements = 3;
-            end
-            actuatorConfig = 2;
-      end
-      rotaryInertia = false;
+arguments
+numElements = 3
+actuatorConfig = 1
+rotaryInertia = false
+generalizedForm = false
 end
-
+vec = @(X) X(:);
 %% Define beam geometry and properties
 BeamLength = 1; % length of beam
-ElasticModulus = 210e9; % Young's modulus
-CrossSecArea = 1e-1; % cross-sectional area
+ElasticModulus = 1e1; % Young's modulus
+CrossSecArea = 5000; % cross-sectional area
 % MomOfInertia = pi^2/16/1.8751040^2*CrossSecArea;
-MomOfInertia = 1e-2; % moment of inertia .5e-2
-density = 8000; % density
+MomOfInertia = 1e-1; % moment of inertia .5e-2
+density = 1/5000; % density
 delta = 0.1; % Cable attachment distance from centerline of beam if actuatorConfiguration = 2
 
 % Define element properties
@@ -247,6 +238,7 @@ end
 %% RHS
 switch actuatorConfig
       case 1 % Cable x and y
+            m=2;
             RB0 = sparse(TotalDOFs, 2);
             RB1 = sparse(TotalDOFs, 2 * TotalDOFs);
             RB2 = sparse(TotalDOFs, 2 * TotalDOFs ^ 2);
@@ -255,8 +247,20 @@ switch actuatorConfig
             RB0(TotalDOFs - 2, 2) = 1; % Force in x direction
             RB0(TotalDOFs - 1, 1) = 1; % Force in y direction
             RB0(TotalDOFs, :) = 0; % Moment in z direction
+
+      case 3 % Cable x and y on each node (to  try to be controllable)
+            m = (numNodes-1)*2;
+            RB0 = sparse(TotalDOFs, m);
+            RB1 = sparse(TotalDOFs, m * TotalDOFs);
+            RB2 = sparse(TotalDOFs, m * TotalDOFs ^ 2);
+            RB3 = sparse(TotalDOFs, m * TotalDOFs ^ 3);
             
+            RB0(4:3:TotalDOFs, 1:m/2) = eye(m/2); % Forces in x direction
+            RB0(5:3:TotalDOFs - 1, m/2+1:end) = eye(m/2); % Force in y direction
+            RB0(TotalDOFs, :) = 0; % Moment in z direction
+
       case 2 % Two displaced cables along beam
+            m=2;
             RB0 = sparse(TotalDOFs, 2);
             RB1 = sparse(TotalDOFs, 2 * TotalDOFs);
             RB2 = sparse(TotalDOFs, 2 * TotalDOFs ^ 2);
@@ -338,21 +342,31 @@ freeDOFsCubed = setdiff(1:TotalDOFs ^ 3, fixedDOFsCubed);
 K3G = K3G(freeDOFs, freeDOFsCubed);
 RB3 = RB3(freeDOFs, [freeDOFsCubed, freeDOFsCubed + TotalDOFs ^ 3]);
 
-D1G = 0.00005 * M1G + 0.00005 * K1G; % Add some damping for numerical stability
+D1G = 0.001 * M1G + 0.001 * K1G; % Add some damping for numerical stability
 
 %% Convert to state-space representation
-if false
-      n = length(M1G);
-      
-      Minv = inv(M1G); % Use cholesky factor for inverting rather than inv()
-      
-      N1 = [sparse(n, n), speye(n);
-            - (Minv * K1G), - (Minv * D1G)];
-      
-      G0 = [sparse(n, 2);
-            (Minv * RB0)];
-      
-      C = sparse(1, 2 * n); C(1, n - 1) = 1;
+% At present, we have a second-order mechanical system with governing equations
+%
+%     M1G q̈ + D1G q̇ + K1G q + K2G (q ⊗ q) + K3G (q ⊗ q ⊗ q) + ...
+%       = RB0 u
+%     y = C₁ q̇ + C₂ q.
+%
+%   Defining the state vector x = [q q̇]^T, we can convert to a first-order
+%   nonlinear state-space
+%
+%     ẋ = A x + N₂ (x ⊗ x) + N₃ (x ⊗ x ⊗ x) ...
+%          + G₀ u + G₁ (x ⊗ u) + G₂ (x ⊗ x ⊗ u) + G₃ (x ⊗ x ⊗ x ⊗ u)
+%     y  = C₁ q̇ + C₂ q.
+
+if generalizedForm
+    n = length(M1G);
+    E = [speye(n), sparse(n,n);
+          sparse(n,n), M1G]; 
+    A = [sparse(n, n), speye(n);
+          - K1G, - D1G];
+    B = [sparse(n, 2);
+          RB0];
+      C = sparse(1, 2 * n); C(1, n - 2) = 1;
       
       % Construct N₂
       p = 2;
@@ -360,8 +374,8 @@ if false
       In2 = sparse(2 * n ^ p, (2 * n) ^ p);
       In2(:, idxs) = speye(2 * n ^ p);
       
-      N2 = [sparse(n, n ^ 2), sparse(n, n ^ 2);
-            - (Minv * K2G), sparse(n, n ^ 2)] * In2;
+      F2 = [sparse(n, n ^ 2), sparse(n, n ^ 2);
+          - K2G, sparse(n, n ^ 2)] * In2;
       
       % Construct N₃
       p = 3;
@@ -369,31 +383,64 @@ if false
       In3 = sparse(2 * n ^ p, (2 * n) ^ p);
       In3(:, idxs) = speye(2 * n ^ p);
       
-      N3 = [sparse(n, n ^ 3), sparse(n, n ^ 3);
-            - (Minv * K3G), sparse(n, n ^ 3)] * In3;
+      F3 = [sparse(n, n ^ 3), sparse(n, n ^ 3);
+          - K3G, sparse(n, n ^ 3)] * In3;
       
       % Construct G
       Im = speye(2);
       G1 = [sparse(n, 2 * n), sparse(n, 2 * n);
-            (Minv * RB1), sparse(n, 2 * n)];
+          RB1, sparse(n, 2 * n)];
       
       G2 = [sparse(n, 2 * n ^ 2), sparse(n, 2 * n ^ 2);
-            (Minv * RB2), sparse(n, 2 * n ^ 2)] * kron(In2, Im);
+          RB2, sparse(n, 2 * n ^ 2)] * kron(In2, Im);
       
       G3 = [sparse(n, 2 * n ^ 3), sparse(n, 2 * n ^ 3);
-            (Minv * RB3), sparse(n, 2 * n ^ 3)] * kron(In3, Im); % Can take a while due to linear solves; consider replacing with Minv actually because it is just n linear solves, not n^3
+            RB3, sparse(n, 2 * n ^ 3)] * kron(In3, Im); % Can take a while due to linear solves; consider replacing with Minv actually because it is just n linear solves, not n^3
+      
+      
+      %%% Standard mass matrix inversion
+      % n = length(M1G);
+      % Minv = inv(M1G); % Use cholesky factor for inverting rather than inv()
+      % A = [sparse(n, n), speye(n);
+      %       - (Minv * K1G), - (Minv * D1G)];
+      %       B = [sparse(n, 2);
+      %           (Minv * RB0)];
+      % C = sparse(1, 2 * n); C(1, n - 1) = 1;
+      % % Construct N₂
+      % p = 2;
+      % idxs = vec(vec((1:n).' + (0:2 * n:2 * n * (n - 1))) + [0, (2 * n) ^ p / 2 + (2 * n) ^ (p - 1) / 2 + n * (p - 2)]);
+      % In2 = sparse(2 * n ^ p, (2 * n) ^ p);
+      % In2(:, idxs) = speye(2 * n ^ p);
+      % F2 = [sparse(n, n ^ 2), sparse(n, n ^ 2);
+      %       - (Minv * K2G), sparse(n, n ^ 2)] * In2;
+      % % Construct N₃
+      % p = 3;
+      % idxs = vec(vec(vec((0:(2 * n) ^ (1 - 1):(2 * n) ^ (1 - 1) * (n - 1)).' + 1 + (0:(2 * n) ^ (2 - 1):(2 * n) ^ (2 - 1) * (n - 1))) + (0:(2 * n) ^ (3 - 1):(2 * n) ^ (3 - 1) * (n - 1))) + [0, (2 * n) ^ p / 2 + (2 * n) ^ (p - 1) / 2 + n * (p - 2)]);
+      % In3 = sparse(2 * n ^ p, (2 * n) ^ p);
+      % In3(:, idxs) = speye(2 * n ^ p);
+      % F3 = [sparse(n, n ^ 3), sparse(n, n ^ 3);
+      %       - (Minv * K3G), sparse(n, n ^ 3)] * In3;
+      % % Construct G
+      % Im = speye(2);
+      % G1 = [sparse(n, 2 * n), sparse(n, 2 * n);
+      %       (Minv * RB1), sparse(n, 2 * n)];
+      
+      % G2 = [sparse(n, 2 * n ^ 2), sparse(n, 2 * n ^ 2);
+      %       (Minv * RB2), sparse(n, 2 * n ^ 2)] * kron(In2, Im);
+      % G3 = [sparse(n, 2 * n ^ 3), sparse(n, 2 * n ^ 3);
+      %       (Minv * RB3), sparse(n, 2 * n ^ 3)] * kron(In3, Im); % Can take a while due to linear solves; consider replacing with Minv actually because it is just n linear solves, not n^3
 else
       n = length(M1G);
       
       McholL = chol(M1G).'; % Use cholesky factor for inverting rather than inv()
-      
-      N1 = [sparse(n, n), speye(n);
+      E = speye(2*n);
+      A = [sparse(n, n), speye(n);
             -McholL.' \ (McholL \ K1G), -McholL.' \ (McholL \ D1G)];
       
-      G0 = [sparse(n, 2);
+      B = [sparse(n, m);
             McholL.' \ (McholL \ RB0)];
       
-      C = sparse(2, 2 * n); C(1, n - 1) = 1;
+      C = sparse(1, 2 * n); C(1, n - 2) = 1;
       % C(2, n - 2) = 1;
       
       % Construct N₂
@@ -402,7 +449,7 @@ else
       In2 = sparse(2 * n ^ p, (2 * n) ^ p);
       In2(:, idxs) = speye(2 * n ^ p);
       
-      N2 = [sparse(n, n ^ 2), sparse(n, n ^ 2);
+      F2 = [sparse(n, n ^ 2), sparse(n, n ^ 2);
             -McholL.' \ (McholL \ K2G), sparse(n, n ^ 2)] * In2;
       
       % Construct N₃
@@ -411,7 +458,7 @@ else
       In3 = sparse(2 * n ^ p, (2 * n) ^ p);
       In3(:, idxs) = speye(2 * n ^ p);
       
-      N3 = [sparse(n, n ^ 3), sparse(n, n ^ 3);
+      F3 = [sparse(n, n ^ 3), sparse(n, n ^ 3);
             -McholL.' \ (McholL \ K3G), sparse(n, n ^ 3)] * In3;
       
       % Construct G
@@ -428,16 +475,16 @@ end
 
 %% Scale input/state/output matrices?
 % warning("Look into rescaling for improved numerical performance")
-timeScaling = 1e-5;  %
-inputScaling = 1;
-outputScaling = 1;
-N1 = N1*timeScaling; N2 = N2*timeScaling; N3 = N3*timeScaling;
-% G0 = G0*inputScaling; G1 = G1*inputScaling; G2 = G2*inputScaling; G3 = G3*inputScaling;
-C = C*outputScaling;
+% timeScaling = 1e-5;  %
+% inputScaling = 1;
+% outputScaling = 1;
+% A = A*timeScaling; F2 = F2*timeScaling; F3 = F3*timeScaling;
+% % B = B*inputScaling; G1 = G1*inputScaling; G2 = G2*inputScaling; G3 = G3*inputScaling;
+% C = C*outputScaling;
 
 %% Format outputs
-f = {full(N1), N2, N3};
-g = {full(G0), G1, G2, G3};
+f = {A, F2, F3};
+g = {B, G1, G2, G3};
 h = {full(C)};
 
 %% Form initial condition
@@ -458,7 +505,7 @@ T = diag([ones(n,1);1e-5*ones(n,1)]);
 A = f{1};
 At = T * f{1} / T;
 
-B = full(G0);
+B = full(B);
 Bt = diag([ones(n,1);1e5*ones(n,1)]) * B;
 
 % scaleFactor = 1e-9;

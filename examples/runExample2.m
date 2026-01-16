@@ -103,8 +103,8 @@ if (plotEnergy || plotBalancing)
     for i = 1:nY
         for j = 1:nX
             x = [X(i, j); Y(i, j)];
-            ePast(i, j) = 0.5 * kronPolyEval(v, x, degree);
-            eFuture(i, j) = 0.5 * kronPolyEval(w, x, degree);
+            ePast(i, j) = 0.5 * kronPolyEval(v, x, degree=degree);
+            eFuture(i, j) = 0.5 * kronPolyEval(w, x, degree=degree);
         end
     end
     set(groot, 'defaultAxesTickLabelInterpreter', 'latex');

@@ -30,9 +30,9 @@ fprintf("\n  - Comparing our energy function with Gray/Scherpen 2001 Example 2.1
 v{3}(abs(v{3}) < 1e-14) = 0; v{4}(abs(v{4}) < 1e-14) = 0; w{3}(abs(w{3}) < 1e-14) = 0; w{4}(abs(w{4}) < 1e-14) = 0;
 
 fprintf("\n    > Controllability energy: \n        Lc = 1/2 *(")
-disp(vpa(kronPolyEval(v, sym('x', [1, 2]).'), 2))
+disp(vpa(kronPolyEval(v, sym('x', [1, 2]).'), degree=2))
 fprintf("    > Observability energy: \n        Lo = 1/4 *(")
-disp(vpa(kronPolyEval(w, sym('x', [1, 2]).') * 2, 2))
+disp(vpa(kronPolyEval(w, sym('x', [1, 2]).') * 2, degree=2))
 
 fprintf("                             ->  Energy functions match.\n\n")
 
@@ -63,7 +63,7 @@ for i = 2:length(ourFullTransformation)
 end
 
 fprintf("    > Our full input-normal/output-diagonal transformation is: \n\n         𝚽(z) = ")
-disp(vpa(kronPolyEval(ourFullTransformation, sym('z', [1, 2]).'), 2))
+disp(vpa(kronPolyEval(ourFullTransformation, sym('z', [1, 2]).'), degree=2))
 
 %% Gray transformation
 z = sym('z', [1, 2]).'; syms(z);
@@ -77,8 +77,8 @@ TGray = composePolynomials(Tin2, TinOd2, degree=degree-1);
 fprintf("    > The transformation supposed to be in Gray/Scherpen 2001 is: \n\n         𝚽(z) = ")
 % fprintf('%s \n', char(Tsym))
 % fprintf("     which can be approximated via Taylor series as: \n\n         𝚽(z) = ")
-% fprintf('%s \n', char(vpa(kronPolyEval(TGray, sym('z', [1, 2]).'), 2)))
-disp(vpa(kronPolyEval(TGray, sym('z', [1, 2]).'), 8))
+% fprintf('%s \n', char(vpa(kronPolyEval(TGray, sym('z', [1, 2]).'), degree=2)))
+disp(vpa(kronPolyEval(TGray, sym('z', [1, 2]).'), degree=8))
 
 [vtilde, wtilde] = transformEnergyFunctions(v, w, TGray);
 
@@ -86,8 +86,8 @@ thresh = 2e-14;
 vtilde{3}(abs(vtilde{3}) < thresh) = 0; vtilde{4}(abs(vtilde{4}) < thresh) = 0; wtilde{2}(abs(wtilde{2}) < thresh) = 0; wtilde{3}(abs(wtilde{3}) < thresh) = 0; wtilde{4}(abs(wtilde{4}) < thresh) = 0;
 
 fprintf("\n    > Controllability energy: \n        Lc = 1/2 *(")
-disp(vpa(kronPolyEval(vtilde, sym('x', [1, 2]).'), 2))
+disp(vpa(kronPolyEval(vtilde, sym('x', [1, 2]).'), degree=2))
 fprintf("    > Observability energy: \n        Lo = 1/2 *(")
-disp(vpa(kronPolyEval(wtilde, sym('x', [1, 2]).'), 2))
+disp(vpa(kronPolyEval(wtilde, sym('x', [1, 2]).'), degree=2))
 
 end

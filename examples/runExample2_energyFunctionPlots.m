@@ -46,8 +46,8 @@ ePast = zeros(N, N); eFuture = zeros(N, N);
 for i = 1:N
     for j = 1:N
         x = [X(i, j); Y(i, j)];
-        ePast(i, j) = 0.5 * kronPolyEval(v, x, degree);
-        eFuture(i, j) = 0.5 * kronPolyEval(w, x, degree);
+        ePast(i, j) = 0.5 * kronPolyEval(v, x, degree=degree);
+        eFuture(i, j) = 0.5 * kronPolyEval(w, x, degree=degree);
     end
 end
 set(groot, 'defaultColorbarTickLabelInterpreter', 'latex','defaultAxesTickLabelInterpreter', 'latex', 'defaulttextinterpreter', 'latex', 'defaultLegendInterpreter', 'latex');

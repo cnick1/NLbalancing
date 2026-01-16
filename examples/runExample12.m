@@ -99,14 +99,14 @@ fprintf("                             ->  Example 3 results match.\n\n")
 % fprintf("    > The full input-normal/output-diagonal transformation is: \n\n         𝚽(z) = ")
 %
 % TinOd{3}(abs(TinOd{3}) < 1e-14) = 0;TinOd{5}(abs(TinOd{5}) < 1e-14) = 0;
-% disp(vpa(kronPolyEval(TinOd(1:5),sym('z', [1, 2]).'),4))
+% disp(vpa(kronPolyEval(TinOd(1:5),sym('z', [1, 2]).'),degree=4))
 
 ourFullTransformation = TinOd;
 
 % [ft, gt, ht] = transformDynamics(f, g, h, TinOd);
 %
 % for i=1:length(ft); ft{i}(abs(ft{i}) < 1e-14) = 0; end
-% disp(vpa(kronPolyEval(ft, sym('z', [1, 2]).',5), 2))
+% disp(vpa(kronPolyEval(ft, sym('z', [1, 2]).',degree=5), 2))
 %
 % for i=1:length(TinOd); ourFullTransformation{i}(abs(TinOd{i}) < 1e-14) = 0; end
 % vpa(kronPolyDerivEval(ourFullTransformation, sym('z', [1, 2]).',1), 2)
@@ -194,7 +194,7 @@ dispKronPoly(what,n=2)
 % [ft, gt, ht] = transformDynamics(f, g, h, TinOd);
 %
 % for i=1:length(ft); ft{i}(abs(ft{i}) < 1e-14) = 0; end
-% disp(vpa(kronPolyEval(ft, sym('z', [1, 2]).',5), 2))
+% disp(vpa(kronPolyEval(ft, sym('z', [1, 2]).',degree=5), 2))
 
 return
 

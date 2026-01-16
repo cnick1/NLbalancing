@@ -5,7 +5,7 @@ function runExample6_timeSimulation(x0)
 %
 %   Input: x0 - Initial condition scaling factor
 %
-%   Reference: [1] N. A. Corbin and B. K    ramer, "Scalable computation of 𝓗_∞
+%   Reference: [1] N. A. Corbin and B. Kramer, "Scalable computation of 𝓗_∞
 %               energy functions for polynomial control-affine systems,” 2023.
 %
 %   Part of the NLbalancing repository.
@@ -19,18 +19,21 @@ end
 numEls = 3; numNodes = numEls + 1; n = 6*numEls;
 
 % Compute energy functions and CPU time
-[f, g, ~, initialCondition] = getSystem6(numEls, 2);
+[E, f, g, h, initialCondition] = getSystem6(numEls, 1);
+g = g(1);
 % initialCondition([1,4,7]) = 0;
 IC = x0 * initialCondition;
 % IC = 0*initialCondition;
 % IC2 = IC; IC2([1,4,7]) = 0;
 % IC1 = IC; IC1([2,5,8]) = 0;
 
-tspan  = [0, 1e6]; 
+tspan  = [0, 500];
 u = [0; 0]; 
 % u = [-5e9; 5e9];
 % u = [-1e10; 1e10];
-[t, X] = ode23(@(t, x) [FofXU(f(1), g(1), x(1:n), u); FofXU(f, g, x(n+1:2*n), u)], tspan, [IC; IC]);
+opts = odeset(OutputFcn=@odeprog);
+global T0; T0 = tic;
+[t, X] = ode23(@(t, x) [FofXU(f(1), g(1), x(1:n), u); FofXU(f, g, x(n+1:2*n), u)], tspan, [IC; IC], opts);
 % [t, X] = ode45(@(t, x) [FofXU(f(1), g(1), x(1:n), u); FofXU(f(1), g(1), x(n+1:2*n), u)], tspan, [2*IC1; IC2]);
 
 Xlin = X(:,1:n);
@@ -99,36 +102,4 @@ GofX = g{1}; lg = length(g); Im = speye(size(g{1},2));
 xk = 1; for k=2:lg; xk = kron(xk, x); GofX = GofX + g{k} * kron(xk, Im); end
 
 xdot = FofX + GofX*u;
-end
-
-function [T, Y] = odeFE(odefun, tspan, y0, h)
-% odeFE Solves an ODE using the Forward Euler method.
-%   [T, Y] = odeFE(odefun, tspan, y0, h) integrates the system of
-%   differential equations y' = odefun(t, y) from time tspan(1) to tspan(2)
-%   with initial conditions y0 using the step size h. odefun is a function
-%   handle that accepts two inputs, time t and state y, and returns the
-%   derivatives dy/dt.
-if nargin < 4
-    h = 0.0000001;
-end
-% Define the time vector from tspan(1) to tspan(2) with step size h
-T = tspan(1):h:tspan(2);
-if T(end) ~= tspan(2)
-    T = [T, tspan(2)]; % Ensure the final time point is included
-end
-n = length(T);
-
-% Initialize the solution matrix
-Y = zeros(length(y0), n);
-Y(:, 1) = y0;
-
-% Forward Euler integration
-for i = 1:n-1
-    t = T(i);
-    y = Y(:, i);
-    Y(:, i+1) = y + h * odefun(t, y);
-end
-
-% Transpose the output to match the format of ode45 and ode23
-T = T'; Y = Y';
 end

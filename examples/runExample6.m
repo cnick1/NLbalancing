@@ -42,7 +42,7 @@ for i=1:numTestCases
     fprintf(' %5d      &%4d  & ', numEls(i), 6 * numEls(i));
     
     % Compute energy functions and CPU time
-    [f, g, h, IC] = getSystem6(numEls(i), 2);
+    [~, f, g, h, IC] = getSystem6(numEls(i), 2);
     tic; for j = 1:nTest(i), [w] = approxFutureEnergy(f, g, h, eta=eta, degree=degree); end, tt = toc / nTest(i);
     
     % Evaluate energy function at x0 corresponding to nodes having linear

@@ -112,8 +112,8 @@ if (plotEnergy || plotBalancing)
         for j = 1:nX
             x = [X1(i, j); X2(i, j)];
             % First in original coordinates...
-            ePastOriginal(i, j) = 0.5 * kronPolyEval(v, x, degree);
-            eFutureOriginal(i, j) = 0.5 * kronPolyEval(w, x, degree);
+            ePastOriginal(i, j) = 0.5 * kronPolyEval(v, x, degree=degree);
+            eFutureOriginal(i, j) = 0.5 * kronPolyEval(w, x, degree=degree);
             % ...then in input-normal coordinates.
             z = [Z1(i, j); Z2(i, j)];
             xTrans = kronPolyEval(T, z, balancingDegree);
@@ -164,7 +164,7 @@ if (plotEnergy || plotBalancing)
             for j = 1:nX
                 x = [X12(i, j); X22(i, j)];
                 % First in original coordinates...
-                ePastOriginal2(i, j) = 0.5 * kronPolyEval(v, x, degree);
+                ePastOriginal2(i, j) = 0.5 * kronPolyEval(v, x, degree=degree);
                 % ...then in input-normal coordinates.
                 z = [Z12(i, j); Z22(i, j)];
                 xTrans = kronPolyEval(T, z, balancingDegree);

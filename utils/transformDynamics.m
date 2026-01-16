@@ -93,12 +93,12 @@ gt{1} = g{1}; % B is not state dependent
 
 if lg > 1 % Else if g(x) = B, we're done
     % Convert g(x) to ∑ gᵢ(x)
-    g_i = cell(m,lg*ld);
+   g_i = cell(m,lg*ld);
     for i=1:m
         for j=1:(lg-1)
             g_i{i,j+1} = g{j+1}(:,i:m:end);
         end
-    end
+    end 
 
     % Transform gᵢ(x)
     for i=1:m

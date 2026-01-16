@@ -46,7 +46,7 @@ set(groot,'defaultLineLineWidth',1,'defaultTextInterpreter','TeX')
 fprintf('Running Example 12, balanced realization via Newton iterations...\n')
 
 if nargin < 2
-    lim = 3;
+    lim = 0.75;
     if nargin < 1
         degree = 4;
     end

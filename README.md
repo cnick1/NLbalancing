@@ -81,7 +81,7 @@ From an initial `x0`, we can compute the approximation to the energy function as
 ```
 or, using the utility function,
 ```
->>  E = (1/2)*kronPolyEval(v,x0,degree);
+>>  E = (1/2)*kronPolyEval(v,x0);
 ```
 TODO: Document input-normal and output-diagonal transformations.
 

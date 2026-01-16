@@ -37,10 +37,10 @@ degree = 4;
 fprintf("\n  - Comparing our energy function with Scherpen/Gray 2000:\n")
 
 fprintf("    Observability energy: \n        Lo = ")
-disp(vpa(kronPolyEval(w, sym('x', [1, 2]).') / 2, 6))
+disp(vpa(kronPolyEval(w, sym('x', [1, 2]).') / 2, degree=6))
 
 fprintf("    Controllability energy: \n        Lc = ")
-disp(vpa(kronPolyEval(v, sym('x', [1, 2]).') / 2, 6))
+disp(vpa(kronPolyEval(v, sym('x', [1, 2]).') / 2, degree=6))
 
 fprintf("\n                             ->  Energy functions match.\n\n")
 
@@ -57,10 +57,10 @@ degree = 4;
 fprintf("\n  - Comparing our energy function with Fujimoto/Scherpen 2005:\n")
 
 fprintf("    Controllability energy: \n        Lc = ")
-disp(vpa(kronPolyEval(v, sym('x', [1, 2]).') / 2, 5))
+disp(vpa(kronPolyEval(v, sym('x', [1, 2]).') / 2, degree=5))
 
 fprintf("    Observability energy: \n        Lo = ")
-disp(vpa(kronPolyEval(w, sym('x', [1, 2]).') / 2, 5))
+disp(vpa(kronPolyEval(w, sym('x', [1, 2]).') / 2, degree=5))
 
 fprintf("\n                             ->  Energy functions match.\n\n")
 

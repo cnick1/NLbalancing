@@ -48,7 +48,7 @@ for xi = 1:n
     energies = zeros(nPoints, 1);
     for i = 1:nPoints
         x = xs(i, :).';
-        energies(i) = 0.5 * kronPolyEval(w, x, degree);
+        energies(i) = 0.5 * kronPolyEval(w, x, degree=degree);
     end
     
     subplot(1, n, xi)
@@ -69,7 +69,7 @@ eFuture = zeros(nY, nX);
 for i = 1:nY
     for j = 1:nX
         x = [X(i, j); Y(i, j)];
-        eFuture(i, j) = 0.5 * kronPolyEval(w, x, degree);
+        eFuture(i, j) = 0.5 * kronPolyEval(w, x, degree=degree);
         if eFuture(i, j) < 0
             eFuture(i, j) = NaN;
         end

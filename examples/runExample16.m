@@ -13,12 +13,12 @@ function runExample16()
 fprintf('Running Example 16\n')
 eta = 0;
 
-degree = 4;
+degree = 6;
 [f, g, h] = getSystem16(degree - 1);
 
 %  Compute the energy functions
 [v] = approxPastEnergy(f, g, h, eta=eta, degree=degree);
-[w] = approxFutureEnergy(f, g, h, eta=eta, degree=degree);;
+[w] = approxFutureEnergy(f, g, h, eta=eta, degree=degree);
 
 fprintf("Beginning comparisons with Krener 2008:\n")
 
@@ -51,6 +51,6 @@ end
 return
 %% Compare transformation
 fprintf("\n  - Comparing our transformation with Krener 2008:\n")
-disp(vpa(kronPolyEval(TinOd, sym('x', [1, 6]).'), 2))
+disp(vpa(kronPolyEval(TinOd, sym('x', [1, 6]).'), degree=2))
 
 end

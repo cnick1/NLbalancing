@@ -32,11 +32,11 @@ F = @(x) kronPolyEval(f, x);
 % U2 = @(x) [0;0;0]; U3 = [0;0;0];
 
 % This is the reduced dynamics retaining nonlinear g(x)
-G = @(x) (g{1} + kronPolyEval(g(2:end), x));
+G = @(x) kronPolyEval(g, x, scenario='G(x)');
 U2 = @(x) [0; 0; 0]; U3 = [0; 0; 0];
 
 % This is technically the full non-affine model that Garrard presented
-% G = @(x) (g{1} + kronPolyEval(g(2:end), x));
+% G = @(x) kronPolyEval(g, x, scenario='G(x)');
 % U2 = @(x) [.47*x(1);0;46]; U3 = [.63;0;61.4];
 
 %% Plot x1 and control u

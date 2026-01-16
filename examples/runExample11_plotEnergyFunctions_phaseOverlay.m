@@ -65,7 +65,7 @@ eFuture = zeros(nY, nX);
 for i = 1:nY
     for j = 1:nX
         x = [X(i, j); Y(i, j)];
-        eFuture(i, j) = 0.5 * kronPolyEval(w, x, degree);
+        eFuture(i, j) = 0.5 * kronPolyEval(w, x, degree=degree);
         %         wRES(i,j) = computeResidualFutureHJB_2D_example11(gravity, L, g, h, eta, w, degree, x);
         if eFuture(i, j) < 0
             eFuture(i, j) = NaN;
