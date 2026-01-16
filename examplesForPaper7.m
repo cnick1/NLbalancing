@@ -1,5 +1,5 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%% Balance / Reduce Examples               %%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%% Balance / Reduce Paper Examples         %%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%% Author: Nicholas Corbin, UCSD           %%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Usage: Run the entire script to generate the examples
@@ -11,7 +11,6 @@
 %     Ex. 31 - 2D stable pendulum (Newman)
 %     Ex. 32 - 3D toy example w/ nonlinear transformation (Holmes)
 %
-%
 %  Authors:   Nick Corbin, UCSD
 %
 %  Reference: [1]
@@ -22,7 +21,6 @@ setKroneckerToolsPath
 addpath('utils')
 addpath('examples')
 
-%%% Primary examples
 %% 2D Fujimoto/Scherpen academic model
 % The purpose of this example is to illustrate the individual steps in the
 % balancing transformation process. Since the dynamics are simple enough, we can
@@ -86,16 +84,22 @@ runExample15_balancedReduction(1,1,2,1)
 runExample15_balancedReduction(1,3,2,1)
 runExample15_balancedReduction(3,3,2,1)
 
+% Illustration that error is lower locally but higher far away 
+degrees = [1:2:5]; U0s = 1:.25:9;
+errors = zeros(length(degrees),length(U0s));
+for i = 1:length(degrees)
+    for j = 1:length(U0s)
+        errors(i,j) = runExample15_balancedReduction(degrees(i),5,2,U0s(j));
+    end
+end
+figure; hold on;
+for i = 1:length(degrees)
+    plot(U0s,errors(i,:),'DisplayName',sprintf('Degree %i transformation',degrees(i)-1))
+end
+legend
+
 
 %% Cubic FEM beam
-% For this example, I can choose between the MSD chain, FEM beam, or FEM heat equation models.
-%     Ex. 6  - Cubic FEM beam -> ***Issue is the conflict between physicallity of reducibility & the numerical conditioning*** THIS IS THE OVERALL ISSUE, FOR CONCLUSION
-%     Ex. 27 - Cubic FEM heat equation
-%     Ex. 17 - Chain of MSD
-% The results I wish to show are
-%   -x Scalability
-%   -x Output error improvement for local initial conditions, similar to the Holmes example
-%   - Plot of error vs distance to equilibrium
 % The story will wrap up centered around that plot of error vs distance to
 % equilibrium: basically for all problems, that plot is qualitatively the
 % behavior to expect. For problems like the Holmes example with a polynomial
@@ -118,6 +122,17 @@ runExample15_balancedReduction(3,3,2,1)
 % vs. numerical conditioning: the beam would be a nice example, but it yields
 % poor numerical conditioning.
 %
-% In a twist, I've been able to get the beam example to work somewhat satisfactorily. The story is still the same: there is a trade-off between reducibility and numerical conditioning. Therefore, I was unable to use the model with just tip measurements and control. However, if I add control to each note and measurements to each node, the model does become better conditioned and is still moderately reducible. Curiously, I am seeing the behavior where the horizontal measurement is zero for the nonlinear model with linear transformation AFTER reduction... so the nonlinear output information is in certain states in the linear transformation and different states in the nonlinear transformation, such that that information is truncated in one case but not the other. THAT is VERY interesting. I need to revisit the Fujimoto doouble pendulum example!
+% In a twist, I've been able to get the beam example to work somewhat
+% satisfactorily. The story is still the same: there is a trade-off between
+% reducibility and numerical conditioning. Therefore, I was unable to use
+% the model with just tip measurements and control. However, if I add
+% control to each note and measurements to each node, the model does become
+% better conditioned and is still moderately reducible. Curiously, I am
+% seeing the behavior where the horizontal measurement is zero for the
+% nonlinear model with linear transformation AFTER reduction... so the
+% nonlinear output information is in certain states in the linear
+% transformation and different states in the nonlinear transformation, such
+% that that information is truncated in one case but not the other. THAT is
+% VERY interesting. 
 runExample6_nonlinearBalancing()
 

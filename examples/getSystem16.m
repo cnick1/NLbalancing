@@ -56,7 +56,7 @@ n = 6;
 x = sym('x', [1, n]).';
 syms(x);
 
-G = .5;
+G = 0.5;
 
 m1 = 1; m2 = 1; m3 = 1;
 l1 = 2; l2 = 2; l3 = 2;
@@ -70,7 +70,7 @@ T = 0.5 * 1/3 * m1 * l1 ^ 2 * x4 ^ 2 ... % m1 kinetic energy (fixed point)
     + 0.5 * m2 * (l1 ^ 2 * x4 ^ 2 +1/4 * l2 ^ 2 * x5 ^ 2 + l1 * l2 * x4 * x5 * cos(x2 - x1)) ... % m2 translational kinetic energy
     + 0.5 * 1/12 * m3 * l3 ^ 2 * x6 ^ 2 ... % m3 rotational kinetic energy
     + 0.5 * m3 * (l1 ^ 2 * x4 ^ 2 + l2 ^ 2 * x5 ^ 2 +1/4 * l3 ^ 2 * x6 ^ 2 ... % m3 translational kinetic energy
-    + 2 * l1 * l2 * x4 * x5 * cos(x2 - x1) + l1 * l3 * x4 * x6 * cos(x3 - x1) ...
+    + l1 * l2 * x4 * x5 * cos(x2 - x1) + l1 * l3 * x4 * x6 * cos(x3 - x1) ...
     + l2 * l3 * x5 * x6 * cos(x3 - x2));
 
 V =- m1 * G * l1 / 2 * cos(x1) ... % m1 potential energy (gravity)

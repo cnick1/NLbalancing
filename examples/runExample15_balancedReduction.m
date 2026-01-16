@@ -1,4 +1,4 @@
-function runExample15_balancedReduction(TransformationDegree, DynamicsDegree, r, U0)
+function error = runExample15_balancedReduction(TransformationDegree, DynamicsDegree, r, U0)
 %runExample15_balancedReduction 
 %
 %   Usage:  runExample15_balancedReduction(degree,r)
@@ -56,20 +56,26 @@ n = 4;
 
 %% Get dynamics and define control problem
 [f, g, h, fsym, gsym, hsym] = getSystem15(DynamicsDegree); [p,n] = size(h{1});
+if U0 == 1
 fprintf('  - The full-order nonlinear model is:\n')
 dispPolyDynamics(f,g,h)
+end
 
 %% Compute balanced realization
 [fbal,gbal,hbal,Tbal,sigmaSquared] = getBalanceThenReduceRealization(f,g,h,eta=0,degree=DynamicsDegree,transformationDegree=TransformationDegree);
+if U0 == 1
 fprintf('  - The full-order balanced realization for the nonlinear model is:\n')
 dispPolyDynamics(fbal,gbal,hbal,variable='z')
+end
 % plotSingularValueFunctions(sigmaSquared)
 
 
 [fbal,gbal,hbal,Tbal,sigmaSquared] = getBalanceThenReduceRealization(f,g,h,r=r,eta=0,degree=DynamicsDegree,transformationDegree=TransformationDegree); 
 TbalInv = transformationInverse(Tbal);
+if U0 == 1
 fprintf('  - The reduced-order balanced realization for the nonlinear model is:\n')
 dispPolyDynamics(fbal,gbal,hbal,variable='z')
+end
 
 %% Simulate dynamics
 % Compare original dynamics with transformed dynamics
@@ -113,78 +119,19 @@ for i=1:length(t2)
     y2(:,i) = kronPolyEval(hbal, Z2(i,:).');
 end
 
-figure
-plot(y1(1,:))
-hold on
-plot(y2(1,:),':')
+% figure
+% plot(y1(1,:))
+% hold on
+% plot(y2(1,:),':')
+% 
+% figure
+% plot(y1(2,:))
+% hold on
+% plot(y2(2,:),':')
 
-figure
-plot(y1(2,:))
-hold on
-plot(y2(2,:),':')
-
-% Plot state trajectories
-% figure('Position', [827 220 560 420]);
-% subplot(3,1,1); hold on;
-% plot(t1,X1)
-% plot(t2,X2,'--')
-% 
-% title('Reconstructed state trajectories'); xlabel('Time t')
-% ylabel('x_i(t)')
-% legend('FOM x_1','FOM x_2','FOM x_3','ROM x_1','ROM x_2','ROM x_3')
-% 
-% % Plot transformed state trajectories
-% subplot(3,1,2); hold on;
-% plot(t1,Z1)
-% plot(t2,Z2,'--')
-% 
-% title('Reconstructed state trajectories'); xlabel('Time t')
-% ylabel('z_i(t)')
-% legend('FOM z_1','FOM z_2','ROM z_1','ROM z_2')
-
-% Plot outputs
-% subplot(3,1,3); 
-% hold on;
-% plot(t1,y1)
-% plot(t2,y2,'--')
-% plot(t2,y3,':')
-% 
-% title('Model output'); xlabel('Time t')
-% ylabel('y(t)')
-% legend('FOM output','ROM output using hbar(z)','ROM output h(x)')
-% 
-% fprintf('\n   The output error is: ||yᵣ(t)-y(t)||₂ = %f \n\n', norm(interp1(t2, y2, 0:.1:5) - interp1(t1, y1, 0:.1:5)))
-
-%% Manifold figure plot
-% dx = 0.05; lim = 2;
-% [z1,z2] = meshgrid(-lim:dx:lim,-lim:dx:lim);
-% x1 = zeros(size(z1)); x2 = x1; x3 = x1;
-% for i=1:numel(z1)
-%     [x1(i), x2(i), x3(i)] = kronPolyEval(Tbal,[z1(i);z2(i)]);
-% end
-% 
-% % figure;
-% % surf(z1,z2,z3)
-% figure;
-% surf(x1,x2,x3)
-% xlim([-2 3])
-% ylim([-2 2])
-% zlim([-20 5])
-% drawnow
-% % return
-% 
-% hold on;
-% plot3(X1(:,1),X1(:,2),X1(:,3),'g',DisplayName='FOM solution')
-% plot3(X2(:,1),X2(:,2),X2(:,3),'r',DisplayName='ROM solution')
-% 
-% if degree == 2
-%     fprintf('    -> The figure confirms that the reduced-order solution trajectories on the linear balanced subspace fail to capture the full dynamics. \n\n')
-% else
-%     fprintf('    -> The figure confirms that the reduced-order solution trajectories on the balanced manifold produce the same output as the original dynamics. \n\n')
-% end
-%% Simulate the system's response to a random noise input
-% Instead of simulating the nonlinear system, it is much faster to simulate
-% the linear system and then transform the solution
+error = norm(interp1(t2, y2(1,:), 0:.1:5) - interp1(t1, y1(1,:), 0:.1:5));
+% error = norm(interp1(t2, y2(2,:), 0:.1:5) - interp1(t1, y1(2,:), 0:.1:5));
+fprintf('\n   The output error is: ||yᵣ(t)-y(t)||₂ = %e \n\n', error)
 
 end
 
