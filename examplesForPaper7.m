@@ -21,7 +21,7 @@ setKroneckerToolsPath
 addpath('utils')
 addpath('examples')
 
-%% 2D Fujimoto/Scherpen academic model
+%% 2D Fujimoto/Scherpen OR 2D Gray/Scherpen academic model 
 % The purpose of this example is to illustrate the individual steps in the
 % balancing transformation process. Since the dynamics are simple enough, we can
 % display the equations for each of the steps in the process: the original
@@ -37,6 +37,7 @@ addpath('examples')
 % rotation/stretching of the nonlinear transformation using the polynomial
 % approach vs the Newton iteration approach.
 runExample12_nonlinearBalancing()
+runExample13_nonlinearBalancing()
 
 %% 2D Newman stable pendulum
 % Continuing with the story, this example becomes one that is slightly more
@@ -71,68 +72,8 @@ runExample32_balancedReduction(4)
 runExample32_balancedReduction(4,'white-noise')
 
 %% 4D Double Pendulum
-% This example is actually very interesting and tells an important part of the
-% story. PRIOR to truncation, the linear transformation is superior because it
-% retains all of the information. However, when it comes to truncation, even for
-% trajectories close to the equilibrium point, there is a qualitative difference
-% between the linear and nonlinear transformations that results in the nonlinear
-% model under the linear truncated transformation behaving more like the
-% linearized dynamics than the nonlinear dynamics, even though the dynamics are
-% still nonlinear! So I was wrong previously when I thought that the comparison
-% shown was the linearized ROM vs the nonlinear ROM.
-runExample15_balancedReduction(1,1,2,1)
-runExample15_balancedReduction(1,3,2,1)
-runExample15_balancedReduction(3,3,2,1)
-
-% Illustration that error is lower locally but higher far away 
-degrees = [1:2:5]; U0s = 1:.25:9;
-errors = zeros(length(degrees),length(U0s));
-for i = 1:length(degrees)
-    for j = 1:length(U0s)
-        errors(i,j) = runExample15_balancedReduction(degrees(i),5,2,U0s(j));
-    end
-end
-figure; hold on;
-for i = 1:length(degrees)
-    plot(U0s,errors(i,:),'DisplayName',sprintf('Degree %i transformation',degrees(i)-1))
-end
-legend
-
+runExample15_nonlinearBalancing()
 
 %% Cubic FEM beam
-% The story will wrap up centered around that plot of error vs distance to
-% equilibrium: basically for all problems, that plot is qualitatively the
-% behavior to expect. For problems like the Holmes example with a polynomial
-% nonlinear transformation, we are able to move that intersection point far off
-% to infinity, but in general there is no reason to expect that to be the case,
-% and instead it will likely be near the equilibrium point of interest.
-% *** I should make that plot for the Holmes example too! For "distance from
-% equilibrium", what happens if I choose initial conditions all ON the balanced
-% manifold, vs. not?
-% ** The balanced manifold is not an invariant manifold! That's where the white
-% noise excitation is a better indicator: certainly there are initial conditions
-% for which the balanced ROM may perform poorly, and likewise where the linear
-% ROM may do better; the issue is whether those initial conditions are
-% reachable/observable! That's why, in the Holmes case, choosing an initial
-% condition from the balanced manifold works well: it is
-% controllable/observable. However, in general, the balanced manifold
-% approximation we compute is not going to be exact, as it was for the Holmes
-% example. Thus, for MSD, beam, or heat eq., can I analytically pick initial
-% conditions from the balanced manifold? The trade-off is one of reducibility
-% vs. numerical conditioning: the beam would be a nice example, but it yields
-% poor numerical conditioning.
-%
-% In a twist, I've been able to get the beam example to work somewhat
-% satisfactorily. The story is still the same: there is a trade-off between
-% reducibility and numerical conditioning. Therefore, I was unable to use
-% the model with just tip measurements and control. However, if I add
-% control to each note and measurements to each node, the model does become
-% better conditioned and is still moderately reducible. Curiously, I am
-% seeing the behavior where the horizontal measurement is zero for the
-% nonlinear model with linear transformation AFTER reduction... so the
-% nonlinear output information is in certain states in the linear
-% transformation and different states in the nonlinear transformation, such
-% that that information is truncated in one case but not the other. THAT is
-% VERY interesting. 
 runExample6_nonlinearBalancing()
 

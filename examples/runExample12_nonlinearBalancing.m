@@ -59,7 +59,7 @@ fprintf(['       f(x) = -9x₁+6x₁²x₂+6x₂³-x₁⁵-2x₁³x₂²-x₁x�
         '       h(x) = [2√2(3x₁+x₁x₂²+x₂³)(3-x₁⁴-2x₁²x₂²-x₂⁴)/{1+x₁⁴+2x₁²x₂²+x₂⁴};\n' ...
         '               √2(3x₂-x₁³-x₁x₂²)(3-x₁⁴-2x₁²x₂²-x₂⁴)/{1+x₁⁴+2x₁²x₂²+x₂⁴}])\n'])   
 
-degree = 3;
+degree = 5;
 [f, g, h] = getSystem12(degree, false);  % Scherpen model
 
 %% Compute balanced realization

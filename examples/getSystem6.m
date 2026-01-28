@@ -60,12 +60,13 @@ end
 vec = @(X) X(:);
 %% Define beam geometry and properties
 BeamLength = 1; % length of beam
-ElasticModulus = 1e1; % Young's modulus
-CrossSecArea = 5000; % cross-sectional area
+ElasticModulus = 210e9; % Young's modulus
+CrossSecArea = 5e0; % cross-sectional area
 % MomOfInertia = pi^2/16/1.8751040^2*CrossSecArea;
-MomOfInertia = 1e-1; % moment of inertia .5e-2
-density = 1/5000; % density
+MomOfInertia = 1e-2; % moment of inertia .5e-2
+density = 8000; % density
 delta = 0.1; % Cable attachment distance from centerline of beam if actuatorConfiguration = 2
+d1 = 0.0001; d2 = 0.0001;
 
 % Define element properties
 numNodes = numElements + 1; % number of nodes
@@ -342,8 +343,7 @@ freeDOFsCubed = setdiff(1:TotalDOFs ^ 3, fixedDOFsCubed);
 K3G = K3G(freeDOFs, freeDOFsCubed);
 RB3 = RB3(freeDOFs, [freeDOFsCubed, freeDOFsCubed + TotalDOFs ^ 3]);
 
-D1G = 0.001 * M1G + 0.001 * K1G; % Add some damping for numerical stability
-
+D1G = d1 * M1G + d2 * K1G; % Add some damping for numerical stability
 %% Convert to state-space representation
 % At present, we have a second-order mechanical system with governing equations
 %

@@ -94,6 +94,7 @@ arguments
     nvp.eta = 0
     nvp.degree = length(f)
     nvp.verbose = false
+    nvp.r = size(f{1},1)
 end
 
 % Print what type of energy function is being computed
@@ -111,7 +112,7 @@ if nvp.verbose
     disp(message)
 end
 
-options.verbose = nvp.verbose;
+options.verbose = nvp.verbose; options.reducedDimension = nvp.r;
 [v] = ppr(f, g, q, -1, nvp.degree, options);
 
 end

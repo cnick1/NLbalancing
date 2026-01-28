@@ -145,7 +145,7 @@ if nvp.verbose
     % Print squared singular value functions and plot them
     fprintf("    Squared singular value functions:\n\n ")
     sigmaSquaredDisp = sigmaSquared;
-    sigmaSquaredDisp(sigmaSquaredDisp < 1e-14) = 0;
+    sigmaSquaredDisp(abs(sigmaSquaredDisp) < 1e-14) = 0;
     syms z
     for i = 1:nvp.r
         fprintf("\b\b       𝜎_%i^2(z) = tau_%i(z e_i) = ", i, i)

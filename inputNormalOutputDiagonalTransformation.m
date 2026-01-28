@@ -75,8 +75,8 @@ function [sigmaSquared, TinOd, vbar, wbar, Xi] = inputNormalOutputDiagonalTransf
 %  Part of the NLbalancing repository.
 %%
 arguments
-    v cell
-    w cell
+    v
+    w
     nvp.degree = length(v) - 1
     nvp.verbose = false
 end

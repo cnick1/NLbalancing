@@ -19,7 +19,7 @@ arguments
     r = 6*(numEls+1)
     U0 = 1.5e-2
     verbose = false
-    nvp.plot = true
+    nvp.plot = false
 end
 set(groot,'defaultLineLineWidth',1.5,'defaultTextInterpreter','latex')
 
@@ -28,8 +28,8 @@ fprintf('Running Example 6, n=%d, degree %d...\n',n,degree)
 
 %% Get dynamics and define control problem
 [E, f, g, ~, initialCondition] = getSystem6(numEls, 3, false, false);
-g = g(1); %g{1} = g{1}(:,1);
-h = {[eye(n/2), zeros(n/2)]};
+% g = g(1); %g{1} = g{1}(:,1);
+% h = {[eye(n/2), zeros(n/2)]};
 
 g = {eye(n)};
 h = {eye(n)};
@@ -49,7 +49,7 @@ if verbose
 end
 
 tic; fprintf('   Computing balanced reduced-order model...')
-[fbal,gbal,hbal,Tbal,sigmaSquared] = getBalanceThenReduceRealization(f,g,h,r=r,eta=0,degree=3,transformationDegree=degree-1);
+    [fbal,gbal,hbal,Tbal,sigmaSquared] = getBalanceThenReduceRealization(f,g,h,r=r,eta=0,degree=3,transformationDegree=degree-1);
 TbalInv = transformationInverse(Tbal);
 T1 = toc; fprintf("completed in %2.2f seconds. \n", T1)
 
@@ -66,7 +66,12 @@ G = @(x) kronPolyEval(g, x, scenario='G(x)');
 Fbal = @(z) kronPolyEval(fbal, z);
 Gbal = @(z) kronPolyEval(gbal, z, scenario='G(x)');
 m = size(g{1},2);
-u = @(t) [zeros(m-1,1); U0*sin(2*pi*t/10)];
+% u = @(t) [zeros(m-1,1); U0*sin(50*t)];
+u = @(t) [zeros(m-1,1); U0*1/.0000025*(t<0.0005)];
+% u = @(t) [zeros(m-1,1); U0*1/.0000025*(t>0.0005)];
+
+% u = @(t) [zeros(m-2,1); U0*1/.0000025*(t<0.0005); 0];
+% u = @(t) [zeros(m-2,1); U0*1/.0000025*(t>0.0005); 0];
 
 %% Simulate original and transformed systems; same input should give same output
 % Solve for z0 initial condition
@@ -77,24 +82,25 @@ z0 = kronPolyEval(TbalInv,x0);
 % Simulate both systems
 global T0; 
 opts = odeset(OutputFcn=@odeprog);
+t = [0:.0001:.05];
 
 fprintf('   Simulating the FOM in the original coordinates...')
-T0 = tic; [t1, X1] = ode23s(@(t, x) F(x) + G(x)*u(t), [0:.1:5], x0, opts);
+T0 = tic; [t, X1] = ode23s(@(t, x) F(x) + G(x)*u(t), t, x0, opts);
 T2 = toc(T0); fprintf("completed in %2.2f seconds. \n", T2)
 
 
 fprintf('   Simulating the ROM in the balanced coordinates...')
-T0 = tic; [t2, Z2] = ode23s(@(t, z) Fbal(z) + Gbal(z)*u(t), [0:.1:5], z0, opts);
+T0 = tic; [t, Z2] = ode23s(@(t, z) Fbal(z) + Gbal(z)*u(t), t, z0, opts);
 T3 = toc(T0); fprintf("completed in %2.2f seconds. \n", T3)
 
 %% Compute and plot the outputs 
 p = size(h{1},1);
-y1 = zeros(p,length(t1));
-y2 = zeros(p,length(t2));
-for i=1:length(t1) 
+y1 = zeros(p,length(t));
+y2 = zeros(p,length(t));
+for i=1:length(t) 
     y1(:,i) = kronPolyEval(h, X1(i,:).');
 end
-for i=1:length(t2) 
+for i=1:length(t) 
     y2(:,i) = kronPolyEval(hbal, Z2(i,:).');
 end
 
@@ -103,18 +109,18 @@ end
 % hold on
 % plot(y2(n/2-2,:))
 
-if n == 6 || nvp.plot
+if nvp.plot
     figure(21414836)
     if degree == 2
         close
         figure(21414836)
-        plot(t1,y1(n/2-2,:),'DisplayName','FOM output')
+        plot(t,y1(n/2-2,:),'DisplayName','FOM output')
         hold on
-        plot(t2,y2(n/2-2,:),'--','DisplayName','ROM output w/ linear transformation')
+        plot(t,y2(n/2-2,:),'--','DisplayName','ROM output w/ linear transformation')
     elseif degree == 3
-        plot(t2,y2(n/2-2,:),':o','DisplayName',sprintf('ROM output w/ degree %i transformation',degree-1))
+        plot(t,y2(n/2-2,:),':o','DisplayName',sprintf('ROM output w/ degree %i transformation',degree-1))
     else
-        plot(t2,y2(n/2-2,:),'--+','DisplayName',sprintf('ROM output w/ degree %i transformation',degree-1))
+        plot(t,y2(n/2-2,:),'--+','DisplayName',sprintf('ROM output w/ degree %i transformation',degree-1))
         xlabel('Time, t'); ylabel('Beam tip horizontal displacement $y(t)$');
         legend('Location','southwest'); %ylim(1e-7*[-.35 .05])
         set(gcf,"Position", [573 443.6667 720 400])
@@ -122,7 +128,7 @@ if n == 6 || nvp.plot
     end
 end
 
-error = norm(interp1(t2, y2(n/2-2,:), 0:.1:5) - interp1(t1, y1(n/2-2,:), 0:.1:5));
+error = norm(interp1(t, y2(n/2-2,:), t) - interp1(t, y1(n/2-2,:), t));
 fprintf('\n   The output error is: ||yᵣ(t)-y(t)||₂ = %e \n\n', error)
 
 end

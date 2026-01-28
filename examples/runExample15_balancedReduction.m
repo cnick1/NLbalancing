@@ -119,15 +119,17 @@ for i=1:length(t2)
     y2(:,i) = kronPolyEval(hbal, Z2(i,:).');
 end
 
-% figure
-% plot(y1(1,:))
-% hold on
-% plot(y2(1,:),':')
-% 
-% figure
-% plot(y1(2,:))
-% hold on
-% plot(y2(2,:),':')
+if ~nargout
+    figure
+    plot(y1(1,:))
+    hold on
+    plot(y2(1,:),':')
+
+    figure
+    plot(y1(2,:))
+    hold on
+    plot(y2(2,:),':')
+end 
 
 error = norm(interp1(t2, y2(1,:), 0:.1:5) - interp1(t1, y1(1,:), 0:.1:5));
 % error = norm(interp1(t2, y2(2,:), 0:.1:5) - interp1(t1, y1(2,:), 0:.1:5));

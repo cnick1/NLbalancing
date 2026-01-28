@@ -66,14 +66,14 @@ function [Tbal, sigmaSquared] = balancingTransformation(v, w, nvp)
 %   See also: approxPastEnergy, approxFutureEnergy, inputNormalOutputDiagonalTransformation, composePolynomials
 %%
 arguments
-    v cell
-    w cell
+    v 
+    w 
     nvp.degree = length(v) - 1
     nvp.r = sqrt(numel(v{2}))
     nvp.verbose = false
 end
 
-[sigmaSquared, TinOd,~,~,Xi] = inputNormalOutputDiagonalTransformation(v, w, degree=nvp.degree, verbose=nvp.verbose);
+[sigmaSquared, TinOd,~,~,Xi] = inputNormalOutputDiagonalTransformation(v, w, degree=nvp.degree, verbose=true); %nvp.verbose);
 [Tscal, TscalInv] = scalingTransformation(sigmaSquared, degree=nvp.degree, r=nvp.r, Xi=Xi);
 Tbal = composePolynomials(TinOd, Tscal, degree=nvp.degree);
 

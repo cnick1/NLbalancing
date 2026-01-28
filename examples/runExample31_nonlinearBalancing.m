@@ -61,14 +61,19 @@ for i = 1:N
     end
 end
 set(groot, 'defaultColorbarTickLabelInterpreter', 'latex','defaultAxesTickLabelInterpreter', 'latex', 'defaulttextinterpreter', 'latex', 'defaultLegendInterpreter', 'latex');
+set(groot,'defaultAxesFontSize',16)
 
 figure('Position',[4.3333 57 387 318]);
 surfc(X, Y, ePast); 
-xlabel('$x_1$'); ylabel('$x_2$'); title('Controllability Energy')
+xlabel('$x_1$'); ylabel('$x_2$'); 
+exportgraphics(gca, 'plots/example31_ctrb.pdf', 'ContentType', 'vector');
+title('Controllability Energy')
 
 figure('Position',[365.6667 57 387 318]);
 surfc(X, Y, eFuture);
-xlabel('$x_1$'); ylabel('$x_2$'); title('Observability Energy')
+xlabel('$x_1$'); ylabel('$x_2$'); 
+exportgraphics(gca, 'plots/example31_obsv.pdf', 'ContentType', 'vector');
+title('Observability Energy')
 
 % Plot the past and future HJB residuals
 xPlot = linspace(-1, 1, N); yPlot = linspace(-1, 1, N);
@@ -78,16 +83,19 @@ vRES = computeResidualPastHJB(f, g, h, eta, v, degree, 1, N);
 wRES = computeResidualFutureHJB(f, g, h, eta, w, degree, 1, N);
 
 figure('Position',[880 287 387 318]);
-contourf(X, Y, vRES); colorbar; axis equal
-xlabel('$x_1$'); ylabel('$x_2$'); title('Controllability Energy Residual')
+contourf(X, Y, abs(vRES)); colorbar; axis equal
+xlabel('$x_1$'); ylabel('$x_2$'); 
 zlim([-.8 .6])
+exportgraphics(gcf, 'plots/example31_ctrb_res.pdf', 'ContentType', 'vector');
+title('Controllability Energy Residual')
 
 figure('Position',[1270 287 387 318]);
-contourf(X, Y, wRES); colorbar; axis equal
-xlabel('$x_1$'); ylabel('$x_2$'); title('Observability Energy Residual')
+contourf(X, Y, abs(wRES)); colorbar; axis equal
+xlabel('$x_1$'); ylabel('$x_2$'); 
 zlim([-.3 .4])
 drawnow
-
+exportgraphics(gcf, 'plots/example31_obsv_res.pdf', 'ContentType', 'vector');
+title('Observability Energy Residual')
 %% Compute the input-normal/output-diagonal transformation approximation, also giving the squared singular value functions
 [fbal,gbal,hbal,Tbal] = getBalanceThenReduceRealization(f,g,h,eta=0,transformationDegree=degree-1,verbose=true);
 TbalInv = transformationInverse(Tbal);
@@ -243,13 +251,13 @@ xlabel("Time, t"); ylabel("Angular Position, $x_1$")
 exportgraphics(gca, 'plots/example31_sin1.pdf', 'ContentType', 'vector');
 
 
-%% Simulate dynamics: u = 5 sin(t/π)
+%% Simulate dynamics: u = 5sin(t/π)
 % Solve for z0 initial condition with a Newton type iteration
 x0 = [1; 1];
 z0 = kronPolyEval(TbalInv,x0);
 
-[t, X1] = ode45(@(t, x) FofXU(x, 1*sin(t/pi)), [0, 40], x0);
-[~, Z1] = ode45(@(t, z) FtofZU(z, 1*sin(t/pi)), t, z0);
+[t, X1] = ode45(@(t, x) FofXU(x, 5*sin(t/pi)), [0, 40], x0);
+[~, Z1] = ode45(@(t, z) FtofZU(z, 5*sin(t/pi)), t, z0);
 
 % Transform Z trajectory into X coordinates to compare
 X2 = zeros(size(Z1));
@@ -324,11 +332,10 @@ exportgraphics(gca, sprintf('plots/example31_sin2_d%i.pdf',degree), 'ContentType
 
 % Plot grid transformations
 % Parameters
-numLines = 27; numPoints = 201; lim = 10;
+numLines = 54; numPoints = 201; lim = 20;
 % Generate original z coordinates
-[yH, xH] = meshgrid(linspace(-lim, lim, numLines), linspace(-2*lim, 2*lim, 2*numPoints)); % Vertical lines
-[xV, yV] = meshgrid(linspace(-2*lim, 2*lim, 2*numLines), linspace(-lim, lim, numPoints)); % Horizontal lines
-
+[yH, xH] = meshgrid(linspace(-lim, lim, numLines), linspace(-lim, lim, numPoints)); % Vertical lines
+[xV, yV] = meshgrid(linspace(-lim, lim, numLines), linspace(-lim, lim, numPoints)); % Horizontal lines
 % Compute transformed coordinates
 xHtr = zeros(size(xH)); yHtr = zeros(size(yH));
 xVtr = zeros(size(xV)); yVtr = zeros(size(yV));
@@ -344,7 +351,7 @@ end
 
 % Prepare figure
 % Generate figure
-figure('Position',[850 442 396 300]); hold on
+figure('Position',[527.6667 244.3333 718.3333 497.3333]); hold on
 for i=1:size(xH,2)
     plot(xHtr(:,i),yHtr(:,i),'Color', [0.75 0.75 0.75])
 end
@@ -359,6 +366,57 @@ xlim([-4 4]); ylim([-4 4])
 xlabel("$x_1$"); ylabel("$x_2$")
 exportgraphics(gca, sprintf('plots/example31_sin2_x_d%i_zoom.pdf',degree), 'ContentType', 'vector');
 
+
+%% Compute the input-normal/output-diagonal transformation approximation, also giving the squared singular value functions
+degree = 2;
+[fbal,gbal,hbal,Tbal] = getBalanceThenReduceRealization(f,g,h,eta=0,transformationDegree=degree-1);
+TbalInv = transformationInverse(Tbal);
+% FofXU = @(x,u) kronPolyEval(f,x) + kronPolyEval(g,x,scenario='G(x)')*u;
+FtofZU = @(z,u) kronPolyEval(fbal,z) + kronPolyEval(gbal,z,scenario='G(x)')*u;
+
+%% Simulate dynamics: u = 5sin(t/π)
+% Solve for z0 initial condition with a Newton type iteration
+x0 = [1; 1];
+z0 = kronPolyEval(TbalInv,x0);
+
+[t, X1] = ode45(@(t, x) FofXU(x, 5*sin(t/pi)), [0, 40], x0);
+[~, Z1] = ode45(@(t, z) FtofZU(z, 5*sin(t/pi)), t, z0);
+
+% Plot grid transformations
+% Parameters
+numLines = 54; numPoints = 201; lim = 20;
+% Generate original z coordinates
+[yH, xH] = meshgrid(linspace(-lim, lim, numLines), linspace(-lim, lim, numPoints)); % Vertical lines
+[xV, yV] = meshgrid(linspace(-lim, lim, numLines), linspace(-lim, lim, numPoints)); % Horizontal lines
+
+% Compute transformed coordinates
+xHtr = zeros(size(xH)); yHtr = zeros(size(yH));
+xVtr = zeros(size(xV)); yVtr = zeros(size(yV));
+zxHtr = zeros(size(xH)); zyHtr = zeros(size(yH));
+zxVtr = zeros(size(xV)); zyVtr = zeros(size(yV));
+for i=1:length(xH(:))
+    [xHtr(i), yHtr(i)] = kronPolyEval(Tbal,[xH(i);yH(i)]);
+    [xVtr(i), yVtr(i)] = kronPolyEval(Tbal,[xV(i);yV(i)]);
+    
+    [zxHtr(i), zyHtr(i)] = kronPolyEval(TbalInv,[xH(i);yH(i)]);
+    [zxVtr(i), zyVtr(i)] = kronPolyEval(TbalInv,[xV(i);yV(i)]);
+end
+
+% Generate figure
+figure('Position',[527.6667 244.3333 718.3333 497.3333]); hold on
+for i=1:size(xH,2)
+    plot(xHtr(:,i),yHtr(:,i),'Color', [0.75 0.75 0.75])
+end
+for i=1:size(xV,2)
+    plot(xVtr(:,i),yVtr(:,i),'Color', [0.75 0.75 0.75])
+end
+set(gca, 'ColorOrderIndex', 1);
+plot(X1(:,1),X1(:,2),'LineWidth',1.5)
+plot(X2(:,1),X2(:,2),'--','LineWidth',1.5)
+axis equal;
+xlim([-4 4]); ylim([-4 4])
+xlabel("$x_1$"); ylabel("$x_2$")
+exportgraphics(gca, sprintf('plots/example31_sin2_x_d%i_zoom.pdf',degree), 'ContentType', 'vector');
 
 %% Get system dynamics
 degree = 8;
@@ -398,8 +456,8 @@ FtofZU = @(z,u) kronPolyEval(fbal,z) + kronPolyEval(gbal,z,scenario='G(x)')*u;
 x0 = [1; 1];
 z0 = kronPolyEval(TbalInv,x0);
 
-[t, X1] = ode45(@(t, x) FofXU(x, 1*sin(t/pi)), [0, 40], x0);
-[~, Z1] = ode45(@(t, z) FtofZU(z, 1*sin(t/pi)), t, z0);
+[t, X1] = ode45(@(t, x) FofXU(x, 5*sin(t/pi)), [0, 40], x0);
+[~, Z1] = ode45(@(t, z) FtofZU(z, 5*sin(t/pi)), t, z0);
 
 % Transform Z trajectory into X coordinates to compare
 X2 = zeros(size(Z1));
@@ -431,7 +489,6 @@ for i=1:length(xH(:))
     [zxVtr(i), zyVtr(i)] = kronPolyEval(TbalInv,[xV(i);yV(i)]);
 end
 
-% Prepare figure
 % Generate figure
 figure('Position',[850 442 396 300]); hold on
 for i=1:size(xH,2)
