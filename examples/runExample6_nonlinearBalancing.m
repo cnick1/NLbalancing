@@ -3,48 +3,45 @@ function runExample6_nonlinearBalancing()
 % N=1 elements (n=6):
 % - first, show that the linearization of these dynamics is qualitatively
 % different than the nonlinear dynamics at this initial condition
-[~,~,~,~,x0] = runExample6_balancedReduction_staticDeflectionIC([],3,2,1,6,1e3,true,10,plot=true);
-runExample6_balancedReduction_staticDeflectionIC(x0,1,2,1,6,1e3,true,10,plot=true);
+runExample6_linearComparison()
 
-[~,~,~,~,x0] = runExample6_balancedReduction_staticDeflectionIC([],3,2,1,4,1e3,true,11,plot=true);
-runExample6_balancedReduction_staticDeflectionIC(x0,1,2,1,4,1e3,true,11,plot=true);
-
-% - output equation containing nonlinearities that become truncated
+% - print output equation to command window containing nonlinearities that
+% become truncated
 % - small initial condition, quadratic and cubic transformations similar
 [~,~,~,~,x0] = runExample6_balancedReduction_staticDeflectionIC([],3,2,1,6,1e3,true,12,plot=true);
 runExample6_balancedReduction_staticDeflectionIC(x0,3,3,1,6,1e3,true,12,plot=true);
 runExample6_balancedReduction_staticDeflectionIC(x0,3,4,1,6,1e3,true,12,plot=true);
 
-[~,~,~,~,x0] = runExample6_balancedReduction_staticDeflectionIC([],3,2,1,4,1e3,true,13,plot=true);
-runExample6_balancedReduction_staticDeflectionIC(x0,3,3,1,4,1e3,true,13,plot=true);
-runExample6_balancedReduction_staticDeflectionIC(x0,3,4,1,4,1e3,true,13,plot=true);
+[~,~,~,~,x0] = runExample6_balancedReduction_staticDeflectionIC([],3,2,1,4,1e3,false,13,plot=true);
+runExample6_balancedReduction_staticDeflectionIC(x0,3,3,1,4,1e3,false,13,plot=true);
+runExample6_balancedReduction_staticDeflectionIC(x0,3,4,1,4,1e3,false,13,plot=true);
 
 % - larger initial condition, cubic transformations slightly better than
 % quadratic as they both break down, and the full transformation itself 
 % begins to no-longer be bijective at these points in the state space
-[~,~,~,~,x0] = runExample6_balancedReduction_staticDeflectionIC([],3,2,1,6,1e4,true,14,plot=true);
-runExample6_balancedReduction_staticDeflectionIC(x0,3,3,1,6,1e4,true,14,plot=true);
-runExample6_balancedReduction_staticDeflectionIC(x0,3,4,1,6,1e4,true,14,plot=true);
+[~,~,~,~,x0] = runExample6_balancedReduction_staticDeflectionIC([],3,2,1,6,1e4,false,14,plot=true);
+runExample6_balancedReduction_staticDeflectionIC(x0,3,3,1,6,1e4,false,14,plot=true);
+runExample6_balancedReduction_staticDeflectionIC(x0,3,4,1,6,1e4,false,14,plot=true);
 
-[~,~,~,~,x0] = runExample6_balancedReduction_staticDeflectionIC([],3,2,1,4,1e4,true,15,plot=true);
-runExample6_balancedReduction_staticDeflectionIC(x0,3,3,1,4,1e4,true,15,plot=true);
-runExample6_balancedReduction_staticDeflectionIC(x0,3,4,1,4,1e4,true,15,plot=true);
+[~,~,~,~,x0] = runExample6_balancedReduction_staticDeflectionIC([],3,2,1,4,1e4,false,15,plot=true);
+runExample6_balancedReduction_staticDeflectionIC(x0,3,3,1,4,1e4,false,15,plot=true);
+runExample6_balancedReduction_staticDeflectionIC(x0,3,4,1,4,1e4,false,15,plot=true);
 
-[~,~,~,~,x0] = runExample6_balancedReduction_staticDeflectionIC([],3,2,1,6,2e4,true,16,plot=true);
-runExample6_balancedReduction_staticDeflectionIC(x0,3,3,1,6,2e4,true,16,plot=true);
-runExample6_balancedReduction_staticDeflectionIC(x0,3,4,1,6,2e4,true,16,plot=true);
+[~,~,~,~,x0] = runExample6_balancedReduction_staticDeflectionIC([],3,2,1,6,2e4,false,16,plot=true);
+runExample6_balancedReduction_staticDeflectionIC(x0,3,3,1,6,2e4,false,16,plot=true);
+runExample6_balancedReduction_staticDeflectionIC(x0,3,4,1,6,2e4,false,16,plot=true);
 
-[~,~,~,~,x0] = runExample6_balancedReduction_staticDeflectionIC([],3,2,1,4,2e4,true,17,plot=true);
-runExample6_balancedReduction_staticDeflectionIC(x0,3,3,1,4,2e4,true,17,plot=true);
-runExample6_balancedReduction_staticDeflectionIC(x0,3,4,1,4,2e4,true,17,plot=true);
+[~,~,~,~,x0] = runExample6_balancedReduction_staticDeflectionIC([],3,2,1,4,2e4,false,17,plot=true);
+runExample6_balancedReduction_staticDeflectionIC(x0,3,3,1,4,2e4,false,17,plot=true);
+runExample6_balancedReduction_staticDeflectionIC(x0,3,4,1,4,2e4,false,17,plot=true);
 
-[~,~,~,~,x0] = runExample6_balancedReduction_staticDeflectionIC([],3,2,1,6,3e4,true,18,plot=true);
-runExample6_balancedReduction_staticDeflectionIC(x0,3,3,1,6,3e4,true,18,plot=true);
-runExample6_balancedReduction_staticDeflectionIC(x0,3,4,1,6,3e4,true,18,plot=true);
+[~,~,~,~,x0] = runExample6_balancedReduction_staticDeflectionIC([],3,2,1,6,3e4,false,18,plot=true);
+runExample6_balancedReduction_staticDeflectionIC(x0,3,3,1,6,3e4,false,18,plot=true);
+runExample6_balancedReduction_staticDeflectionIC(x0,3,4,1,6,3e4,false,18,plot=true);
 
-[~,~,~,~,x0] = runExample6_balancedReduction_staticDeflectionIC([],3,2,1,4,3e4,true,19,plot=true);
-runExample6_balancedReduction_staticDeflectionIC(x0,3,3,1,4,3e4,true,19,plot=true);
-runExample6_balancedReduction_staticDeflectionIC(x0,3,4,1,4,3e4,true,19,plot=true);
+[~,~,~,~,x0] = runExample6_balancedReduction_staticDeflectionIC([],3,2,1,4,3e4,false,19,plot=true);
+runExample6_balancedReduction_staticDeflectionIC(x0,3,3,1,4,3e4,false,19,plot=true);
+runExample6_balancedReduction_staticDeflectionIC(x0,3,4,1,4,3e4,false,19,plot=true);
 
 
 % N=3 elements (n=18):
