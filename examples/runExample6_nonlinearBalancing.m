@@ -123,7 +123,7 @@ end
 function runExample6_timeTrials(d, numTrials)
 numEls = [1 2 4 8 16 32 64 128 180];
 Ex6timings = zeros(numTrials,3);
-for i = 1:4
+for i = 1:3
     T1Temp = 0; T2Temp = 0; T3Temp = 0;
     for j=1:3 % average over 3 runs
         [T1, T2, T3] = runExample6_balancedReduction_staticDeflectionIC([],d,numEls(i),6,3e4);
@@ -131,7 +131,7 @@ for i = 1:4
     end
     Ex6timings(i,:) = [T1Temp, T2Temp, T3Temp]./3;
 end
-for i = 5:numTrials
+for i = 4:numTrials
     [T1, T2, T3] = runExample6_balancedReduction_staticDeflectionIC([],d,numEls(i),6,3e4);
     Ex6timings(i,:) = [T1, T2, T3];
 end
