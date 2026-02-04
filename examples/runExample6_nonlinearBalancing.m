@@ -108,13 +108,13 @@ function runExample6_nonlinearBalancing()
 % (T1), and simulate the ROM (T3).
 
 % Linear balancing transformation
-runExample6_timeTrials(2, 3);
+runExample6_timeTrials(2, 8);
 
 % Quadratic balancing transformation
-runExample6_timeTrials(3, 3);
+runExample6_timeTrials(3, 8);
 
 % Cubic balancing transformation
-runExample6_timeTrials(4, 3);
+runExample6_timeTrials(4, 8);
 
 end
 
@@ -130,8 +130,11 @@ for i = 1:3
     Ex6timings(i,:) = [T1Temp, T2Temp, T3Temp]./3;
 end
 for i = 4:numTrials
-    [T1, T2, T3] = runExample6_balancedReduction_staticDeflectionIC([],d,numEls(i),6,3e4,false,1,plot=false);
-    Ex6timings(i,:) = [T1, T2, T3];
+    try
+        [T1, T2, T3] = runExample6_balancedReduction_staticDeflectionIC([],d,numEls(i),6,3e4,false,1,plot=false);
+        Ex6timings(i,:) = [T1, T2, T3];
+    catch
+    end
 end
 fprintf('Writing data to plots/example6_balancingScaling_d%d.dat \n',d)
 fileID = fopen(sprintf('plots/example6_balancingScaling_d%d.dat',d), 'w');
