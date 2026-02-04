@@ -107,7 +107,6 @@ function runExample6_nonlinearBalancing()
 % Next we compare the time required to simulate the FOM (T2), construct the ROM
 % (T1), and simulate the ROM (T3).
 
-timib = tic;
 % Linear balancing transformation
 runExample6_timeTrials(2, 3);
 
@@ -116,7 +115,6 @@ runExample6_timeTrials(3, 3);
 
 % Cubic balancing transformation
 runExample6_timeTrials(4, 3);
-toc(timib)
 
 end
 
