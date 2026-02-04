@@ -30,16 +30,29 @@ F = @(x) kronPolyEval(f, x);
 Flin = @(x) kronPolyEval(flin, x);
 G = @(x) kronPolyEval(g, x, scenario='G(x)');
 
-u = @(t) [zeros(m-2,1); U0*(t>0.0005); 0];
-[t, X1] = ode23s(@(t, x) F(x) + G(x)*u(t), [0 .1], 0*initialCondition);
-y1 = zeros(p,length(t));
-for i=1:length(t)
-    y1(:,i) = kronPolyEval(h, X1(i,:).');
-end
-figure
-plot(y1(n/2-2,:))
+% Option 1: Obtain steady-state via time integration
+% u = @(t) [zeros(m-2,1); U0*(t>0.0005); 0];
+% [t, X1] = ode23s(@(t, x) F(x) + G(x)*u(t), [0 .1], 0*initialCondition);
+% y1 = zeros(p,length(t));
+% for i=1:length(t)
+%     y1(:,i) = kronPolyEval(h, X1(i,:).');
+% end
+% figure
+% plot(y1(n/2-2,:))
+%
+% x0 = X1(end,:).';
 
-x0 = X1(end,:).';
+
+% Option 2: Obtain steady-state Newton iteration for equilibrium point
+fsymmetric = f;
+for i=2:length(fsymmetric)
+    for j = 1:n
+        fsymmetric{i}(j,:) = kronMonomialSymmetrize(fsymmetric{i}(j,:),n,i);
+    end
+end
+
+u = [zeros(m-2,1); U0; 0];
+x0 = newtonIteration(-g{1}*u, @(x) kronPolyEval(f, x), @(x) jcbn(fsymmetric, x), maxIter=100);
 
 %% Simulate to compare original dynamics with linearized dynamics
 u = @(t) [zeros(m,1)];

@@ -56,6 +56,8 @@ function varargout = newtonIteration(x, g, J, options)
 %                   (see the multidimensonal formulation section)
 %
 %   Part of the NLbalancing repository.
+% 
+%  See also: kronPolyEval, jcbn, PhiBar, PhiBarJacobian
 %%
 arguments
     x
