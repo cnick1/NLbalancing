@@ -16,7 +16,7 @@ function [T1, T2, T3, error, x0] = runExample6_balancedReduction_staticDeflectio
 arguments
     x0 = []
     degree = 4
-    numEls = 1
+    numEls = 3
     r = 4
     U0 = 3e4
     verbose = false
@@ -29,9 +29,9 @@ numNodes = numEls + 1; n = 6*numEls;
 fprintf('Running Example 6, n=%d, degree %d...\n',n,degree)
 
 %% Get dynamics and define control problem
-[E, f, g, ~, initialCondition] = getSystem6(numEls, 3, false, false);
+[f,g,h] = getSystem6_sparse(numEls);
 
-g = {eye(n)}; h = {eye(n)}; m = size(g{1},2); p = size(h{1},1);
+m = size(g{1},2); p = size(h{1},1);
 F = @(x) kronPolyEval(f, x);
 G = @(x) kronPolyEval(g, x, scenario='G(x)');
 

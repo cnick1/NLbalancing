@@ -252,9 +252,9 @@ switch actuatorConfig
       case 3 % Cable x and y on each node (to  try to be controllable)
             m = (numNodes-1)*2;
             RB0 = sparse(TotalDOFs, m);
-            RB1 = sparse(TotalDOFs, m * TotalDOFs);
-            RB2 = sparse(TotalDOFs, m * TotalDOFs ^ 2);
-            RB3 = sparse(TotalDOFs, m * TotalDOFs ^ 3);
+            RB1 = sparseCSR(TotalDOFs, m * TotalDOFs);
+            RB2 = sparseCSR(TotalDOFs, m * TotalDOFs ^ 2);
+            RB3 = sparseCSR(TotalDOFs, m * TotalDOFs ^ 3);
             
             RB0(4:3:TotalDOFs, 1:m/2) = eye(m/2); % Forces in x direction
             RB0(5:3:TotalDOFs - 1, m/2+1:end) = eye(m/2); % Force in y direction
