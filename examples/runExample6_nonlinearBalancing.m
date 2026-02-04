@@ -126,13 +126,13 @@ Ex6timings = zeros(numTrials,3);
 for i = 1:3
     T1Temp = 0; T2Temp = 0; T3Temp = 0;
     for j=1:3 % average over 3 runs
-        [T1, T2, T3] = runExample6_balancedReduction_staticDeflectionIC([],d,numEls(i),6,3e4);
+        [T1, T2, T3] = runExample6_balancedReduction_staticDeflectionIC([],d,numEls(i),6,3e4,false,1,plot=false);
         T1Temp = T1Temp+T1; T2Temp = T2Temp+T2; T3Temp = T3Temp+T3;
     end
     Ex6timings(i,:) = [T1Temp, T2Temp, T3Temp]./3;
 end
 for i = 4:numTrials
-    [T1, T2, T3] = runExample6_balancedReduction_staticDeflectionIC([],d,numEls(i),6,3e4);
+    [T1, T2, T3] = runExample6_balancedReduction_staticDeflectionIC([],d,numEls(i),6,3e4,false,1,plot=false);
     Ex6timings(i,:) = [T1, T2, T3];
 end
 fprintf('Writing data to plots/example6_balancingScaling_d%d.dat \n',d)
