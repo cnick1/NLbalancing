@@ -69,37 +69,37 @@ function runExample6_nonlinearBalancing()
 % % Next, we show the differences in the models obtained via linear and nonlinear
 % % balancing. These are all nonlinear models; the difference here is specifically
 % % in the degree of balancing transformation used.
-% [~,~,~,~,x0] = runExample6_balancedReduction_staticDeflectionIC([],2,1,6,1e3,true,12,plot=true);
+% [~,~,~,x0] = runExample6_balancedReduction_staticDeflectionIC([],2,1,6,1e3,true,12,plot=true);
 % runExample6_balancedReduction_staticDeflectionIC(x0,3,1,6,1e3,true,12,plot=true);
 % runExample6_balancedReduction_staticDeflectionIC(x0,4,1,6,1e3,true,12,plot=true);
 % 
-% [~,~,~,~,x0] = runExample6_balancedReduction_staticDeflectionIC([],2,1,4,1e3,false,13,plot=true);
+% [~,~,~,x0] = runExample6_balancedReduction_staticDeflectionIC([],2,1,4,1e3,false,13,plot=true);
 % runExample6_balancedReduction_staticDeflectionIC(x0,3,1,4,1e3,false,13,plot=true);
 % runExample6_balancedReduction_staticDeflectionIC(x0,4,1,4,1e3,false,13,plot=true);
 % 
 % % Now we show that, as the initial conditions depart from the origin, eventually
 % % the nonlinear approximations are no longer convergent.
-% [~,~,~,~,x0] = runExample6_balancedReduction_staticDeflectionIC([],2,1,6,1e4,false,14,plot=true);
+% [~,~,~,x0] = runExample6_balancedReduction_staticDeflectionIC([],2,1,6,1e4,false,14,plot=true);
 % runExample6_balancedReduction_staticDeflectionIC(x0,3,1,6,1e4,false,14,plot=true);
 % runExample6_balancedReduction_staticDeflectionIC(x0,4,1,6,1e4,false,14,plot=true);
 % 
-% [~,~,~,~,x0] = runExample6_balancedReduction_staticDeflectionIC([],2,1,4,1e4,false,15,plot=true);
+% [~,~,~,x0] = runExample6_balancedReduction_staticDeflectionIC([],2,1,4,1e4,false,15,plot=true);
 % runExample6_balancedReduction_staticDeflectionIC(x0,3,1,4,1e4,false,15,plot=true);
 % runExample6_balancedReduction_staticDeflectionIC(x0,4,1,4,1e4,false,15,plot=true);
 % 
-% [~,~,~,~,x0] = runExample6_balancedReduction_staticDeflectionIC([],2,1,6,2e4,false,16,plot=true);
+% [~,~,~,x0] = runExample6_balancedReduction_staticDeflectionIC([],2,1,6,2e4,false,16,plot=true);
 % runExample6_balancedReduction_staticDeflectionIC(x0,3,1,6,2e4,false,16,plot=true);
 % runExample6_balancedReduction_staticDeflectionIC(x0,4,1,6,2e4,false,16,plot=true);
 % 
-% [~,~,~,~,x0] = runExample6_balancedReduction_staticDeflectionIC([],2,1,4,2e4,false,17,plot=true);
+% [~,~,~,x0] = runExample6_balancedReduction_staticDeflectionIC([],2,1,4,2e4,false,17,plot=true);
 % runExample6_balancedReduction_staticDeflectionIC(x0,3,1,4,2e4,false,17,plot=true);
 % runExample6_balancedReduction_staticDeflectionIC(x0,4,1,4,2e4,false,17,plot=true);
 % 
-% [~,~,~,~,x0] = runExample6_balancedReduction_staticDeflectionIC([],2,1,6,3e4,false,18,plot=true);
+% [~,~,~,x0] = runExample6_balancedReduction_staticDeflectionIC([],2,1,6,3e4,false,18,plot=true);
 % runExample6_balancedReduction_staticDeflectionIC(x0,3,1,6,3e4,false,18,plot=true);
 % runExample6_balancedReduction_staticDeflectionIC(x0,4,1,6,3e4,false,18,plot=true);
 % 
-% [~,~,~,~,x0] = runExample6_balancedReduction_staticDeflectionIC([],2,1,4,3e4,false,19,plot=true);
+% [~,~,~,x0] = runExample6_balancedReduction_staticDeflectionIC([],2,1,4,3e4,false,19,plot=true);
 % runExample6_balancedReduction_staticDeflectionIC(x0,3,1,4,3e4,false,19,plot=true);
 % runExample6_balancedReduction_staticDeflectionIC(x0,4,1,4,3e4,false,19,plot=true);
 
@@ -107,36 +107,38 @@ function runExample6_nonlinearBalancing()
 % Next we compare the time required to simulate the FOM (T2), construct the ROM
 % (T1), and simulate the ROM (T3).
 
+[~,~,~,x0] = runExample6_balancedReduction_staticDeflectionIC([],3,16,6,3e4,false,1,plot=false);
+
 % Linear balancing transformation
-runExample6_timeTrials(2, 10);
+runExample6_timeTrials(2, 8, x0);
 
 % Quadratic balancing transformation
-runExample6_timeTrials(3, 10);
+runExample6_timeTrials(3, 8, x0);
 
 % Cubic balancing transformation
-runExample6_timeTrials(4, 7);
+runExample6_timeTrials(4, 7, x0);
 
 end
 
-function runExample6_timeTrials(d, numTrials)
+function runExample6_timeTrials(d, numTrials, x0)
 numEls = [1 2 4 8 16 32 64 128 180 256];
-Ex6timings = zeros(numTrials,3);
-for i = 1:3
-    T1Temp = 0; T2Temp = 0; T3Temp = 0;
-    for j=1:3 % average over 3 runs
-        [T1, T2, T3] = runExample6_balancedReduction_staticDeflectionIC([],d,numEls(i),6,3e4,false,1,plot=false);
-        T1Temp = T1Temp+T1; T2Temp = T2Temp+T2; T3Temp = T3Temp+T3;
-    end
-    Ex6timings(i,:) = [T1Temp, T2Temp, T3Temp]./3;
-end
-for i = 4:numTrials
+Ex6timings = zeros(numTrials,3); 
+for i = numTrials:-1:4
     try
         zeros((6*numEls(i))^d,1);
-        [T1, T2, T3] = runExample6_balancedReduction_staticDeflectionIC([],d,numEls(i),6,3e4,false,1,plot=false);
+        [T1, T2, T3] = runExample6_balancedReduction_staticDeflectionIC([],d,numEls(i),6,3e4,false,1,plot=false,x0init=x0);
         Ex6timings(i,:) = [T1, T2, T3];
     catch
         warning('RAM capacity will be exceeded, skipping this case')
     end
+end
+for i = 3:-1:1
+    T1Temp = 0; T2Temp = 0; T3Temp = 0;
+    for j=1:3 % average over 3 runs
+        [T1, T2, T3] = runExample6_balancedReduction_staticDeflectionIC([],d,numEls(i),6,3e4,false,1,plot=false,x0init=x0);
+        T1Temp = T1Temp+T1; T2Temp = T2Temp+T2; T3Temp = T3Temp+T3;
+    end
+    Ex6timings(i,:) = [T1Temp, T2Temp, T3Temp]./3;
 end
 fprintf('Writing data to plots/example6_balancingScaling_d%d.dat \n',d)
 fileID = fopen(sprintf('plots/example6_balancingScaling_d%d.dat',d), 'w');
