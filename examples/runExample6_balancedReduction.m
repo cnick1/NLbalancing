@@ -18,7 +18,7 @@ arguments
     degree = 4
     numEls = 3
     r = 4
-    U0 = 3e4
+    U0 = 2e4
     verbose = false
     figNum = 21414836
     nvp.plot = true

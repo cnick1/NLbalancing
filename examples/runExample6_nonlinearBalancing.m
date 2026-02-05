@@ -107,7 +107,7 @@ function runExample6_nonlinearBalancing()
 % Next we compare the time required to simulate the FOM (T2), construct the ROM
 % (T1), and simulate the ROM (T3).
 
-[~,~,~,x0] = runExample6_balancedReduction_staticDeflectionIC([],3,16,6,3e4,false,1,plot=false);
+[~,~,~,x0] = runExample6_balancedReduction_staticDeflectionIC([],3,16,6,2e4,false,1,plot=false);
 
 % Linear balancing transformation
 runExample6_timeTrials(2, 8, x0);
@@ -123,22 +123,22 @@ end
 function runExample6_timeTrials(d, numTrials, x0)
 numEls = [1 2 4 8 16 32 64 128 180 256];
 Ex6timings = zeros(numTrials,3); 
-for i = numTrials:-1:4
+for i = 1:3
+    T1Temp = 0; T2Temp = 0; T3Temp = 0;
+    for j=1:3 % average over 3 runs
+        [T1, T2, T3] = runExample6_balancedReduction_staticDeflectionIC([],d,numEls(i),6,2e4,false,1,plot=false,x0init=x0);
+        T1Temp = T1Temp+T1; T2Temp = T2Temp+T2; T3Temp = T3Temp+T3;
+    end
+    Ex6timings(i,:) = [T1Temp, T2Temp, T3Temp]./3;
+end
+for i = 4:numTrials
     try
         zeros((6*numEls(i))^d,1);
-        [T1, T2, T3] = runExample6_balancedReduction_staticDeflectionIC([],d,numEls(i),6,3e4,false,1,plot=false,x0init=x0);
+        [T1, T2, T3] = runExample6_balancedReduction_staticDeflectionIC([],d,numEls(i),6,2e4,false,1,plot=false,x0init=x0);
         Ex6timings(i,:) = [T1, T2, T3];
     catch
         warning('RAM capacity will be exceeded, skipping this case')
     end
-end
-for i = 3:-1:1
-    T1Temp = 0; T2Temp = 0; T3Temp = 0;
-    for j=1:3 % average over 3 runs
-        [T1, T2, T3] = runExample6_balancedReduction_staticDeflectionIC([],d,numEls(i),6,3e4,false,1,plot=false,x0init=x0);
-        T1Temp = T1Temp+T1; T2Temp = T2Temp+T2; T3Temp = T3Temp+T3;
-    end
-    Ex6timings(i,:) = [T1Temp, T2Temp, T3Temp]./3;
 end
 fprintf('Writing data to plots/example6_balancingScaling_d%d.dat \n',d)
 fileID = fopen(sprintf('plots/example6_balancingScaling_d%d.dat',d), 'w');
