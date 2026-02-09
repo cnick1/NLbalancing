@@ -1,4 +1,4 @@
-function [T1, T2, T3, x0] = runExample6_balancedReduction_staticDeflectionIC(x0, degree, numEls, r,  U0, verbose, figNum, nvp)
+function [T1, T2, T3, x0] = runExample6_balancedReduction(x0, degree, numEls, r,  U0, verbose, figNum, nvp)
 %runExample6_balancedReduction
 %
 %   Usage:  runExample6_balancedReduction(degree,lim)
@@ -49,26 +49,26 @@ if isempty(x0)
     % plot(y1(n/2-2,:))
     %
     % x0 = X1(end,:).';
-
-
+    
+    
     % Option 2: Obtain steady-state Newton iteration for equilibrium point
     fsymmetric = f;
     for i=2:length(fsymmetric)
         % for j = 1:n
         %     fsymmetric{i}(j,:) = kronMonomialSymmetrize(fsymmetric{i}(j,:),n,i);
         % end
-            fsymmetric{i} = kronMonomialSymmetrize(fsymmetric{i},n,i);
+        fsymmetric{i} = kronMonomialSymmetrize(fsymmetric{i},n,i);
     end
-
+    
     u = [zeros(m-2,1); U0; 0];
-    if length(nvp.x0init) ~= n % interpolate lower-order solution as initial guess  
+    if length(nvp.x0init) ~= n % interpolate lower-order solution as initial guess
         nvp.x0init = vec([zeros(3,2); reshape(nvp.x0init,[],2)]); % add fixed node dofs
         nvp.x0init = vec(interp1(linspace(0,1,length(nvp.x0init)/6), reshape(nvp.x0init,[],6), linspace(0,1,numEls+1), 'linear'));
         nvp.x0init = reshape(nvp.x0init,[],2); % remove fixed node dofs
         nvp.x0init = vec(nvp.x0init(4:end,:));
     end
     x0 = newtonIteration(-g{1}*u, @(x) kronPolyEval(f, x), @(x) jcbn(fsymmetric, x), maxIter=10, z0=nvp.x0init);
-    plot(x0); drawnow
+    % plot(x0); drawnow
 end
 
 if verbose
@@ -134,14 +134,14 @@ if nvp.plot
     for i=1:length(t)
         y2(:,i) = kronPolyEval(hbal, Z2(i,:).');
     end
-
+    
     if r == n
         modelName = 'FOM';
     else
         modelName = 'ROM';
     end
-
-
+    
+    
     figure(figNum)
     if degree == 2
         close
@@ -150,7 +150,7 @@ if nvp.plot
         plot(t,y1(n/2-2,:),'DisplayName','FOM output','LineWidth',3.5)
         hold on
         plot(t,y2(n/2-2,:),'--','DisplayName',sprintf('%s output w/ linear transformation',modelName),'LineWidth',3.5)
-
+        
         subplot(2,1,2)
         plot(t,y1(n/2-1,:),'DisplayName','FOM output','LineWidth',3.5)
         hold on
@@ -158,7 +158,7 @@ if nvp.plot
     elseif degree == 3
         subplot(2,1,1)
         plot(t,y2(n/2-2,:),':o','MarkerIndices',1:20:length(t),'MarkerSize',6,'DisplayName',sprintf('%s output w/ degree %i transformation',modelName,degree-1))
-
+        
         subplot(2,1,2)
         plot(t,y2(n/2-1,:),':o','MarkerIndices',1:20:length(t),'MarkerSize',6,'DisplayName',sprintf('%s output w/ degree %i transformation',modelName,degree-1))
     else
@@ -167,12 +167,12 @@ if nvp.plot
         xlabel('Time, t'); ylabel('$y_1(t)$'); title('Beam tip horizontal displacement')
         legend('Location','southeast'); %ylim(1e-7*[-.35 .05])
         grid on
-
+        
         subplot(2,1,2)
         plot(t,y2(n/2-1,:),'--+','MarkerIndices',1:15:length(t),'MarkerSize',6,'DisplayName',sprintf('%s output w/ degree %i transformation',modelName,degree-1))
         xlabel('Time, t'); ylabel('$y_2(t)$'); title('Beam tip vertical displacement ')
         grid on
-
+        
         set(gcf,"Position",[545 269 774 420])
         exportgraphics(gcf, sprintf('plots/example6_n%i_r%i_d%i_U0%i_y.pdf',n,r,degree,U0*100), 'ContentType', 'vector');
     end

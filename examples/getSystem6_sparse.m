@@ -1,4 +1,4 @@
-function [f, g, h] = getSystem6_sparse(numElements)
+function [f, g, h, E] = getSystem6_sparse(numElements, generalizedForm)
 %getSystem6_sparse  Generates a cubic finite element beam model. The system models a
 % nonlinear (due to von Karman strains) Euler-Bernoulli Beam with numElements
 % elements, returning a state-space system with 6*numElements degrees of freedom
@@ -41,7 +41,8 @@ function [f, g, h] = getSystem6_sparse(numElements)
 %   Part of the NLbalancing repository.
 %%
 arguments
-numElements = 3
+    numElements = 3
+    generalizedForm = false
 end
 vec = @(X) X(:);
 %% Define beam geometry and properties
@@ -72,111 +73,111 @@ a = x(2) - x(1); % element length
 %% Assemble linear global matrices (mass and stiffness)
 % Define mass matrix for one element
 M1E = density * CrossSecArea * a / 420 * ...
-      [140, 0, 0, 70, 0, 0;
-      0, 156, 22 * a, 0, 54, -13 * a;
-      0, 22 * a, 4 * a ^ 2, 0, 13 * a, -3 * a ^ 2;
-      70, 0, 0, 140, 0, 0;
-      0, 54, 13 * a, 0, 156, -22 * a;
-      0, -13 * a, -3 * a ^ 2, 0, -22 * a, 4 * a ^ 2];
+    [140, 0, 0, 70, 0, 0;
+    0, 156, 22 * a, 0, 54, -13 * a;
+    0, 22 * a, 4 * a ^ 2, 0, 13 * a, -3 * a ^ 2;
+    70, 0, 0, 140, 0, 0;
+    0, 54, 13 * a, 0, 156, -22 * a;
+    0, -13 * a, -3 * a ^ 2, 0, -22 * a, 4 * a ^ 2];
 
 % Define stiffness matrix for one element
 K1E = [ElasticModulus * CrossSecArea / a, 0, 0, -ElasticModulus * CrossSecArea / a, 0, 0;
-      0, 12 * ElasticModulus * MomOfInertia / a ^ 3, 6 * ElasticModulus * MomOfInertia / a ^ 2, 0, -12 * ElasticModulus * MomOfInertia / a ^ 3, 6 * ElasticModulus * MomOfInertia / a ^ 2;
-      0, 6 * ElasticModulus * MomOfInertia / a ^ 2, 4 * ElasticModulus * MomOfInertia / a, 0, -6 * ElasticModulus * MomOfInertia / a ^ 2, 2 * ElasticModulus * MomOfInertia / a;
-      -ElasticModulus * CrossSecArea / a, 0, 0, ElasticModulus * CrossSecArea / a, 0, 0;
-      0, -12 * ElasticModulus * MomOfInertia / a ^ 3, -6 * ElasticModulus * MomOfInertia / a ^ 2, 0, 12 * ElasticModulus * MomOfInertia / a ^ 3, -6 * ElasticModulus * MomOfInertia / a ^ 2;
-      0, 6 * ElasticModulus * MomOfInertia / a ^ 2, 2 * ElasticModulus * MomOfInertia / a, 0, -6 * ElasticModulus * MomOfInertia / a ^ 2, 4 * ElasticModulus * MomOfInertia / a];
+    0, 12 * ElasticModulus * MomOfInertia / a ^ 3, 6 * ElasticModulus * MomOfInertia / a ^ 2, 0, -12 * ElasticModulus * MomOfInertia / a ^ 3, 6 * ElasticModulus * MomOfInertia / a ^ 2;
+    0, 6 * ElasticModulus * MomOfInertia / a ^ 2, 4 * ElasticModulus * MomOfInertia / a, 0, -6 * ElasticModulus * MomOfInertia / a ^ 2, 2 * ElasticModulus * MomOfInertia / a;
+    -ElasticModulus * CrossSecArea / a, 0, 0, ElasticModulus * CrossSecArea / a, 0, 0;
+    0, -12 * ElasticModulus * MomOfInertia / a ^ 3, -6 * ElasticModulus * MomOfInertia / a ^ 2, 0, 12 * ElasticModulus * MomOfInertia / a ^ 3, -6 * ElasticModulus * MomOfInertia / a ^ 2;
+    0, 6 * ElasticModulus * MomOfInertia / a ^ 2, 2 * ElasticModulus * MomOfInertia / a, 0, -6 * ElasticModulus * MomOfInertia / a ^ 2, 4 * ElasticModulus * MomOfInertia / a];
 
 % Define stiffness matrix for one element
 K2E = sparse([[0, 0, 0, 0, 0, 0;
-      0, -6 * ElasticModulus * CrossSecArea / (5 * a ^ 2), -ElasticModulus * CrossSecArea / (10 * a), 0, 6 * ElasticModulus * CrossSecArea / (5 * a ^ 2), -ElasticModulus * CrossSecArea / (10 * a);
-      0, -ElasticModulus * CrossSecArea / (10 * a), -2 * ElasticModulus * CrossSecArea / 15, 0, ElasticModulus * CrossSecArea / (10 * a), ElasticModulus * CrossSecArea / 30;
-      0, 0, 0, 0, 0, 0;
-      0, 6 * ElasticModulus * CrossSecArea / (5 * a ^ 2), ElasticModulus * CrossSecArea / (10 * a), 0, -6 * ElasticModulus * CrossSecArea / (5 * a ^ 2), ElasticModulus * CrossSecArea / (10 * a)
-      0, -ElasticModulus * CrossSecArea / (10 * a), ElasticModulus * CrossSecArea / 30, 0, ElasticModulus * CrossSecArea / (10 * a), -2 * ElasticModulus * CrossSecArea / 15;
-      ], [0, -3 * ElasticModulus * CrossSecArea / (5 * a ^ 2), -ElasticModulus * CrossSecArea / (10 * a), 0, 6 * ElasticModulus * CrossSecArea / (5 * a ^ 2), -ElasticModulus * CrossSecArea / (10 * a);
-      0, 0, 0, 6 * ElasticModulus * CrossSecArea / (5 * a ^ 2), 0, 0;
-      0, 0, 0, ElasticModulus * CrossSecArea / (10 * a), 0, 0;
-      0, 3 * ElasticModulus * CrossSecArea / (5 * a ^ 2), ElasticModulus * CrossSecArea / (10 * a), 0, -6 * ElasticModulus * CrossSecArea / (5 * a ^ 2), ElasticModulus * CrossSecArea / (10 * a);
-      0, 0, 0, -6 * ElasticModulus * CrossSecArea / (5 * a ^ 2), 0, 0;
-      0, 0, 0, ElasticModulus * CrossSecArea / (10 * a), 0, 0;
-      ], [0, 0, -ElasticModulus * CrossSecArea / 15, 0, ElasticModulus * CrossSecArea / (10 * a), ElasticModulus * CrossSecArea / 30;
-      0, 0, 0, ElasticModulus * CrossSecArea / (10 * a), 0, 0;
-      0, 0, 0, 2 * ElasticModulus * CrossSecArea / 15, 0, 0;
-      0, 0, ElasticModulus * CrossSecArea / 15, 0, -ElasticModulus * CrossSecArea / (10 * a), -ElasticModulus * CrossSecArea / 30;
-      0, 0, 0, -ElasticModulus * CrossSecArea / (10 * a), 0, 0;
-      0, 0, 0, -ElasticModulus * CrossSecArea / 30, 0, 0
-      ], [0, 0, 0, 0, 0, 0;
-      0, 0, 0, 0, -6 * ElasticModulus * CrossSecArea / (5 * a ^ 2), ElasticModulus * CrossSecArea / (10 * a);
-      0, 0, 0, 0, -ElasticModulus * CrossSecArea / (10 * a), -ElasticModulus * CrossSecArea / 30;
-      0, 0, 0, 0, 0, 0;
-      0, 0, 0, 0, 6 * ElasticModulus * CrossSecArea / (5 * a ^ 2), -ElasticModulus * CrossSecArea / (10 * a);
-      0, 0, 0, 0, -ElasticModulus * CrossSecArea / (10 * a), 2 * ElasticModulus * CrossSecArea / 15
-      ], [0, 0, 0, 0, -3 * ElasticModulus * CrossSecArea / (5 * a ^ 2), ElasticModulus * CrossSecArea / (10 * a);
-      0, 0, 0, 0, 0, 0;
-      0, 0, 0, 0, 0, 0;
-      0, 0, 0, 0, 3 * ElasticModulus * CrossSecArea / (5 * a ^ 2), -ElasticModulus * CrossSecArea / (10 * a);
-      0, 0, 0, 0, 0, 0;
-      0, 0, 0, 0, 0, 0
-      ], [0, 0, 0, 0, 0, -ElasticModulus * CrossSecArea / 15;
-      0, 0, 0, 0, 0, 0;
-      0, 0, 0, 0, 0, 0;
-      0, 0, 0, 0, 0, ElasticModulus * CrossSecArea / 15;
-      0, 0, 0, 0, 0, 0;
-      0, 0, 0, 0, 0, 0]]);
+    0, -6 * ElasticModulus * CrossSecArea / (5 * a ^ 2), -ElasticModulus * CrossSecArea / (10 * a), 0, 6 * ElasticModulus * CrossSecArea / (5 * a ^ 2), -ElasticModulus * CrossSecArea / (10 * a);
+    0, -ElasticModulus * CrossSecArea / (10 * a), -2 * ElasticModulus * CrossSecArea / 15, 0, ElasticModulus * CrossSecArea / (10 * a), ElasticModulus * CrossSecArea / 30;
+    0, 0, 0, 0, 0, 0;
+    0, 6 * ElasticModulus * CrossSecArea / (5 * a ^ 2), ElasticModulus * CrossSecArea / (10 * a), 0, -6 * ElasticModulus * CrossSecArea / (5 * a ^ 2), ElasticModulus * CrossSecArea / (10 * a)
+    0, -ElasticModulus * CrossSecArea / (10 * a), ElasticModulus * CrossSecArea / 30, 0, ElasticModulus * CrossSecArea / (10 * a), -2 * ElasticModulus * CrossSecArea / 15;
+    ], [0, -3 * ElasticModulus * CrossSecArea / (5 * a ^ 2), -ElasticModulus * CrossSecArea / (10 * a), 0, 6 * ElasticModulus * CrossSecArea / (5 * a ^ 2), -ElasticModulus * CrossSecArea / (10 * a);
+    0, 0, 0, 6 * ElasticModulus * CrossSecArea / (5 * a ^ 2), 0, 0;
+    0, 0, 0, ElasticModulus * CrossSecArea / (10 * a), 0, 0;
+    0, 3 * ElasticModulus * CrossSecArea / (5 * a ^ 2), ElasticModulus * CrossSecArea / (10 * a), 0, -6 * ElasticModulus * CrossSecArea / (5 * a ^ 2), ElasticModulus * CrossSecArea / (10 * a);
+    0, 0, 0, -6 * ElasticModulus * CrossSecArea / (5 * a ^ 2), 0, 0;
+    0, 0, 0, ElasticModulus * CrossSecArea / (10 * a), 0, 0;
+    ], [0, 0, -ElasticModulus * CrossSecArea / 15, 0, ElasticModulus * CrossSecArea / (10 * a), ElasticModulus * CrossSecArea / 30;
+    0, 0, 0, ElasticModulus * CrossSecArea / (10 * a), 0, 0;
+    0, 0, 0, 2 * ElasticModulus * CrossSecArea / 15, 0, 0;
+    0, 0, ElasticModulus * CrossSecArea / 15, 0, -ElasticModulus * CrossSecArea / (10 * a), -ElasticModulus * CrossSecArea / 30;
+    0, 0, 0, -ElasticModulus * CrossSecArea / (10 * a), 0, 0;
+    0, 0, 0, -ElasticModulus * CrossSecArea / 30, 0, 0
+    ], [0, 0, 0, 0, 0, 0;
+    0, 0, 0, 0, -6 * ElasticModulus * CrossSecArea / (5 * a ^ 2), ElasticModulus * CrossSecArea / (10 * a);
+    0, 0, 0, 0, -ElasticModulus * CrossSecArea / (10 * a), -ElasticModulus * CrossSecArea / 30;
+    0, 0, 0, 0, 0, 0;
+    0, 0, 0, 0, 6 * ElasticModulus * CrossSecArea / (5 * a ^ 2), -ElasticModulus * CrossSecArea / (10 * a);
+    0, 0, 0, 0, -ElasticModulus * CrossSecArea / (10 * a), 2 * ElasticModulus * CrossSecArea / 15
+    ], [0, 0, 0, 0, -3 * ElasticModulus * CrossSecArea / (5 * a ^ 2), ElasticModulus * CrossSecArea / (10 * a);
+    0, 0, 0, 0, 0, 0;
+    0, 0, 0, 0, 0, 0;
+    0, 0, 0, 0, 3 * ElasticModulus * CrossSecArea / (5 * a ^ 2), -ElasticModulus * CrossSecArea / (10 * a);
+    0, 0, 0, 0, 0, 0;
+    0, 0, 0, 0, 0, 0
+    ], [0, 0, 0, 0, 0, -ElasticModulus * CrossSecArea / 15;
+    0, 0, 0, 0, 0, 0;
+    0, 0, 0, 0, 0, 0;
+    0, 0, 0, 0, 0, ElasticModulus * CrossSecArea / 15;
+    0, 0, 0, 0, 0, 0;
+    0, 0, 0, 0, 0, 0]]);
 
 % Define stiffness matrix for one element
 K3E = [sparse(6, 42), [0, 0, 0, 0, 0, 0;
-      0, 36 * ElasticModulus * CrossSecArea / (35 * a ^ 3), 27 * ElasticModulus * CrossSecArea / (70 * a ^ 2), 0, - 108 * ElasticModulus * CrossSecArea / (35 * a ^ 3), 27 * ElasticModulus * CrossSecArea / (70 * a ^ 2);
-      0, 9 * ElasticModulus * CrossSecArea / (70 * a ^ 2), 9 * ElasticModulus * CrossSecArea / (70 * a), 0, - 27 * ElasticModulus * CrossSecArea / (70 * a ^ 2), 0;
-      0, 0, 0, 0, 0, 0;
-      0, - 36 * ElasticModulus * CrossSecArea / (35 * a ^ 3), - 27 * ElasticModulus * CrossSecArea / (70 * a ^ 2), 0, 108 * ElasticModulus * CrossSecArea / (35 * a ^ 3), - 27 * ElasticModulus * CrossSecArea / (70 * a ^ 2);
-      0, 9 * ElasticModulus * CrossSecArea / (70 * a ^ 2), 0, 0, - 27 * ElasticModulus * CrossSecArea / (70 * a ^ 2), 9 * ElasticModulus * CrossSecArea / (70 * a); ], [0, 0, 0, 0, 0, 0;
-      0, 0, 9 * ElasticModulus * CrossSecArea / (70 * a), 0, - 27 * ElasticModulus * CrossSecArea / (35 * a ^ 2), 0;
-      0, 0, - 3 * ElasticModulus * CrossSecArea / 280, 0, - 9 * ElasticModulus * CrossSecArea / (35 * a), 3 * ElasticModulus * CrossSecArea / 140;
-      0, 0, 0, 0, 0, 0;
-      0, 0, - 9 * ElasticModulus * CrossSecArea / (70 * a), 0, 27 * ElasticModulus * CrossSecArea / (35 * a ^ 2), 0;
-      0, 0, 3 * ElasticModulus * CrossSecArea / 280, 0, 0, 3 * ElasticModulus * CrossSecArea / 140; ], sparse(6, 6), [0, 0, 0, 0, 0, 0;
-      0, 0, 0, 0, 108 * ElasticModulus * CrossSecArea / (35 * a ^ 3), - 27 * ElasticModulus * CrossSecArea / (35 * a ^ 2);
-      0, 0, 0, 0, 27 * ElasticModulus * CrossSecArea / (70 * a ^ 2), 0;
-      0, 0, 0, 0, 0, 0;
-      0, 0, 0, 0, - 108 * ElasticModulus * CrossSecArea / (35 * a ^ 3), 27 * ElasticModulus * CrossSecArea / (35 * a ^ 2);
-      0, 0, 0, 0, 27 * ElasticModulus * CrossSecArea / (70 * a ^ 2), - 9 * ElasticModulus * CrossSecArea / (35 * a); ], [0, 0, 0, 0, 0, 0;
-      0, 0, 0, 0, 0, 9 * ElasticModulus * CrossSecArea / (70 * a);
-      0, 0, 0, 0, 0, 3 * ElasticModulus * CrossSecArea / 280;
-      0, 0, 0, 0, 0, 0;
-      0, 0, 0, 0, 0, - 9 * ElasticModulus * CrossSecArea / (70 * a);
-      0, 0, 0, 0, 0, - 3 * ElasticModulus * CrossSecArea / 280; ], sparse(6, 12), [0, 0, 0, 0, 0, 0;
-      0, 0, - ElasticModulus * CrossSecArea / 280, 0, - 9 * ElasticModulus * CrossSecArea / (70 * a), 3 * ElasticModulus * CrossSecArea / 280;
-      0, 0, ElasticModulus * CrossSecArea * a / 35, 0, 3 * ElasticModulus * CrossSecArea / 280, - 3 * ElasticModulus * CrossSecArea * a / 280;
-      0, 0, 0, 0, 0, 0;
-      0, 0, ElasticModulus * CrossSecArea / 280, 0, 9 * ElasticModulus * CrossSecArea / (70 * a), - 3 * ElasticModulus * CrossSecArea / 280;
-      0, 0, - ElasticModulus * CrossSecArea * a / 280, 0, - 3 * ElasticModulus * CrossSecArea / 280, ElasticModulus * CrossSecArea * a / 140; ], sparse(6, 6), [0, 0, 0, 0, 0, 0;
-      0, 0, 0, 0, 27 * ElasticModulus * CrossSecArea / (70 * a ^ 2), 0;
-      0, 0, 0, 0, 9 * ElasticModulus * CrossSecArea / (70 * a), - 3 * ElasticModulus * CrossSecArea / 140;
-      0, 0, 0, 0, 0, 0;
-      0, 0, 0, 0, - 27 * ElasticModulus * CrossSecArea / (70 * a ^ 2), 0;
-      0, 0, 0, 0, 0, - 3 * ElasticModulus * CrossSecArea / 140; ], [0, 0, 0, 0, 0, 0;
-      0, 0, 0, 0, 0, 3 * ElasticModulus * CrossSecArea / 280;
-      0, 0, 0, 0, 0, ElasticModulus * CrossSecArea * a / 140;
-      0, 0, 0, 0, 0, 0;
-      0, 0, 0, 0, 0, - 3 * ElasticModulus * CrossSecArea / 280;
-      0, 0, 0, 0, 0, - 3 * ElasticModulus * CrossSecArea * a / 280; ], sparse(6, 60), [0, 0, 0, 0, 0, 0;
-      0, 0, 0, 0, - 36 * ElasticModulus * CrossSecArea / (35 * a ^ 3), 27 * ElasticModulus * CrossSecArea / (70 * a ^ 2);
-      0, 0, 0, 0, - 9 * ElasticModulus * CrossSecArea / (70 * a ^ 2), 0;
-      0, 0, 0, 0, 0, 0;
-      0, 0, 0, 0, 36 * ElasticModulus * CrossSecArea / (35 * a ^ 3), - 27 * ElasticModulus * CrossSecArea / (70 * a ^ 2);
-      0, 0, 0, 0, - 9 * ElasticModulus * CrossSecArea / (70 * a ^ 2), 9 * ElasticModulus * CrossSecArea / (70 * a); ], [0, 0, 0, 0, 0, 0;
-      0, 0, 0, 0, 0, - 9 * ElasticModulus * CrossSecArea / (70 * a);
-      0, 0, 0, 0, 0, - 3 * ElasticModulus * CrossSecArea / 280;
-      0, 0, 0, 0, 0, 0;
-      0, 0, 0, 0, 0, 9 * ElasticModulus * CrossSecArea / (70 * a);
-      0, 0, 0, 0, 0, 3 * ElasticModulus * CrossSecArea / 280; ], sparse(6, 30), [0, 0, 0, 0, 0, 0;
-      0, 0, 0, 0, 0, - ElasticModulus * CrossSecArea / 280;
-      0, 0, 0, 0, 0, - ElasticModulus * CrossSecArea * a / 280;
-      0, 0, 0, 0, 0, 0;
-      0, 0, 0, 0, 0, ElasticModulus * CrossSecArea / 280;
-      0, 0, 0, 0, 0, ElasticModulus * CrossSecArea * a / 35; ]];
+    0, 36 * ElasticModulus * CrossSecArea / (35 * a ^ 3), 27 * ElasticModulus * CrossSecArea / (70 * a ^ 2), 0, - 108 * ElasticModulus * CrossSecArea / (35 * a ^ 3), 27 * ElasticModulus * CrossSecArea / (70 * a ^ 2);
+    0, 9 * ElasticModulus * CrossSecArea / (70 * a ^ 2), 9 * ElasticModulus * CrossSecArea / (70 * a), 0, - 27 * ElasticModulus * CrossSecArea / (70 * a ^ 2), 0;
+    0, 0, 0, 0, 0, 0;
+    0, - 36 * ElasticModulus * CrossSecArea / (35 * a ^ 3), - 27 * ElasticModulus * CrossSecArea / (70 * a ^ 2), 0, 108 * ElasticModulus * CrossSecArea / (35 * a ^ 3), - 27 * ElasticModulus * CrossSecArea / (70 * a ^ 2);
+    0, 9 * ElasticModulus * CrossSecArea / (70 * a ^ 2), 0, 0, - 27 * ElasticModulus * CrossSecArea / (70 * a ^ 2), 9 * ElasticModulus * CrossSecArea / (70 * a); ], [0, 0, 0, 0, 0, 0;
+    0, 0, 9 * ElasticModulus * CrossSecArea / (70 * a), 0, - 27 * ElasticModulus * CrossSecArea / (35 * a ^ 2), 0;
+    0, 0, - 3 * ElasticModulus * CrossSecArea / 280, 0, - 9 * ElasticModulus * CrossSecArea / (35 * a), 3 * ElasticModulus * CrossSecArea / 140;
+    0, 0, 0, 0, 0, 0;
+    0, 0, - 9 * ElasticModulus * CrossSecArea / (70 * a), 0, 27 * ElasticModulus * CrossSecArea / (35 * a ^ 2), 0;
+    0, 0, 3 * ElasticModulus * CrossSecArea / 280, 0, 0, 3 * ElasticModulus * CrossSecArea / 140; ], sparse(6, 6), [0, 0, 0, 0, 0, 0;
+    0, 0, 0, 0, 108 * ElasticModulus * CrossSecArea / (35 * a ^ 3), - 27 * ElasticModulus * CrossSecArea / (35 * a ^ 2);
+    0, 0, 0, 0, 27 * ElasticModulus * CrossSecArea / (70 * a ^ 2), 0;
+    0, 0, 0, 0, 0, 0;
+    0, 0, 0, 0, - 108 * ElasticModulus * CrossSecArea / (35 * a ^ 3), 27 * ElasticModulus * CrossSecArea / (35 * a ^ 2);
+    0, 0, 0, 0, 27 * ElasticModulus * CrossSecArea / (70 * a ^ 2), - 9 * ElasticModulus * CrossSecArea / (35 * a); ], [0, 0, 0, 0, 0, 0;
+    0, 0, 0, 0, 0, 9 * ElasticModulus * CrossSecArea / (70 * a);
+    0, 0, 0, 0, 0, 3 * ElasticModulus * CrossSecArea / 280;
+    0, 0, 0, 0, 0, 0;
+    0, 0, 0, 0, 0, - 9 * ElasticModulus * CrossSecArea / (70 * a);
+    0, 0, 0, 0, 0, - 3 * ElasticModulus * CrossSecArea / 280; ], sparse(6, 12), [0, 0, 0, 0, 0, 0;
+    0, 0, - ElasticModulus * CrossSecArea / 280, 0, - 9 * ElasticModulus * CrossSecArea / (70 * a), 3 * ElasticModulus * CrossSecArea / 280;
+    0, 0, ElasticModulus * CrossSecArea * a / 35, 0, 3 * ElasticModulus * CrossSecArea / 280, - 3 * ElasticModulus * CrossSecArea * a / 280;
+    0, 0, 0, 0, 0, 0;
+    0, 0, ElasticModulus * CrossSecArea / 280, 0, 9 * ElasticModulus * CrossSecArea / (70 * a), - 3 * ElasticModulus * CrossSecArea / 280;
+    0, 0, - ElasticModulus * CrossSecArea * a / 280, 0, - 3 * ElasticModulus * CrossSecArea / 280, ElasticModulus * CrossSecArea * a / 140; ], sparse(6, 6), [0, 0, 0, 0, 0, 0;
+    0, 0, 0, 0, 27 * ElasticModulus * CrossSecArea / (70 * a ^ 2), 0;
+    0, 0, 0, 0, 9 * ElasticModulus * CrossSecArea / (70 * a), - 3 * ElasticModulus * CrossSecArea / 140;
+    0, 0, 0, 0, 0, 0;
+    0, 0, 0, 0, - 27 * ElasticModulus * CrossSecArea / (70 * a ^ 2), 0;
+    0, 0, 0, 0, 0, - 3 * ElasticModulus * CrossSecArea / 140; ], [0, 0, 0, 0, 0, 0;
+    0, 0, 0, 0, 0, 3 * ElasticModulus * CrossSecArea / 280;
+    0, 0, 0, 0, 0, ElasticModulus * CrossSecArea * a / 140;
+    0, 0, 0, 0, 0, 0;
+    0, 0, 0, 0, 0, - 3 * ElasticModulus * CrossSecArea / 280;
+    0, 0, 0, 0, 0, - 3 * ElasticModulus * CrossSecArea * a / 280; ], sparse(6, 60), [0, 0, 0, 0, 0, 0;
+    0, 0, 0, 0, - 36 * ElasticModulus * CrossSecArea / (35 * a ^ 3), 27 * ElasticModulus * CrossSecArea / (70 * a ^ 2);
+    0, 0, 0, 0, - 9 * ElasticModulus * CrossSecArea / (70 * a ^ 2), 0;
+    0, 0, 0, 0, 0, 0;
+    0, 0, 0, 0, 36 * ElasticModulus * CrossSecArea / (35 * a ^ 3), - 27 * ElasticModulus * CrossSecArea / (70 * a ^ 2);
+    0, 0, 0, 0, - 9 * ElasticModulus * CrossSecArea / (70 * a ^ 2), 9 * ElasticModulus * CrossSecArea / (70 * a); ], [0, 0, 0, 0, 0, 0;
+    0, 0, 0, 0, 0, - 9 * ElasticModulus * CrossSecArea / (70 * a);
+    0, 0, 0, 0, 0, - 3 * ElasticModulus * CrossSecArea / 280;
+    0, 0, 0, 0, 0, 0;
+    0, 0, 0, 0, 0, 9 * ElasticModulus * CrossSecArea / (70 * a);
+    0, 0, 0, 0, 0, 3 * ElasticModulus * CrossSecArea / 280; ], sparse(6, 30), [0, 0, 0, 0, 0, 0;
+    0, 0, 0, 0, 0, - ElasticModulus * CrossSecArea / 280;
+    0, 0, 0, 0, 0, - ElasticModulus * CrossSecArea * a / 280;
+    0, 0, 0, 0, 0, 0;
+    0, 0, 0, 0, 0, ElasticModulus * CrossSecArea / 280;
+    0, 0, 0, 0, 0, ElasticModulus * CrossSecArea * a / 35; ]];
 
 
 %% Assemble global system
@@ -194,10 +195,10 @@ for ie = 1:nel
 
     % Build triplets from local matrix
     [row_idx, col_idx] = ndgrid(dofs, dofs);
-    
+
     Icell{ie} = row_idx(:); Jcell{ie} = col_idx(:);
     VcellM{ie} = M1E(:); VcellK{ie} = K1E(:);
-    
+
 end
 
 % Concatenate all triplet data
@@ -207,7 +208,7 @@ I = vertcat(Icell{:}); J = vertcat(Jcell{:});
 M1G  = sparse(I, J, vertcat(VcellM{:}), nvg, nvg);
 K1G = sparse(I, J, vertcat(VcellK{:}), nvg, nvg);
 
-% Assemble quadratic stiffness matrix 
+% Assemble quadratic stiffness matrix
 Icell = cell(nel, 1); Jcell = cell(nel, 1); Vcell = cell(nel, 1);
 for ie = 1:nel
     % Local node indices
@@ -215,10 +216,10 @@ for ie = 1:nel
     dofs = vec(DOFsPerNode*(nodes-1)+(1:DOFsPerNode).').';
     dofsm1 = dofs - 1;
     dofs2 = vec(dofs' + dofsm1*nvg).';
-    
+
     % Build triplets from local matrix
     [row_idx, col_idx] = ndgrid(dofs, dofs2);
-    
+
     Icell{ie} = row_idx(:); Jcell{ie} = col_idx(:); Vcell{ie} = K2E(:);
 end
 
@@ -228,7 +229,7 @@ I = vertcat(Icell{:}); J = vertcat(Jcell{:}); V = vertcat(Vcell{:});
 % Assemble global sparse matrix
 K2G = sparseCSR(I, J, full(V), nvg, nvg^2);
 
-% Assemble cubic stiffness matrix 
+% Assemble cubic stiffness matrix
 Icell = cell(nel, 1); Jcell = cell(nel, 1); Vcell = cell(nel, 1);
 for ie = 1:nel
     % Local node indices
@@ -237,10 +238,10 @@ for ie = 1:nel
     dofsm1 = dofs - 1;
     dofs2 = vec(dofs' + dofsm1*nvg).';
     dofs3 = vec(dofs2' + dofsm1*nvg^2).';
-    
+
     % Build triplets from local matrix
     [row_idx, col_idx] = ndgrid(dofs, dofs3);
-    
+
     Icell{ie} = row_idx(:); Jcell{ie} = col_idx(:); Vcell{ie} = K3E(:);
 end
 
@@ -290,33 +291,59 @@ D1G = d1 * M1G + d2 * K1G; % Add some damping for numerical stability
 %          + G₀ u + G₁ (x ⊗ u) + G₂ (x ⊗ x ⊗ u) + G₃ (x ⊗ x ⊗ x ⊗ u)
 %     y  = C₁ q̇ + C₂ q.
 
-      n = length(M1G);
-      
-      McholL = chol(M1G).'; % Use cholesky factor for inverting rather than inv()
-      A = [sparse(n, n), speye(n);
-            -McholL.' \ (McholL \ K1G), -McholL.' \ (McholL \ D1G)];
-            
-      % Construct F₂
-      p = 2;
-      idxs = vec(vec((1:n).' + (0:2 * n:2 * n * (n - 1))) + [0, (2 * n) ^ p / 2 + (2 * n) ^ (p - 1) / 2 + n * (p - 2)]);
-      In2 = sparse(2 * n ^ p, (2 * n) ^ p);
-      In2(:, idxs) = speye(2 * n ^ p);
-      
-      F2 = [sparse(n, n ^ 2), sparse(n, n ^ 2);
-            -McholL.' \ (McholL \ K2G), sparse(n, n ^ 2)] * In2;
-      
-      % Construct F₃
-      p = 3;
-      idxs = vec(vec(vec((0:(2 * n) ^ (1 - 1):(2 * n) ^ (1 - 1) * (n - 1)).' + 1 + (0:(2 * n) ^ (2 - 1):(2 * n) ^ (2 - 1) * (n - 1))) + (0:(2 * n) ^ (3 - 1):(2 * n) ^ (3 - 1) * (n - 1))) + [0, (2 * n) ^ p / 2 + (2 * n) ^ (p - 1) / 2 + n * (p - 2)]);
-      In3 = sparse(2 * n ^ p, (2 * n) ^ p);
-      In3(:, idxs) = speye(2 * n ^ p);
-      
-      F3 = [sparse(n, n ^ 3), sparse(n, n ^ 3);
-            -McholL.' \ (McholL \ K3G), sparse(n, n ^ 3)] * In3;
-      
+n = length(M1G);
+
+if generalizedForm
+    E = [speye(n), sparse(n,n);
+        sparse(n,n), M1G];
+
+    A = [sparse(n, n), speye(n);
+        - K1G, - D1G];
+
+    % Construct F₂
+    p = 2;
+    idxs = vec(vec((1:n).' + (0:2 * n:2 * n * (n - 1))) + [0, (2 * n) ^ p / 2 + (2 * n) ^ (p - 1) / 2 + n * (p - 2)]);
+    In2 = sparse(2 * n ^ p, (2 * n) ^ p);
+    In2(:, idxs) = speye(2 * n ^ p);
+
+    F2 = sparseCSR([sparse(n, n ^ 2), sparse(n, n ^ 2);
+        -1*K2G, sparse(n, n ^ 2)] * In2);
+
+    % Construct F₃
+    p = 3;
+    idxs = vec(vec(vec((0:(2 * n) ^ (1 - 1):(2 * n) ^ (1 - 1) * (n - 1)).' + 1 + (0:(2 * n) ^ (2 - 1):(2 * n) ^ (2 - 1) * (n - 1))) + (0:(2 * n) ^ (3 - 1):(2 * n) ^ (3 - 1) * (n - 1))) + [0, (2 * n) ^ p / 2 + (2 * n) ^ (p - 1) / 2 + n * (p - 2)]);
+    In3 = sparse(2 * n ^ p, (2 * n) ^ p);
+    In3(:, idxs) = speye(2 * n ^ p);
+
+    F3 = sparseCSR([sparse(n, n ^ 3), sparse(n, n ^ 3);
+        -1*K3G, sparse(n, n ^ 3)] * In3);
+else
+    E = eye(2*n);
+    McholL = chol(M1G).'; % Use cholesky factor for inverting rather than inv()
+    A = [sparse(n, n), speye(n);
+        -McholL.' \ (McholL \ K1G), -McholL.' \ (McholL \ D1G)];
+
+    % Construct F₂
+    p = 2;
+    idxs = vec(vec((1:n).' + (0:2 * n:2 * n * (n - 1))) + [0, (2 * n) ^ p / 2 + (2 * n) ^ (p - 1) / 2 + n * (p - 2)]);
+    In2 = sparse(2 * n ^ p, (2 * n) ^ p);
+    In2(:, idxs) = speye(2 * n ^ p);
+
+    F2 = [sparse(n, n ^ 2), sparse(n, n ^ 2);
+        -McholL.' \ (McholL \ K2G), sparse(n, n ^ 2)] * In2;
+
+    % Construct F₃
+    p = 3;
+    idxs = vec(vec(vec((0:(2 * n) ^ (1 - 1):(2 * n) ^ (1 - 1) * (n - 1)).' + 1 + (0:(2 * n) ^ (2 - 1):(2 * n) ^ (2 - 1) * (n - 1))) + (0:(2 * n) ^ (3 - 1):(2 * n) ^ (3 - 1) * (n - 1))) + [0, (2 * n) ^ p / 2 + (2 * n) ^ (p - 1) / 2 + n * (p - 2)]);
+    In3 = sparse(2 * n ^ p, (2 * n) ^ p);
+    In3(:, idxs) = speye(2 * n ^ p);
+
+    F3 = [sparse(n, n ^ 3), sparse(n, n ^ 3);
+        -McholL.' \ (McholL \ K3G), sparse(n, n ^ 3)] * In3;
+end
 %% Format outputs
 f = {A, F2, F3};
-g = {eye(2*n)};
+g = {E};
 h = {eye(2*n)};
 
 end
