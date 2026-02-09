@@ -106,19 +106,9 @@ runExample6_balancedReduction(x0,4,1,4,3e4,false,19,plot=true);
 %% N=N elements (scalability results)
 % Next we compare the time required to simulate the FOM (T2), construct the ROM
 % (T1), and simulate the ROM (T3).
-U0 = 2e4; IC_filename = sprintf('examples/getSystem6_staticDeflectionIC_%i.mat',U0);
+U0 = 2e4;
 numEls = [1 2 4 8 16 32 64 128 180];
-% Pre-compute and store initial conditions
-if isfile(IC_filename)
-    load(IC_filename)
-else
-    x0s = cell(length(numEls),1);
-    x0s{1} = runExample6_getStaticDeflectionIC(numEls(1), U0);
-    for i = 2:length(numEls)
-        x0s{i} = runExample6_getStaticDeflectionIC(numEls(i), U0, x0s{i-1});
-    end
-    save(IC_filename, 'x0s');
-end
+x0s = runExample6_getStaticDeflectionIC(numEls, U0);
 
 % Linear balancing transformation
 % runExample6_timeTrials(U0, numEls, 2, 9, x0s);

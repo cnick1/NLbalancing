@@ -1,4 +1,4 @@
-function x0 = runExample6_getStaticDeflectionIC(numEls, U0, x0init)
+function x0s = runExample6_getStaticDeflectionIC(numEls, U0)
 %runExample6_getStaticDeflectionIC
 %
 %   Usage:  runExample6_getStaticDeflectionIC(degree,lim)
@@ -14,14 +14,29 @@ function x0 = runExample6_getStaticDeflectionIC(numEls, U0, x0init)
 %%
 % close all;
 arguments
-    numEls = 16
+    numEls = [1 2 4 8 16 32 64 128 180]
     U0 = 2e4
-    x0init = zeros(6*numEls,1)
 end
+
 set(groot,'defaultLineLineWidth',2,'defaultTextInterpreter','latex')
+IC_filename = sprintf('examples/getSystem6_staticDeflectionIC_%i.mat',U0);
+
+if isfile(IC_filename)
+    load(IC_filename)
+else
+    x0s = cell(length(numEls),1);
+    x0s{1} = getX0(numEls(1),U0,zeros(6*numEls(1),1));
+    for i = 2:length(numEls)
+        x0s{i} = getX0(numEls(i), U0, x0s{i-1});
+    end
+    save(IC_filename, 'x0s');
+end
+
+end
+
+function x0 = getX0(numEls,U0,x0init)
 vec = @(x) x(:);
 clear n nn F2i F2j F2v F3i F3j F3v I21 I22 I31 I32 I33
-
 
 n = 6*numEls;
 fprintf('Getting Example 6 Initial Condition, n=%d...\n',n)
@@ -47,9 +62,9 @@ if length(x0init) ~= n % interpolate lower-order solution as initial guess
     x0init = vec(x0init(4:end,:));
 end
 x0 = newtonIteration(-g{1}*u, @(x) kronPolyEval(f, x), @(x) sparsejcbn(fsymmetric, x), maxIter=10, z0=x0init);
-plot(x0); drawnow
 
 end
+
 
 function J = sparsejcbn(F, x)
 %jcbn Return the Jacobian J(x) = ∂f(x)/∂x of the function f(x) evaluated at x.
@@ -68,15 +83,6 @@ for j = 1:n
     if isempty(find(F{2}(j,:),1)); continue; end
     J(j,:) = J(j,:) + 2 * x.' * reshape(F{2}(j,:),n,[]);
 end
-
-% k=3 term, need to iterate over n rows to apply kron-vec identity
-% xkm1 = kron(x, x);
-% for j = 1:n
-%         if isempty(find(F{3}(j,:),1)); continue; end
-%
-%         % J(j,:) = J(j,:) + 3 * xkm1.' * reshape(F{3}(j,:),n^2,[]);
-%         J(j,:) = J(j,:) + 3 * (reshape(F{3}(j,:),n^2,[]).' * xkm1).';
-% end
 
 % Option 2:
 persistent nn F3i F3j F3v I1 I2
