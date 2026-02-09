@@ -61,47 +61,47 @@ function runExample6_nonlinearBalancing()
 %   Part of the NLbalancing repository.
 %%
 
-%% N=1 elements (n=6)
-% First, we show that the linearized dynamics are qualitatively different
-% than the nonlinear dynamics
-runExample6_linearComparison()
-
-% Next, we show the differences in the models obtained via linear and nonlinear
-% balancing. These are all nonlinear models; the difference here is specifically
-% in the degree of balancing transformation used.
-[~,~,~,x0] = runExample6_balancedReduction([],2,1,6,1e3,true,12,plot=true);
-runExample6_balancedReduction(x0,3,1,6,1e3,true,12,plot=true);
-runExample6_balancedReduction(x0,4,1,6,1e3,true,12,plot=true);
-
-[~,~,~,x0] = runExample6_balancedReduction([],2,1,4,1e3,false,13,plot=true);
-runExample6_balancedReduction(x0,3,1,4,1e3,false,13,plot=true);
-runExample6_balancedReduction(x0,4,1,4,1e3,false,13,plot=true);
-
-% Now we show that, as the initial conditions depart from the origin, eventually
-% the nonlinear approximations are no longer convergent.
-[~,~,~,x0] = runExample6_balancedReduction([],2,1,6,1e4,false,14,plot=true);
-runExample6_balancedReduction(x0,3,1,6,1e4,false,14,plot=true);
-runExample6_balancedReduction(x0,4,1,6,1e4,false,14,plot=true);
-
-[~,~,~,x0] = runExample6_balancedReduction([],2,1,4,1e4,false,15,plot=true);
-runExample6_balancedReduction(x0,3,1,4,1e4,false,15,plot=true);
-runExample6_balancedReduction(x0,4,1,4,1e4,false,15,plot=true);
-
-[~,~,~,x0] = runExample6_balancedReduction([],2,1,6,2e4,false,16,plot=true);
-runExample6_balancedReduction(x0,3,1,6,2e4,false,16,plot=true);
-runExample6_balancedReduction(x0,4,1,6,2e4,false,16,plot=true);
-
-[~,~,~,x0] = runExample6_balancedReduction([],2,1,4,2e4,false,17,plot=true);
-runExample6_balancedReduction(x0,3,1,4,2e4,false,17,plot=true);
-runExample6_balancedReduction(x0,4,1,4,2e4,false,17,plot=true);
-
-[~,~,~,x0] = runExample6_balancedReduction([],2,1,6,3e4,false,18,plot=true);
-runExample6_balancedReduction(x0,3,1,6,3e4,false,18,plot=true);
-runExample6_balancedReduction(x0,4,1,6,3e4,false,18,plot=true);
-
-[~,~,~,x0] = runExample6_balancedReduction([],2,1,4,3e4,false,19,plot=true);
-runExample6_balancedReduction(x0,3,1,4,3e4,false,19,plot=true);
-runExample6_balancedReduction(x0,4,1,4,3e4,false,19,plot=true);
+% %% N=1 elements (n=6)
+% % First, we show that the linearized dynamics are qualitatively different
+% % than the nonlinear dynamics
+% runExample6_linearComparison()
+% 
+% % Next, we show the differences in the models obtained via linear and nonlinear
+% % balancing. These are all nonlinear models; the difference here is specifically
+% % in the degree of balancing transformation used.
+% [~,~,~,x0] = runExample6_balancedReduction([],2,1,6,1e3,true,12,plot=true);
+% runExample6_balancedReduction(x0,3,1,6,1e3,true,12,plot=true);
+% runExample6_balancedReduction(x0,4,1,6,1e3,true,12,plot=true);
+% 
+% [~,~,~,x0] = runExample6_balancedReduction([],2,1,4,1e3,false,13,plot=true);
+% runExample6_balancedReduction(x0,3,1,4,1e3,false,13,plot=true);
+% runExample6_balancedReduction(x0,4,1,4,1e3,false,13,plot=true);
+% 
+% % Now we show that, as the initial conditions depart from the origin, eventually
+% % the nonlinear approximations are no longer convergent.
+% [~,~,~,x0] = runExample6_balancedReduction([],2,1,6,1e4,false,14,plot=true);
+% runExample6_balancedReduction(x0,3,1,6,1e4,false,14,plot=true);
+% runExample6_balancedReduction(x0,4,1,6,1e4,false,14,plot=true);
+% 
+% [~,~,~,x0] = runExample6_balancedReduction([],2,1,4,1e4,false,15,plot=true);
+% runExample6_balancedReduction(x0,3,1,4,1e4,false,15,plot=true);
+% runExample6_balancedReduction(x0,4,1,4,1e4,false,15,plot=true);
+% 
+% [~,~,~,x0] = runExample6_balancedReduction([],2,1,6,2e4,false,16,plot=true);
+% runExample6_balancedReduction(x0,3,1,6,2e4,false,16,plot=true);
+% runExample6_balancedReduction(x0,4,1,6,2e4,false,16,plot=true);
+% 
+% [~,~,~,x0] = runExample6_balancedReduction([],2,1,4,2e4,false,17,plot=true);
+% runExample6_balancedReduction(x0,3,1,4,2e4,false,17,plot=true);
+% runExample6_balancedReduction(x0,4,1,4,2e4,false,17,plot=true);
+% 
+% [~,~,~,x0] = runExample6_balancedReduction([],2,1,6,3e4,false,18,plot=true);
+% runExample6_balancedReduction(x0,3,1,6,3e4,false,18,plot=true);
+% runExample6_balancedReduction(x0,4,1,6,3e4,false,18,plot=true);
+% 
+% [~,~,~,x0] = runExample6_balancedReduction([],2,1,4,3e4,false,19,plot=true);
+% runExample6_balancedReduction(x0,3,1,4,3e4,false,19,plot=true);
+% runExample6_balancedReduction(x0,4,1,4,3e4,false,19,plot=true);
 
 %% N=N elements (scalability results)
 % Next we compare the time required to simulate the FOM (T2), construct the ROM
@@ -110,21 +110,14 @@ U0 = 2e4;
 numEls = [1 2 4 8 16 32 64 128 180];
 x0s = runExample6_getStaticDeflectionIC(numEls, U0);
 
-% Linear balancing transformation
-% runExample6_timeTrials(U0, numEls, 2, 9, x0s);
-%
-% % Quadratic balancing transformation
-% runExample6_timeTrials(U0, numEls, 3, 9, x0s);
-%
-% % Cubic balancing transformation
-% runExample6_timeTrials(U0, numEls, 4, 8, x0s);
-runExample6_timeTrials(U0, numEls, 2, 3, x0s);
+Linear balancing transformation
+runExample6_timeTrials(U0, numEls, 2, 9, x0s);
 
 % Quadratic balancing transformation
-runExample6_timeTrials(U0, numEls, 3, 3, x0s);
+runExample6_timeTrials(U0, numEls, 3, 9, x0s);
 
 % Cubic balancing transformation
-runExample6_timeTrials(U0, numEls, 4, 3, x0s);
+runExample6_timeTrials(U0, numEls, 4, 8, x0s);
 
 end
 

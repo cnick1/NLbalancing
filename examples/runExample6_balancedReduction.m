@@ -24,6 +24,7 @@ arguments
     nvp.plot = true
     nvp.x0init = zeros(6*numEls,1)
 end
+clear n nn F2i F2j F2v F3i F3j F3v I21 I22 I31 I32 I33
 set(groot,'defaultLineLineWidth',2,'defaultTextInterpreter','latex')
 vec = @(x) x(:);
 
@@ -34,8 +35,8 @@ fprintf('Running Example 6, n=%d, degree %d...\n',n,degree)
 [f,g,h] = getSystem6_sparse(numEls);
 
 m = size(g{1},2); p = size(h{1},1);
-F = @(x) kronPolyEval(f, x);
-G = @(x) kronPolyEval(g, x, scenario='G(x)');
+% F = @(x) kronPolyEval(f, x); G = @(x) kronPolyEval(g, x, scenario='G(x)');
+F = @(x) sparseKronPolyEval(f, x); G = @(x) g{1};
 
 if isempty(x0)
     % Obtain steady-state Newton iteration for equilibrium point
@@ -51,7 +52,7 @@ if isempty(x0)
         nvp.x0init = reshape(nvp.x0init,[],2); % remove fixed node dofs
         nvp.x0init = vec(nvp.x0init(4:end,:));
     end
-    x0 = newtonIteration(-g{1}*u, @(x) kronPolyEval(f, x), @(x) jcbn(fsymmetric, x), maxIter=10, z0=nvp.x0init);
+    x0 = newtonIteration(-g{1}*u, @(x) kronPolyEval(f, x), @(x) sparsejcbn(fsymmetric, x), maxIter=10, z0=nvp.x0init);
 end
 
 if verbose
@@ -91,6 +92,7 @@ z0 = kronPolyEval(TbalInv,x0);
 
 %% Apply reduction by eliminating z3 (set it and its derivative to zero)
 % Simulate both systems
+clear nn F2i F2j F2v F3i F3j F3v I21 I22 I31 I32 I33
 global T0;
 opts = odeset(OutputFcn=@odeprog);
 t = [0:.0001:.05];
@@ -164,3 +166,72 @@ end
 
 end
 
+function J = sparsejcbn(F, x)
+%jcbn Return the Jacobian J(x) = ∂f(x)/∂x of the function f(x) evaluated at x.
+%              f(x) = F₁x + F₂(x⊗x) + ... + Fd(x...⊗x)
+%   the Jacobian is given by
+%       J(x) = ∂f(x)/∂x = F₁ + 2F₂(I⊗x) + ... + d Fd(I...⊗x)
+%%
+n = size(x, 1);
+% k=1 term
+J = full(double(F{1}));
+if isempty(find(x,1)) % if x is zero, only the constant term remains, so we are done
+    return;
+end
+% k=2 term, need to iterate over n rows to apply kron-vec identity
+for j = 1:n
+    if isempty(find(F{2}(j,:),1)); continue; end
+    J(j,:) = J(j,:) + 2 * x.' * reshape(F{2}(j,:),n,[]);
+end
+
+% k=3 term, need to iterate over n rows to apply kron-vec identity
+persistent nn F3i F3j F3v I1 I2
+if isempty(nn) || nn ~= length(x)
+    nn = length(x);
+    for j = 1:nn
+        if isempty(find(F{3}(j,:),1)); continue; end
+        [F3i{j}, F3j{j}, F3v{j}] = find(reshape(F{3}(j,:),nn,[]));
+        [I1{j}, I2{j}] = ind2sub([nn nn], F3j{j});
+    end
+
+end
+for j = 1:n
+    % if isempty(find(F{3}(j,:),1)); continue; end
+    if isempty(find(F{3}(j,:),1)); continue; end
+    xprod = x(I1{j}) .* x(I2{j});
+    J(j,:) = J(j,:) + 3 * accumarray(F3i{j}, F3v{j} .* xprod, [n, 1]).';
+end
+
+end
+
+
+function [x] = sparseKronPolyEval(f,z)
+%sparseKronPolyEval Evaluate a Kronecker polynomial with sparse optimization
+%   - Assumes f{2} is zero, f{1} and f{3} are only other coefficients
+%   - Assumes f{3} is sparse and avoids forming kron(z,z,z)
+% Output:   x = f{1}*z + f{3}*(z⊗z⊗z)
+%%
+
+% Evaluate linear and quadratic terms normally
+x = f{1}*z;
+
+% Use persistent variables to only compute sparsity pattern once
+persistent nn F2i F2j F2v F3i F3j F3v I21 I22 I31 I32 I33
+if isempty(nn) || nn ~= length(z)
+    nn = length(z);
+    [F2i, F2j, F2v] = find(f{2});
+    [I21, I22] = ind2sub([nn nn], F2j);
+
+    [F3i, F3j, F3v] = find(f{3});
+    [I31, I32, I33] = ind2sub([nn nn nn], F3j);
+end
+
+% Efficient sparse evaluation of f{2}*(z⊗z)
+zprod = z(I21) .* z(I22);
+x = x + accumarray(F2i, F2v .* zprod, size(x));
+
+% Efficient sparse evaluation of f{3}*(z⊗z⊗z)
+zprod = z(I31) .* z(I32) .* z(I33);
+x = x + accumarray(F3i, F3v .* zprod, size(x));
+
+end
