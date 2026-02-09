@@ -1,4 +1,4 @@
-function x0 = runExample6_getStaticDeflectionIC_sparse(numEls, U0, x0init)
+function x0 = runExample6_getStaticDeflectionIC(numEls, U0, x0init)
 %runExample6_getStaticDeflectionIC
 %
 %   Usage:  runExample6_getStaticDeflectionIC(degree,lim)
