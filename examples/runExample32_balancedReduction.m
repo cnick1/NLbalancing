@@ -52,7 +52,7 @@ fprintf('Running Example 32, polynomial balanced realization...\n')
 [f, g, h] = getSystem32(transform=true);
 
 %% Compute balanced realization
-[fbal,gbal,hbal,Tbal,sigmaSquared] = getBalanceThenReduceRealization(f,g,h,r=3,eta=0,degree=3,transformationDegree=degree-1,verbose=true);
+[fbal,gbal,hbal,Tbal,sigmaSquared] = getBalanceThenReduceRealization(f,g,h,r=2,eta=0,degree=3,transformationDegree=degree-1,verbose=true);
 TbalInv = transformationInverse(Tbal);
 
 %% Manifold figure plot
