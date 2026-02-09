@@ -38,25 +38,9 @@ F = @(x) kronPolyEval(f, x);
 G = @(x) kronPolyEval(g, x, scenario='G(x)');
 
 if isempty(x0)
-    % Option 1: Obtain steady-state via time integration
-    % u = @(t) [zeros(m-2,1); U0*(t>0.0005); 0];
-    % [t, X1] = ode23s(@(t, x) F(x) + G(x)*u(t), [0 .1], 0*initialCondition);
-    % y1 = zeros(p,length(t));
-    % for i=1:length(t)
-    %     y1(:,i) = kronPolyEval(h, X1(i,:).');
-    % end
-    % figure
-    % plot(y1(n/2-2,:))
-    %
-    % x0 = X1(end,:).';
-    
-    
-    % Option 2: Obtain steady-state Newton iteration for equilibrium point
+    % Obtain steady-state Newton iteration for equilibrium point
     fsymmetric = f;
     for i=2:length(fsymmetric)
-        % for j = 1:n
-        %     fsymmetric{i}(j,:) = kronMonomialSymmetrize(fsymmetric{i}(j,:),n,i);
-        % end
         fsymmetric{i} = kronMonomialSymmetrize(fsymmetric{i},n,i);
     end
     
@@ -68,7 +52,6 @@ if isempty(x0)
         nvp.x0init = vec(nvp.x0init(4:end,:));
     end
     x0 = newtonIteration(-g{1}*u, @(x) kronPolyEval(f, x), @(x) jcbn(fsymmetric, x), maxIter=10, z0=nvp.x0init);
-    % plot(x0); drawnow
 end
 
 if verbose
