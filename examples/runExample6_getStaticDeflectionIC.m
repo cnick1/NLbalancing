@@ -46,7 +46,7 @@ fprintf('Getting Example 6 Initial Condition, n=%d...\n',n)
 
 m = size(g{1},2); p = size(h{1},1);
 F = @(x) kronPolyEval(f, x);
-G = @(x) kronPolyEval(g, x, scenario='G(x)');
+G = @(x) g{1};
 
 % Obtain steady-state Newton iteration for equilibrium point
 fsymmetric = f;
