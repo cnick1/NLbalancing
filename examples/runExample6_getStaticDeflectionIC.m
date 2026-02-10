@@ -51,7 +51,7 @@ G = @(x) kronPolyEval(g, x, scenario='G(x)');
 % Obtain steady-state Newton iteration for equilibrium point
 fsymmetric = f;
 for i=2:length(fsymmetric)
-    fsymmetric{i} = kronMonomialSymmetrize(fsymmetric{i},n,i);
+    fsymmetric{i} = sparseKronMonomialSymmetrize(fsymmetric{i},n,i);
 end
 
 u = [zeros(m-2,1); U0; 0];
@@ -65,6 +65,71 @@ x0 = newtonIteration(-g{1}*u, @(x) kronPolyEval(f, x), @(x) sparsejcbn(fsymmetri
 
 end
 
+
+function [c] = sparseKronMonomialSymmetrize(c, n, k)
+if nargin < 3
+    k = log(length(c))/log(n);
+end
+
+if ~any(c(:))
+    return
+end
+
+
+%% Perform actual symmetrization
+for i=1:size(c,1)
+    if any(c(i,:))
+        I = find(c(i,:));
+        subs = tt_ind2sub(ones(1, k) * n, I);
+
+        all_perms = cellfun(@perms, num2cell(unique(subs, 'rows'), 2), 'UniformOutput', false);
+        subs = unique(vertcat(all_perms{:}), 'rows');
+        idx = tt_sub2ind(ones(1, k) * n, subs);
+
+        classsubs = sort(subs, 2); % Normalize to one permutation, i.e. reference element
+
+        mult = [1 cumprod(ones(1, k - 1) * n)]; % Form shifts
+        linclassidx = (classsubs - 1) * mult' + 1; % Form vector that maps to the reference elements
+
+        classsum = sparse(linclassidx, 1, c(i, idx).', n^k, 1);
+        classnum = sparse(1:max(linclassidx),1,accumarray(linclassidx, 1),n^k,1);
+
+        [I,J,~] = find(classsum);
+        avg = sparse(I,J,classsum(I) ./ classnum(I),n^k,1);
+
+        % Copy averaged entries back to the other locations
+        avg(idx) = avg(linclassidx);
+
+        % Fill in each entry with its new symmetric version
+        c(i,:) = avg;
+    end
+end
+end
+
+
+function v = symmetrizeHelper(v,linclassidx,classnum)
+%symmetrizeHelper Performs the gather/scatter averaging operation
+%   Input/Output: v - vector of dimension nᵏ, symmetrized result
+if ~any(v)
+    return
+end
+
+classsum = accumarray(linclassidx, v);
+
+% Option 2:
+if issparse(v)
+    [I,J,~] = find(classsum);
+    avg = sparse(I,J,classsum(I) ./ classnum(I),length(v),1);
+else
+    avg = zeros(size(v));
+    I = find(classsum);
+    avg(I) = classsum(I) ./ classnum(I);
+end
+
+
+% Fill in each entry with its new symmetric version
+v = avg(linclassidx);
+end
 
 function J = sparsejcbn(F, x)
 %jcbn Return the Jacobian J(x) = ∂f(x)/∂x of the function f(x) evaluated at x.

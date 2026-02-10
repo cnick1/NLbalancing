@@ -110,7 +110,7 @@ U0 = 2e4;
 numEls = [1 2 4 8 16 32 64 128 180];
 x0s = runExample6_getStaticDeflectionIC(numEls, U0);
 
-Linear balancing transformation
+% Linear balancing transformation
 runExample6_timeTrials(U0, numEls, 2, 9, x0s);
 
 % Quadratic balancing transformation
