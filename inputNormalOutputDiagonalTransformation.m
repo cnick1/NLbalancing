@@ -190,6 +190,7 @@ for k = 3:nvp.degree + 1
 
     if nvp.verbose; fprintf("completed in %f seconds. \n", toc); end
 end
+clear wtilde vtilde
 
 %% Combine transformation with linear input-normal transformation
 TinOd = cell(1,nvp.degree);
@@ -200,7 +201,12 @@ for k = 2:nvp.degree
 end
 
 %% Pluck out the singular value function coefficients
-[vbar, wbar] = transformEnergyFunctions(v, w, TinOd, true); % Could transform just the observability; could probably even just compute the diagonal entries
+if nvp.verbose
+    [vbar, wbar] = transformEnergyFunctions(v, w, TinOd); % Could transform just the observability; could probably even just compute the diagonal entries
+else
+    vbar = [];
+    [~, wbar] = transformEnergyFunctions(v, w, TinOd, true); % Could transform just the observability; could probably even just compute the diagonal entries
+end
 
 sigmaSquared = zeros(n, nvp.degree);
 for k = 2:nvp.degree + 1
