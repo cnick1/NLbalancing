@@ -53,7 +53,7 @@ wtilde = cell(1, degree);
 vtilde{2} = vec(T{1}.' * V2 * T{1});
 wtilde{2} = vec(T{1}.' * W2 * T{1});
 
-if false%inputNormal
+if inputNormal
     % TODO: consider adding a check to verify that the transformation is input normal, throw error if not
     for k = 3:degree
         vtilde{k} = sparse(n^k,1);
