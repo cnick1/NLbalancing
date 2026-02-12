@@ -61,9 +61,9 @@ function runExample6_nonlinearBalancing()
 %   Part of the NLbalancing repository.
 %%
 
-% %% N=1 elements (n=6)
-% % First, we show that the linearized dynamics are qualitatively different
-% % than the nonlinear dynamics
+%% N=1 elements (n=6)
+% First, we show that the linearized dynamics are qualitatively different
+% than the nonlinear dynamics
 % runExample6_linearComparison()
 % 
 % % Next, we show the differences in the models obtained via linear and nonlinear
@@ -111,17 +111,20 @@ numEls = [1 2 4 8 16 32 64 128 180];
 x0s = runExample6_getStaticDeflectionIC(numEls, U0);
 
 % Linear balancing transformation
-runExample6_timeTrials(U0, numEls, 2, 9, x0s);
+runExample6_timeTrials(U0, numEls, 2, 8, x0s);
 
 % Quadratic balancing transformation
-runExample6_timeTrials(U0, numEls, 3, 9, x0s);
+runExample6_timeTrials(U0, numEls, 3, 8, x0s);
 
 % Cubic balancing transformation
-runExample6_timeTrials(U0, numEls, 4, 8, x0s);
+runExample6_timeTrials(U0, numEls, 4, 6, x0s);
 
 end
 
 function runExample6_timeTrials(U0, numEls, d, numTrials, x0s)
+fprintf('Writing data to plots/example6_balancingScaling_d%d.dat \n',d)
+fileID = fopen(sprintf('plots/example6_balancingScaling_d%d.dat',d), 'w');
+fprintf(fileID, '# Table I Data\n# finite element beam model, scalability results; d=%d \nnumElements &   n  &     n^%d      &  Balancing CPU-sec   &  FOM Sim. CPU-sec    &  ROM Sim. CPU-sec \n', d, d+1);
 Ex6timings = zeros(numTrials,3);
 for i = 1:min([3,numTrials])
     T1Temp = 0; T2Temp = 0; T3Temp = 0;
@@ -130,21 +133,18 @@ for i = 1:min([3,numTrials])
         T1Temp = T1Temp+T1; T2Temp = T2Temp+T2; T3Temp = T3Temp+T3;
     end
     Ex6timings(i,:) = [T1Temp, T2Temp, T3Temp]./3;
+    fprintf(fileID, ' %5d      &%4d  &  %10.4e  &     %12.6e     &     %12.6e     &    %12.6e \n', numEls(i), 6*numEls(i), (6*numEls(i))^(d+1), Ex6timings(i,1), Ex6timings(i,2), Ex6timings(i,3));
 end
 for i = 4:numTrials
     try
-        zeros((6*numEls(i))^d,1);
         [T1, T2, T3] = runExample6_balancedReduction(x0s{i},d,numEls(i),6,U0,false,1,plot=false);
         Ex6timings(i,:) = [T1, T2, T3];
+        fprintf(fileID, ' %5d      &%4d  &  %10.4e  &     %12.6e     &     %12.6e     &    %12.6e \n', numEls(i), 6*numEls(i), (6*numEls(i))^(d+1), Ex6timings(i,1), Ex6timings(i,2), Ex6timings(i,3));
+        fclose(fileID); % Save each run as we go to avoid data loss
+        fileID = fopen(sprintf('plots/example6_balancingScaling_d%d.dat',d), 'a');
     catch
-        warning('RAM capacity will be exceeded, skipping this case')
+        warning('RAM capacity exceeded, skipping this case')
     end
-end
-fprintf('Writing data to plots/example6_balancingScaling_d%d.dat \n',d)
-fileID = fopen(sprintf('plots/example6_balancingScaling_d%d.dat',d), 'w');
-fprintf(fileID, '# Table I Data\n# finite element beam model, scalability results; d=%d \nnumElements &   n  &     n^%d      &  Balancing CPU-sec   &  FOM Sim. CPU-sec    &  ROM Sim. CPU-sec \n', d, d+1);
-for i=1:numTrials
-    fprintf(fileID, ' %5d      &%4d  &  %10.4e  &     %12.6e     &     %12.6e     &    %12.6e \n', numEls(i), 6*numEls(i), (6*numEls(i))^(d+1), Ex6timings(i,1), Ex6timings(i,2), Ex6timings(i,3));
 end
 fclose(fileID);
 end

@@ -33,6 +33,8 @@ fprintf('Running Example 6, n=%d, degree %d...\n',n,degree)
 
 %% Get dynamics and define control problem
 [f,g,h] = getSystem6_sparse(numEls);
+g_artificial = g; h_artificial = h;
+g = {g{1}(:,end-1)}; h = {h{1}([n/2-2,n/2-1],:)};
 
 m = size(g{1},2); p = size(h{1},1);
 % F = @(x) kronPolyEval(f, x); G = @(x) kronPolyEval(g, x, scenario='G(x)');
@@ -62,13 +64,13 @@ end
 
 %% Compute balanced realization
 if verbose
-    [fbal,gbal,hbal,Tbal,sigmaSquared] = getBalanceThenReduceRealization(f,g,h,eta=0,degree=3,transformationDegree=degree-1);
+    [fbal,gbal,hbal,Tbal,sigmaSquared] = getBalanceThenReduceRealization(f,g_artificial,h_artificial,eta=0,degree=3,transformationDegree=degree-1,f=f,g=g,h=h);
     fprintf('  - The full-order balanced realization for the nonlinear model is:\n')
     dispPolyDynamics(fbal,gbal,hbal,variable='z')
 end
 
 tic; fprintf('   Computing balanced reduced-order model...')
-[fbal,gbal,hbal,Tbal,sigmaSquared] = getBalanceThenReduceRealization(f,g,h,r=r,eta=0,degree=3,transformationDegree=degree-1);
+[fbal,gbal,hbal,Tbal,sigmaSquared] = getBalanceThenReduceRealization(f,g_artificial,h_artificial,r=r,eta=0,degree=3,transformationDegree=degree-1,f=f,g=g,h=h);
 TbalInv = transformationInverse(Tbal);
 T1 = toc; fprintf("completed in %2.2f seconds. \n", T1)
 
@@ -83,7 +85,7 @@ end
 
 Fbal = @(z) kronPolyEval(fbal, z);
 Gbal = @(z) kronPolyEval(gbal, z, scenario='G(x)');
-u = @(t) [zeros(m,1)];
+u = @(t) 0;
 
 %% Simulate original and transformed systems; same input should give same output
 % Solve for z0 initial condition
@@ -127,38 +129,38 @@ if nvp.plot
     end
     
     
-    figure(figNum)
+    figure(figNum); 
     if degree == 2
         close
-        figure(figNum)
-        subplot(2,1,1)
-        plot(t,y1(n/2-2,:),'DisplayName','FOM output','LineWidth',3.5)
+        figure(figNum); tiledlayout(2,1, 'Padding', 'none', 'TileSpacing', 'compact'); 
+        nexttile(1)
+        plot(t,y1(1,:),'DisplayName','FOM output','LineWidth',3.5)
         hold on
-        plot(t,y2(n/2-2,:),'--','DisplayName',sprintf('%s output w/ linear transformation',modelName),'LineWidth',3.5)
+        plot(t,y2(1,:),'--','DisplayName',sprintf('%s output w/ linear transformation',modelName),'LineWidth',3.5)
         
-        subplot(2,1,2)
-        plot(t,y1(n/2-1,:),'DisplayName','FOM output','LineWidth',3.5)
+        nexttile(2)
+        plot(t,y1(2,:),'DisplayName','FOM output','LineWidth',3.5)
         hold on
-        plot(t,y2(n/2-1,:),'--','DisplayName',sprintf('%s output w/ linear transformation',modelName),'LineWidth',3.5)
+        plot(t,y2(2,:),'--','DisplayName',sprintf('%s output w/ linear transformation',modelName),'LineWidth',3.5)
     elseif degree == 3
-        subplot(2,1,1)
-        plot(t,y2(n/2-2,:),':o','MarkerIndices',1:20:length(t),'MarkerSize',6,'DisplayName',sprintf('%s output w/ degree %i transformation',modelName,degree-1))
+        nexttile(1)
+        plot(t,y2(1,:),':o','MarkerIndices',1:20:length(t),'MarkerSize',6,'DisplayName',sprintf('%s output w/ degree %i transformation',modelName,degree-1))
         
-        subplot(2,1,2)
-        plot(t,y2(n/2-1,:),':o','MarkerIndices',1:20:length(t),'MarkerSize',6,'DisplayName',sprintf('%s output w/ degree %i transformation',modelName,degree-1))
+        nexttile(2)
+        plot(t,y2(2,:),':o','MarkerIndices',1:20:length(t),'MarkerSize',6,'DisplayName',sprintf('%s output w/ degree %i transformation',modelName,degree-1))
     else
-        subplot(2,1,1)
-        plot(t,y2(n/2-2,:),'--+','MarkerIndices',1:15:length(t),'MarkerSize',6,'DisplayName',sprintf('%s output w/ degree %i transformation',modelName,degree-1))
-        xlabel('Time, t'); ylabel('$y_1(t)$'); title('Beam tip horizontal displacement')
+        nexttile(1)
+        plot(t,y2(1,:),'--+','MarkerIndices',1:15:length(t),'MarkerSize',6,'DisplayName',sprintf('%s output w/ degree %i transformation',modelName,degree-1))
+        ylabel('$y_1(t)$'); %xlabel('Time, t'); title('Beam tip horizontal displacement')
         legend('Location','southeast'); %ylim(1e-7*[-.35 .05])
         grid on
         
-        subplot(2,1,2)
-        plot(t,y2(n/2-1,:),'--+','MarkerIndices',1:15:length(t),'MarkerSize',6,'DisplayName',sprintf('%s output w/ degree %i transformation',modelName,degree-1))
-        xlabel('Time, t'); ylabel('$y_2(t)$'); title('Beam tip vertical displacement ')
+        nexttile(2)
+        plot(t,y2(2,:),'--+','MarkerIndices',1:15:length(t),'MarkerSize',6,'DisplayName',sprintf('%s output w/ degree %i transformation',modelName,degree-1))
+        ylabel('$y_2(t)$'); xlabel('Time, t'); %title('Beam tip vertical displacement ')
         grid on
         
-        set(gcf,"Position",[545 269 774 420])
+        set(gcf,"Position",[545 269 774*.75 420*1])
         exportgraphics(gcf, sprintf('plots/example6_n%i_r%i_d%i_U0%i_y.pdf',n,r,degree,U0*100), 'ContentType', 'vector');
     end
 end
