@@ -150,7 +150,7 @@ for i=1:size(xH,2)
 end
 set(gca, 'ColorOrderIndex', 1);
 plot(X1(:,1),X1(:,2),'LineWidth',1.5)
-plot(X2(:,1),X2(:,2),'--','LineWidth',1.5)
+plot(X2(:,1),X2(:,2),'--','LineWidth',2.5)
 axis equal;
 xlim([-.2 .2]); ylim([-.2 .2])
 xlabel("$x_1$"); ylabel("$x_2$")
@@ -163,7 +163,7 @@ for i=1:size(xH,2)
 end
 set(gca, 'ColorOrderIndex', 1);
 plot(Z2(:,1),Z2(:,2),'LineWidth',1.5)
-plot(Z1(:,1),Z1(:,2),'--','LineWidth',1.5)
+plot(Z1(:,1),Z1(:,2),'--','LineWidth',2.5)
 axis equal;
 xlim([-.5 .5]); ylim([-.5 .5])
 xlabel("$z_1$"); ylabel("$z_2$")
@@ -171,7 +171,7 @@ exportgraphics(gca, 'plots/example31_impulse_z.pdf', 'ContentType', 'vector');
 
 figure('Position',[290 442 560 300]); hold on
 plot(t,X1(:,1),'LineWidth',1.5,'DisplayName','Original realization solution')
-plot(t,X2(:,1),'--','LineWidth',1.5,'DisplayName','Balanced realization solution')
+plot(t,X2(:,1),'--','LineWidth',2.5,'DisplayName','Balanced realization solution')
 legend; grid on
 xlabel("Time, t"); ylabel("Angular Position, $x_1$")
 exportgraphics(gca, 'plots/example31_impulse.pdf', 'ContentType', 'vector');
@@ -224,7 +224,7 @@ for i=1:size(xH,2)
 end
 set(gca, 'ColorOrderIndex', 1);
 plot(X1(:,1),X1(:,2),'LineWidth',1.5)
-plot(X2(:,1),X2(:,2),'--','LineWidth',1.5)
+plot(X2(:,1),X2(:,2),'--','LineWidth',2.5)
 axis equal;
 xlim([-.2 .2]); ylim([-.2 .2])
 xlabel("$x_1$"); ylabel("$x_2$")
@@ -237,7 +237,7 @@ for i=1:size(xH,2)
 end
 set(gca, 'ColorOrderIndex', 1);
 plot(Z2(:,1),Z2(:,2),'LineWidth',1.5)
-plot(Z1(:,1),Z1(:,2),'--','LineWidth',1.5)
+plot(Z1(:,1),Z1(:,2),'--','LineWidth',2.5)
 axis equal;
 xlim([-.5 .5]); ylim([-.5 .5])
 xlabel("$z_1$"); ylabel("$z_2$")
@@ -245,7 +245,7 @@ exportgraphics(gca, 'plots/example31_sin1_z.pdf', 'ContentType', 'vector');
 
 figure('Position',[290 442 560 300]); hold on
 plot(t,X1(:,1),'LineWidth',1.5,'DisplayName','Original realization solution')
-plot(t,X2(:,1),'--','LineWidth',1.5,'DisplayName','Balanced realization solution')
+plot(t,X2(:,1),'--','LineWidth',2.5,'DisplayName','Balanced realization solution')
 legend; grid on
 xlabel("Time, t"); ylabel("Angular Position, $x_1$")
 exportgraphics(gca, 'plots/example31_sin1.pdf', 'ContentType', 'vector');
@@ -301,7 +301,7 @@ for i=1:size(xV,2)
 end
 set(gca, 'ColorOrderIndex', 1);
 plot(X1(:,1),X1(:,2),'LineWidth',1.5)
-plot(X2(:,1),X2(:,2),'--','LineWidth',1.5)
+plot(X2(:,1),X2(:,2),'--','LineWidth',2.5)
 axis equal;
 xlim([-1.75 1.75]); ylim([-1.75 1.75])
 xlabel("$x_1$"); ylabel("$x_2$")
@@ -316,7 +316,7 @@ for i=1:size(xV,2)
 end
 set(gca, 'ColorOrderIndex', 1);
 plot(Z2(:,1),Z2(:,2),'LineWidth',1.5)
-plot(Z1(:,1),Z1(:,2),'--','LineWidth',1.5)
+plot(Z1(:,1),Z1(:,2),'--','LineWidth',2.5)
 axis equal;
 xlim([-5 5]); ylim([-5 5])
 xlabel("$z_1$"); ylabel("$z_2$")
@@ -324,7 +324,7 @@ exportgraphics(gca, sprintf('plots/example31_sin2_z_d%i.pdf',degree), 'ContentTy
 
 figure('Position',[290 442 560 300]); hold on
 plot(t,X1(:,1),'LineWidth',1.5,'DisplayName','Original realization solution')
-plot(t,X2(:,1),'--','LineWidth',1.5,'DisplayName','Balanced realization solution')
+plot(t,X2(:,1),'--','LineWidth',2.5,'DisplayName','Balanced realization solution')
 legend; grid on
 xlabel("Time, t"); ylabel("Angular Position, $x_1$")
 exportgraphics(gca, sprintf('plots/example31_sin2_d%i.pdf',degree), 'ContentType', 'vector');
@@ -360,7 +360,7 @@ for i=1:size(xV,2)
 end
 set(gca, 'ColorOrderIndex', 1);
 plot(X1(:,1),X1(:,2),'LineWidth',1.5)
-plot(X2(:,1),X2(:,2),'--','LineWidth',1.5)
+plot(X2(:,1),X2(:,2),'--','LineWidth',2.5)
 axis equal;
 xlim([-4 4]); ylim([-4 4])
 xlabel("$x_1$"); ylabel("$x_2$")
@@ -412,7 +412,7 @@ for i=1:size(xV,2)
 end
 set(gca, 'ColorOrderIndex', 1);
 plot(X1(:,1),X1(:,2),'LineWidth',1.5)
-plot(X2(:,1),X2(:,2),'--','LineWidth',1.5)
+plot(X2(:,1),X2(:,2),'--','LineWidth',2.5)
 axis equal;
 xlim([-4 4]); ylim([-4 4])
 xlabel("$x_1$"); ylabel("$x_2$")
@@ -499,7 +499,7 @@ for i=1:size(xV,2)
 end
 set(gca, 'ColorOrderIndex', 1);
 plot(X1(:,1),X1(:,2),'LineWidth',1.5)
-plot(X2(:,1),X2(:,2),'--','LineWidth',1.5)
+plot(X2(:,1),X2(:,2),'--','LineWidth',2.5)
 axis equal;
 xlim([-1.75 1.75]); ylim([-1.75 1.75])
 xlabel("$x_1$"); ylabel("$x_2$")
@@ -514,7 +514,7 @@ for i=1:size(xV,2)
 end
 set(gca, 'ColorOrderIndex', 1);
 plot(Z2(:,1),Z2(:,2),'LineWidth',1.5)
-plot(Z1(:,1),Z1(:,2),'--','LineWidth',1.5)
+plot(Z1(:,1),Z1(:,2),'--','LineWidth',2.5)
 axis equal;
 xlim([-5 5]); ylim([-5 5])
 xlabel("$z_1$"); ylabel("$z_2$")
@@ -522,7 +522,7 @@ exportgraphics(gca, sprintf('plots/example31_sin2_z_d%i.pdf',degree), 'ContentTy
 
 figure('Position',[290 442 560 300]); hold on
 plot(t,X1(:,1),'LineWidth',1.5,'DisplayName','Original realization solution')
-plot(t,X2(:,1),'--','LineWidth',1.5,'DisplayName','Balanced realization solution')
+plot(t,X2(:,1),'--','LineWidth',2.5,'DisplayName','Balanced realization solution')
 legend; grid on
 xlabel("Time, t"); ylabel("Angular Position, $x_1$")
 exportgraphics(gca, sprintf('plots/example31_sin2_d%i.pdf',degree), 'ContentType', 'vector');

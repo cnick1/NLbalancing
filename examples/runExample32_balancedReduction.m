@@ -56,7 +56,7 @@ fprintf('Running Example 32, polynomial balanced realization...\n')
 TbalInv = transformationInverse(Tbal);
 
 %% Manifold figure plot
-dx = 0.125; lim = 2;
+dx = 0.25; lim = 2;
 [z1,z2] = meshgrid(-lim:dx:lim,-lim:dx:lim);
 x1 = zeros(size(z1)); x2 = x1; x3 = x1;
 for i=1:numel(z1)
@@ -65,6 +65,7 @@ end
 
 f1 = figure;
 surf(x1,x2,x3)
+brighten(.85);
 xlim([-2 3])
 ylim([-2 2])
 zlim([-20 5])
@@ -91,7 +92,7 @@ switch scenario
         %% Apply reduction by eliminating z3 (set it and its derivative to zero)
         % Simulate both systems
         [t1, X1] = ode45(@(t, x) F(x), [0, 5], x0);
-        [t2, Z2] = ode45(@(t, z) Fbal(z), [0, 5], z0);
+        [t2, Z2] = ode45(@(t, z) Fbal(z), t1, z0);
 
         % Convert z trajectories to x coordinates
         X2 = zeros(length(t2),3);
@@ -149,11 +150,11 @@ switch scenario
 
         figure(214748364); hold on;
         if degree == 2
-            plot(t1,y1,'DisplayName','FOM output')
-            plot(t2,y2,'--','DisplayName','ROM output w/ linear transformation')
+            plot(t1,y1,'-o','LineWidth',2.5,'MarkerIndices',1:5:length(y2),'DisplayName','FOM output')
+            plot(t2,y2,'-s','LineWidth',1,'MarkerIndices',1:5:length(y2),'DisplayName','ROM output w/ linear transformation')
             xlabel('Time, t'); ylabel('y(t)'); legend
         else
-            plot(t2,y2,':','DisplayName','ROM output w/ nonlinear transformation')
+            plot(t2,y2,'-*','LineWidth',1,'MarkerIndices',1:5:length(y2),'DisplayName','ROM output w/ nonlinear transformation')
             xlabel('Time, t'); ylabel('y(t)'); legend
             set(gcf,"Position", [573 443.6667 560 238.6667])
             exportgraphics(gca, sprintf('plots/example32_d%i_y.pdf',degree), 'ContentType', 'vector');
@@ -162,8 +163,8 @@ switch scenario
         fprintf('\n   The output error is: ||yᵣ(t)-y(t)||₂ = %f \n\n', norm(interp1(t2, y2, 0:.1:5) - interp1(t1, y1, 0:.1:5)))
 
         figure(f1)
-        plot3(X1(:,1),X1(:,2),X1(:,3),'g',DisplayName='FOM solution')
-        plot3(X2(:,1),X2(:,2),X2(:,3),'r',DisplayName='ROM solution')
+        plot3(X1(:,1),X1(:,2),X1(:,3),'g--o','MarkerIndices',1:10:length(y2),'LineWidth',2,DisplayName='FOM solution')
+        plot3(X2(:,1),X2(:,2),X2(:,3),'r-s','MarkerIndices',1:10:length(y2),'LineWidth',2,DisplayName='ROM solution')
         xlabel('$x_1$'); ylabel('$x_2$'); zlabel('$x_3$')
         exportgraphics(gca, sprintf('plots/example32_d%i.pdf',degree), 'ContentType', 'vector');
 
