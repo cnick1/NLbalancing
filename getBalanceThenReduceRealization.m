@@ -37,6 +37,13 @@ function [fbal,gbal,hbal,Tbal,sigmaSquared] = getBalanceThenReduceRealization(f,
 %                 compute quadratic energy functions and a linear
 %                 transformation.
 %       verbose - optional argument to print runtime information
+%       f,g,h   - alternative system dynamics to apply the balancing
+%                 transformation to. The main use case would be if you
+%                 balance with respect to a particular g and h for
+%                 numerical reasons, but then want to restrict to a subset
+%                 of the inputs/outputs. Avoiding computing the transformed
+%                 dynamics for all of the artificial inputs/outputs can
+%                 save a lot of time.
 %
 %   Output:
 %       fbal,gbal,hbal - cell arrays containing the polynomial coefficients for
@@ -92,6 +99,9 @@ arguments
     nvp.transformationDegree = []
     nvp.eta = 0
     nvp.verbose = false
+    nvp.f = f
+    nvp.g = g
+    nvp.h = h
 end
 if isempty(nvp.transformationDegree)
     nvp.transformationDegree = nvp.degree;
@@ -140,6 +150,7 @@ end
 % function balancingTransformation() computes an approximate polynomial
 % expansion for the balancing transformation.
 [Tbal, sigmaSquared] = balancingTransformation(v, w, degree=nvp.transformationDegree, verbose=nvp.verbose, r=nvp.r);
+clear v w % done with the energy functions now
 
 if nvp.verbose
     % Print squared singular value functions and plot them
@@ -173,7 +184,7 @@ end
 %        ż̄ = f̃(z̄) + g̃(z̄) u, y = h̃(z̄)
 % The function transformDynamics() computes an approximate polynomial expansion
 % for the transformed dynamics without inverting the nonlinear Jacobian.
-[fbal,gbal,hbal] = transformDynamics(f,g,h,Tbal,degree=nvp.degree);
+[fbal,gbal,hbal] = transformDynamics(nvp.f,nvp.g,nvp.h,Tbal,degree=nvp.degree);
 
 if nvp.verbose
     fprintf('  - The reduced-order balanced realization is:\n');

@@ -73,8 +73,8 @@ arguments
     nvp.verbose = false
 end
 
-[sigmaSquared, TinOd,~,~,Xi] = inputNormalOutputDiagonalTransformation(v, w, degree=nvp.degree, verbose=true); %nvp.verbose);
-[Tscal, TscalInv] = scalingTransformation(sigmaSquared, degree=nvp.degree, r=nvp.r, Xi=Xi);
+[sigmaSquared, TinOd,~,~,Xi] = inputNormalOutputDiagonalTransformation(v, w, degree=nvp.degree, verbose=nvp.verbose);
+Tscal = scalingTransformation(sigmaSquared, degree=nvp.degree, r=nvp.r, Xi=Xi);
 Tbal = composePolynomials(TinOd, Tscal, degree=nvp.degree);
 
 end
