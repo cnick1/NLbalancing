@@ -126,7 +126,7 @@ switch scenario
         plot(t1,X1)
         plot(t2,X2,'--')
 
-        title('Reconstructed state trajectories'); xlabel('Time t')
+        title('Reconstructed state trajectories'); xlabel("$t$")
         ylabel('$x_i(t)$')
         legend('FOM $x_1$','FOM $x_2$','FOM $x_3$','ROM $x_1$','ROM $x_2$','ROM $x_3$')
 
@@ -135,7 +135,7 @@ switch scenario
         plot(t1,Z1)
         plot(t2,Z2,'--')
 
-        title('Reconstructed state trajectories'); xlabel('Time t')
+        title('Reconstructed state trajectories'); xlabel("$t$")
         ylabel('$z_i(t)$')
         legend('FOM $z_1$','FOM $z_2$','ROM $z_1$','ROM $z_2$')
 
@@ -150,13 +150,13 @@ switch scenario
 
         figure(214748364); hold on;
         if degree == 2
-            plot(t1,y1,'-o','LineWidth',2.5,'MarkerIndices',1:5:length(y2),'DisplayName','FOM output')
-            plot(t2,y2,'-s','LineWidth',1,'MarkerIndices',1:5:length(y2),'DisplayName','ROM output w/ linear transformation')
-            xlabel('Time, t'); ylabel('y(t)'); legend
+            plot(t1,y1,'-o','LineWidth',2.5,'MarkerIndices',1:5:length(y2),'DisplayName','FOM')
+            plot(t2,y2,'-s','LineWidth',1,'MarkerIndices',1:5:length(y2),'DisplayName','Linear subspace ROM')
+            xlabel("$t$"); ylabel('$y(t)$'); legend
         else
-            plot(t2,y2,'-*','LineWidth',1,'MarkerIndices',1:5:length(y2),'DisplayName','ROM output w/ nonlinear transformation')
-            xlabel('Time, t'); ylabel('y(t)'); legend
-            set(gcf,"Position", [573 443.6667 560 238.6667])
+            plot(t2,y2,'-*','LineWidth',1,'MarkerIndices',1:5:length(y2),'DisplayName','Nonlinear manifold ROM')
+            xlabel("$t$"); ylabel('$y(t)$'); legend; grid on;
+            set(gcf,"Position", [573 443.6667 1120 238.6667])
             exportgraphics(gca, sprintf('plots/example32_d%i_y.pdf',degree), 'ContentType', 'vector');
         end
 
@@ -166,6 +166,7 @@ switch scenario
         plot3(X1(:,1),X1(:,2),X1(:,3),'g--o','MarkerIndices',1:10:length(y2),'LineWidth',2,DisplayName='FOM solution')
         plot3(X2(:,1),X2(:,2),X2(:,3),'r-s','MarkerIndices',1:10:length(y2),'LineWidth',2,DisplayName='ROM solution')
         xlabel('$x_1$'); ylabel('$x_2$'); zlabel('$x_3$')
+        legend('','FOM','ROM',Location='west')
         exportgraphics(gca, sprintf('plots/example32_d%i.pdf',degree), 'ContentType', 'vector');
 
         if degree == 2

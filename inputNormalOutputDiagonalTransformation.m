@@ -143,7 +143,7 @@ for k = 3:nvp.degree + 1
         if i > length(vtilde); break; end
         temp = temp + calTTv(Tod, i, k, vtilde{i}); % TODO: Accelerate this
     end
-    RHS = [RHS; -Nk * temp];
+    RHS = [RHS; -Nk * temp]; clear temp Nk
     
     %% Form output-diagonal equations coefficient matrix
     CoeffMatrix = [CoeffMatrix; 2 * Nkhat * kron(speye(n^(k-1)), W2tilde)]; % TODO: kronecker rules; currently this is a sparse repmat diag kind of thing, so it is ok
@@ -157,7 +157,7 @@ for k = 3:nvp.degree + 1
         if i > length(wtilde); break; end
         temp = temp + calTTv(Tod, i, k, wtilde{i}); % TODO: Accelerate this; should already be efficient via calTTv
     end
-    RHS = [RHS; -Nkhat * temp];
+    RHS = [RHS; -Nkhat * temp]; clear temp Nkhat
     
     %% Form `flexibility' equations (Kronecker product repeated entries)
     [linclassidx] = referenceElementMap(n, k-1);

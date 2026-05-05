@@ -47,7 +47,7 @@ if isempty(x0)
         fsymmetric{i} = kronMonomialSymmetrize(fsymmetric{i},n,i);
     end
     
-    u = [zeros(m-2,1); U0; 0];
+    u = U0;
     if length(nvp.x0init) ~= n % interpolate lower-order solution as initial guess
         nvp.x0init = vec([zeros(3,2); reshape(nvp.x0init,[],2)]); % add fixed node dofs
         nvp.x0init = vec(interp1(linspace(0,1,length(nvp.x0init)/6), reshape(nvp.x0init,[],6), linspace(0,1,numEls+1), 'linear'));
@@ -59,12 +59,12 @@ end
 
 if verbose
     fprintf('  - The full-order nonlinear model is:\n')
-    dispPolyDynamics(f,g,h)
+    dispPolyDynamics(f,g_artificial,h_artificial)
 end
 
 %% Compute balanced realization
 if verbose
-    [fbal,gbal,hbal,Tbal,sigmaSquared] = getBalanceThenReduceRealization(f,g_artificial,h_artificial,eta=0,degree=3,transformationDegree=degree-1,f=f,g=g,h=h);
+    [fbal,gbal,hbal,Tbal,sigmaSquared] = getBalanceThenReduceRealization(f,g_artificial,h_artificial,eta=0,degree=3,transformationDegree=degree-1);
     fprintf('  - The full-order balanced realization for the nonlinear model is:\n')
     dispPolyDynamics(fbal,gbal,hbal,variable='z')
 end
@@ -76,8 +76,9 @@ T1 = toc; fprintf("completed in %2.2f seconds. \n", T1)
 
 if verbose
     plotSingularValueFunctions(sigmaSquared)
+    [fbal2,gbal2,hbal2] = getBalanceThenReduceRealization(f,g_artificial,h_artificial,r=r,eta=0,degree=3,transformationDegree=degree-1);
     fprintf('  - The reduced-order balanced realization for the nonlinear model is:\n')
-    dispPolyDynamics(fbal,gbal,hbal,variable='z')
+    dispPolyDynamics(fbal2,gbal2,hbal2,variable='z')
 end
 
 %% Simulate dynamics
@@ -134,29 +135,29 @@ if nvp.plot
         close
         figure(figNum); tiledlayout(2,1, 'Padding', 'none', 'TileSpacing', 'compact'); 
         nexttile(1)
-        plot(t,y1(1,:),'DisplayName','FOM output','LineWidth',3.5)
+        plot(t,y1(1,:),'DisplayName','FOM','LineWidth',3.5)
         hold on
-        plot(t,y2(1,:),'--','DisplayName',sprintf('%s output w/ linear transformation',modelName),'LineWidth',3.5)
+        plot(t,y2(1,:),'--','DisplayName',sprintf('%s (degree 1 transf.)',modelName),'LineWidth',3.5)
         
         nexttile(2)
-        plot(t,y1(2,:),'DisplayName','FOM output','LineWidth',3.5)
+        plot(t,y1(2,:),'DisplayName','FOM','LineWidth',3.5)
         hold on
-        plot(t,y2(2,:),'--','DisplayName',sprintf('%s output w/ linear transformation',modelName),'LineWidth',3.5)
+        plot(t,y2(2,:),'--','DisplayName',sprintf('%s (degree 1 transf.)',modelName),'LineWidth',3.5)
     elseif degree == 3
         nexttile(1)
-        plot(t,y2(1,:),':o','MarkerIndices',1:20:length(t),'MarkerSize',6,'DisplayName',sprintf('%s output w/ degree %i transformation',modelName,degree-1))
+        plot(t,y2(1,:),':o','MarkerIndices',1:20:length(t),'MarkerSize',6,'DisplayName',sprintf('%s (degree %i transf.)',modelName,degree-1))
         
         nexttile(2)
-        plot(t,y2(2,:),':o','MarkerIndices',1:20:length(t),'MarkerSize',6,'DisplayName',sprintf('%s output w/ degree %i transformation',modelName,degree-1))
+        plot(t,y2(2,:),':o','MarkerIndices',1:20:length(t),'MarkerSize',6,'DisplayName',sprintf('%s (degree %i transf.)',modelName,degree-1))
     else
         nexttile(1)
-        plot(t,y2(1,:),'--+','MarkerIndices',1:15:length(t),'MarkerSize',6,'DisplayName',sprintf('%s output w/ degree %i transformation',modelName,degree-1))
+        plot(t,y2(1,:),'--+','MarkerIndices',1:15:length(t),'MarkerSize',6,'DisplayName',sprintf('%s (degree %i transf.)',modelName,degree-1))
         ylabel('$y_1(t)$'); %xlabel('Time, t'); title('Beam tip horizontal displacement')
         legend('Location','southeast'); %ylim(1e-7*[-.35 .05])
         grid on
         
         nexttile(2)
-        plot(t,y2(2,:),'--+','MarkerIndices',1:15:length(t),'MarkerSize',6,'DisplayName',sprintf('%s output w/ degree %i transformation',modelName,degree-1))
+        plot(t,y2(2,:),'--+','MarkerIndices',1:15:length(t),'MarkerSize',6,'DisplayName',sprintf('%s (degree %i transf.)',modelName,degree-1))
         ylabel('$y_2(t)$'); xlabel('Time, t'); %title('Beam tip vertical displacement ')
         grid on
         

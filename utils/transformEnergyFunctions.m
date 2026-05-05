@@ -57,17 +57,26 @@ if inputNormal
     % TODO: consider adding a check to verify that the transformation is input normal, throw error if not
     for k = 3:degree
         vtilde{k} = sparse(n^k,1);
-        wtilde{k} = vec(T{k - 1}.' * W2 * T{1}) + vec(T{1}.' * W2 * T{k - 1});
-        
+        try
+            wtilde{k} = vec(T{k - 1}.' * W2 * T{1}) + vec(T{1}.' * W2 * T{k - 1});
+        catch
+        end
+
         for i = 2:k - 2
             j = k - i;
-            wtilde{k} = wtilde{k} + vec(T{j}.' * W2 * T{i});
+            try
+                wtilde{k} = wtilde{k} + vec(T{j}.' * W2 * T{i});
+            catch
+            end
         end
-        
+
         for i = 3:k
-            wtilde{k} = wtilde{k} + calTTv(T, i, k, w{i});
+            try
+                wtilde{k} = wtilde{k} + calTTv(T, i, k, w{i});
+            catch
+            end
         end
-        
+
         wtilde{k} = kronMonomialSymmetrize(wtilde{k},n,k);
     end
 else
@@ -79,7 +88,7 @@ else
             wtilde{k} = vec(T{k - 1}.' * W2 * T{1}) + vec(T{1}.' * W2 * T{k - 1});
         catch
         end
-        
+
         for i = 2:k - 2
             j = k - i;
             try
@@ -88,7 +97,7 @@ else
             catch
             end
         end
-        
+
         for i = 3:k
             try
                 vtilde{k} = vtilde{k} + calTTv(T, i, k, v{i});
@@ -96,7 +105,7 @@ else
             catch
             end
         end
-        
+
         vtilde{k} = kronMonomialSymmetrize(vtilde{k},r,k);
         wtilde{k} = kronMonomialSymmetrize(wtilde{k},r,k);
     end

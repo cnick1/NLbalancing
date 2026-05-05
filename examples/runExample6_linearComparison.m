@@ -75,18 +75,20 @@ figure(10)
 close
 figure(10)
 subplot(2,1,1)
-plot(t,y1(n/2-2,:),'DisplayName','FOM output')
+plot(t,y1(n/2-2,:),'DisplayName','FOM')
 hold on
-plot(t,y2(n/2-2,:),':','DisplayName','Linearized FOM output')
-xlabel('Time, t'); ylabel('$y_1(t)$'); title('Beam tip horizontal displacement ')
+plot(t,y2(n/2-2,:),':','DisplayName','Linearized FOM')
+xlabel('$t$'); ylabel('$y_1(t)$'); 
+% title('Beam tip horizontal displacement ')
 legend('Location','southeast'); %ylim(1e-7*[-.35 .05])
 grid on
 
 subplot(2,1,2)
 plot(t,y1(n/2-1,:),'DisplayName','FOM output')
 hold on
-plot(t,y2(n/2-1,:),':','DisplayName','Linearized FOM output')
-xlabel('Time, t'); ylabel('$y_2(t)$'); title('Beam tip vertical displacement ')
+plot(t,y2(n/2-1,:),':','DisplayName','Linearized FOM')
+xlabel('$t$'); ylabel('$y_2(t)$'); 
+% title('Beam tip vertical displacement ')
 grid on 
 set(gcf,"Position",[545 269 774 420])
 

@@ -36,7 +36,6 @@ addpath('examples')
 % serves as a nice vehicle to show the grid transformations to illustrate the
 % rotation/stretching of the nonlinear transformation using the polynomial
 % approach vs the Newton iteration approach.
-runExample12_nonlinearBalancing()
 runExample13_nonlinearBalancing()
 
 %% 2D Newman stable pendulum
